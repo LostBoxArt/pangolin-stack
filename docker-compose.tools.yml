@@ -1,0 +1,28 @@
+# Pangolin Stack - Utility Tools
+# Usage: docker compose -f docker-compose.yml -f docker-compose.tools.yml run --rm maxmind-updater
+
+services:
+  maxmind-updater:
+    container_name: maxmind-updater
+    image: alpine:latest
+    restart: "no"
+    environment:
+      - MAXMIND_ACCOUNT_ID=${MAXMIND_ACCOUNT_ID}
+      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
+    volumes:
+      - ./config/maxmind:/data
+    command: >
+      sh -c "
+        apk add --no-cache wget tar &&
+        cd /data &&
+        echo 'Downloading GeoLite2-City database...' &&
+        wget -O GeoLite2-City.tar.gz 'https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz' --user=$${MAXMIND_ACCOUNT_ID} --password='$${MAXMIND_LICENSE_KEY}' &&
+        tar --wildcards -xzf GeoLite2-City.tar.gz --strip-components=1 '*/GeoLite2-City.mmdb' &&
+        rm -f GeoLite2-City.tar.gz &&
+        echo 'Downloading GeoLite2-Country database...' &&
+        wget -O GeoLite2-Country.tar.gz 'https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz' --user=$${MAXMIND_ACCOUNT_ID} --password='$${MAXMIND_LICENSE_KEY}' &&
+        tar --wildcards -xzf GeoLite2-Country.tar.gz --strip-components=1 '*/GeoLite2-Country.mmdb' &&
+        rm -f GeoLite2-Country.tar.gz &&
+        echo 'GeoIP databases downloaded successfully!' &&
+        ls -la /data
+      "

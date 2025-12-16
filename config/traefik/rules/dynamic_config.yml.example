@@ -1,0 +1,117 @@
+# Traefik Dynamic Configuration
+# Copy this to dynamic_config.yml and fill in your values
+
+http:
+  middlewares:
+    fail2ban:
+      plugin:
+        fail2ban:
+          rules:
+            bantime: "3h"
+            findtime: "10m"
+            maxretry: 4
+
+    crowdsec:
+      plugin:
+        crowdsec:
+          ClientTrustedIPs:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 10.0.0.0/8
+            - 100.64.0.0/20
+          CrowdsecAppsecEnabled: true
+          CrowdsecAppsecFailureBlock: true
+          CrowdsecAppsecHost: crowdsec:7422
+          CrowdsecAppsecUnreachableBlock: true
+          CrowdsecLapiHost: crowdsec:8080
+          # Get this from: docker exec crowdsec cscli bouncers add traefik-bouncer
+          CrowdsecLapiKey: YOUR_CROWDSEC_LAPI_KEY
+          CrowdsecLapiScheme: http
+          CrowdsecMode: live
+          DefaultDecisionSeconds: 15
+          Enabled: true
+          ForwardedHeadersTrustedIPs:
+            - 0.0.0.0/0
+          HttpTimeoutSeconds: 10
+          LogLevel: INFO
+          UpdateIntervalSeconds: 15
+          UpdateMaxFailure: 0
+
+    default-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+
+    security-headers:
+      headers:
+        contentTypeNosniff: true
+        customFrameOptionsValue: SAMEORIGIN
+        customResponseHeaders:
+          Server: ""
+          X-Forwarded-Proto: https
+          X-Powered-By: ""
+        forceSTSHeader: true
+        hostsProxyHeaders:
+          - X-Forwarded-Host
+        referrerPolicy: strict-origin-when-cross-origin
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 63072000
+
+  routers:
+    api-router:
+      entryPoints:
+        - websecure
+      middlewares:
+        - security-headers
+      rule: Host(`pangolin.YOUR_DOMAIN.xyz`) && PathPrefix(`/api/v1`)
+      service: api-service
+      tls:
+        certResolver: letsencrypt
+
+    main-app-router-redirect:
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+      rule: Host(`pangolin.YOUR_DOMAIN.xyz`)
+      service: next-service
+
+    next-router:
+      entryPoints:
+        - websecure
+      middlewares:
+        - security-headers
+      rule: Host(`pangolin.YOUR_DOMAIN.xyz`) && !PathPrefix(`/api/v1`)
+      service: next-service
+      tls:
+        certResolver: letsencrypt
+
+    ws-router:
+      entryPoints:
+        - websecure
+      middlewares:
+        - security-headers
+      rule: Host(`pangolin.YOUR_DOMAIN.xyz`)
+      service: api-service
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    api-service:
+      loadBalancer:
+        servers:
+          - url: http://pangolin:3000
+
+    next-service:
+      loadBalancer:
+        servers:
+          - url: http://pangolin:3002

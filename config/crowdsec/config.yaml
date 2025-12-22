@@ -38,8 +38,8 @@ api:
     trusted_ips: # IP ranges, or IPs which can have admin API access
       - 127.0.0.1
       - ::1
-      # online_client: # Central API credentials (to push signals and receive bad IPs)
-      #   credentials_path: /etc/crowdsec//online_api_credentials.yaml
+    online_client: # Central API credentials (to push signals and receive bad IPs)
+      credentials_path: /etc/crowdsec/online_api_credentials.yaml
     enable: true
 prometheus:
   enabled: true

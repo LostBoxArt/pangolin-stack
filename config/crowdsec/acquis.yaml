@@ -1,1 +1,6 @@
-{"source": "file", "filename": "/does/not/exist", "labels": {"type": "syslog"}}
+source: file
+filenames:
+  - /var/log/traefik/access.log
+  - /var/log/traefik/traefik.log
+labels:
+  type: traefik

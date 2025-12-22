@@ -135,7 +135,7 @@ services:
       - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
     restart: unless-stopped
   traefik-agent:
-    image: hhftechnology/traefik-log-dashboard-agent:latest
+    image: hhftechnology/traefik-log-dashboard-agent:2.3.0
     container_name: traefik-agent
     restart: unless-stopped
     ports:
@@ -161,7 +161,7 @@ services:
       retries: 3
       start_period: 10s
   traefik-dashboard:
-    image: hhftechnology/traefik-log-dashboard:latest
+    image: hhftechnology/traefik-log-dashboard:2.3.0
     container_name: traefik-dashboard
     restart: unless-stopped
     ports:
@@ -207,7 +207,7 @@ services:
         ls -la /data
       "
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:latest
+    image: ghcr.io/pocket-id/pocket-id:v1.16.0
     container_name: pocket-id
     restart: unless-stopped
     environment:

@@ -20,6 +20,7 @@ services:
     hostname: crowdsec
     expose:
       - 6060
+      - 8080
     healthcheck:
       test:
         - CMD
@@ -40,6 +41,19 @@ services:
       - ./config/crowdsec_logs/syslog:/var/log/syslog:ro
       - ./config/crowdsec_logs:/var/log
       - ./config/traefik/logs:/var/log/traefik
+  crowdsec-web-ui:
+    image: ghcr.io/theduffman85/crowdsec-web-ui:latest
+    container_name: crowdsec-web-ui
+    restart: unless-stopped
+    depends_on:
+      crowdsec:
+        condition: service_healthy
+    environment:
+      - CROWDSEC_URL=http://crowdsec:8080
+      - CROWDSEC_USER=crowdsec-web-ui
+      - CROWDSEC_PASSWORD=${CROWDSEC_WEB_UI_PASSWORD}
+    volumes:
+      - ./config/crowdsec-web-ui:/app/config
   gerbil:
     cap_add:
       - NET_ADMIN

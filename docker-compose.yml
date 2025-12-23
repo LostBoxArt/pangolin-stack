@@ -67,7 +67,7 @@ services:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: fosrl/gerbil:1.3.0
+    image: fosrl/gerbil:latest
     ports:
       - 51820:51820/udp
       - 443:443
@@ -88,7 +88,7 @@ services:
         - -f
         - http://localhost:3001/api/v1/
       timeout: 3s
-    image: fosrl/pangolin:1.13.1
+    image: fosrl/pangolin:1.14.0
     restart: unless-stopped
     volumes:
       - ./config:/app/config
@@ -149,7 +149,7 @@ services:
       - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
     restart: unless-stopped
   traefik-agent:
-    image: hhftechnology/traefik-log-dashboard-agent:2.3.0
+    image: hhftechnology/traefik-log-dashboard-agent:latest
     container_name: traefik-agent
     restart: unless-stopped
     ports:
@@ -175,7 +175,7 @@ services:
       retries: 3
       start_period: 10s
   traefik-dashboard:
-    image: hhftechnology/traefik-log-dashboard:2.3.0
+    image: hhftechnology/traefik-log-dashboard:latest
     container_name: traefik-dashboard
     restart: unless-stopped
     ports:

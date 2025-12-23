@@ -90,3 +90,4 @@ config/traefik/rules/resource-overrides.yml
 
 # Traefik static config (contains email)
 config/traefik/traefik_config.yml
+config/db/db.sqlite

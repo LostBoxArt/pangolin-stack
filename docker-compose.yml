@@ -45,13 +45,16 @@ services:
     image: ghcr.io/theduffman85/crowdsec-web-ui:latest
     container_name: crowdsec-web-ui
     restart: unless-stopped
+    ports:
+      - "3458:3000"
     depends_on:
       crowdsec:
         condition: service_healthy
     environment:
-      - CROWDSEC_URL=http://crowdsec:8080
-      - CROWDSEC_USER=crowdsec-web-ui
-      - CROWDSEC_PASSWORD=${CROWDSEC_WEB_UI_PASSWORD}
+      CROWDSEC_URL: http://crowdsec:8080
+      CROWDSEC_USER: crowdsec-web-ui
+      CROWDSEC_PASSWORD: ${CROWDSEC_WEB_UI_PASSWORD}
+      DB_DIR: /app/config
     volumes:
       - ./config/crowdsec-web-ui:/app/config
   gerbil:
@@ -88,7 +91,7 @@ services:
         - -f
         - http://localhost:3001/api/v1/
       timeout: 3s
-    image: fosrl/pangolin:1.14.0
+    image: fosrl/pangolin:1.14.1
     restart: unless-stopped
     volumes:
       - ./config:/app/config

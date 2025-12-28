@@ -33,6 +33,7 @@ services:
       - com.centurylinklabs.watchtower.enable=false
     ports:
       - 6060:6060
+      - 8080:8080
     restart: unless-stopped
     volumes:
       - ./config/crowdsec:/etc/crowdsec

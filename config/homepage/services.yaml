@@ -1,0 +1,77 @@
+# Homepage Services
+# See https://gethomepage.dev/configs/services/
+
+- Media:
+    - Request:
+        icon: jellyseerr.png
+        href: https://request.dennisb.xyz
+        description: Media Requests
+    - Sonarr:
+        icon: sonarr.png
+        href: https://sonarr.dennisb.xyz
+        description: TV Shows
+    - Radarr:
+        icon: radarr.png
+        href: https://radarr.dennisb.xyz
+        description: Movies
+    - Bazarr:
+        icon: bazarr.png
+        href: https://bazarr.dennisb.xyz
+        description: Subtitles
+    - Prowlarr:
+        icon: prowlarr.png
+        href: https://prowlarr.dennisb.xyz
+        description: Indexer Manager
+
+- Downloads:
+    - Huntarr:
+        icon: lidarr.png
+        href: https://huntarr.dennisb.xyz
+        description: Music/Books
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: https://torrent.dennisb.xyz
+        description: Torrent Client
+    - Flood:
+        icon: flood.png
+        href: https://flood.dennisb.xyz
+        description: rTorrent UI
+    - Firefox:
+        icon: firefox.png
+        href: https://firefox.dennisb.xyz
+        description: Browser
+
+- Infrastructure:
+    - Nasus:
+        icon: asustor.png
+        href: https://nasus.dennisb.xyz
+        description: NAS Storage
+    - Dashdot:
+    - Portainer:
+        icon: portainer.png
+        href: https://portainer.dennisb.xyz
+        description: Docker Management
+    - AdGuard:
+        icon: adguard-home.png
+        href: https://adguard.dennisb.xyz
+        description: DNS & Ad Blocking
+    - Cleanuparr:
+        icon: mdi-broom
+        href: https://cleanuparr.dennisb.xyz
+        description: Media Cleanup
+    - Traefik:
+        icon: traefik.png
+        href: https://traefik-logs.dennisb.xyz/dashboard
+        description: Reverse Proxy
+    - CrowdSec:
+        icon: crowdsec.png
+        href: https://crowdsec.dennisb.xyz
+        description: Security Engine
+    - Pocket ID:
+        icon: pocket-id.png
+        href: https://auth.dennisb.xyz
+        description: Identity Provider
+    - Pangolin:
+        icon: pangolin.png
+        href: https://pangolin.dennisb.xyz
+        description: Dashboard Manager

@@ -1,0 +1,29 @@
+# Homepage Settings
+# See https://gethomepage.dev/configs/settings/
+
+title: Nasus
+base: https://home.dennisb.xyz
+
+background:
+  image: https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070
+  opacity: 50
+  blur: 0
+
+theme: dark
+color: slate
+
+iconStyle: theme
+
+layout:
+  - Media:
+      style: row
+      columns: 3
+  - Downloads:
+      style: row
+      columns: 3
+  - Infrastructure:
+      style: row
+      columns: 3
+
+headerStyle: clean
+fullWidth: true

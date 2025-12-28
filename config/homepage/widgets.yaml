@@ -1,0 +1,19 @@
+# Homepage Widgets
+# See https://gethomepage.dev/configs/widgets/
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: short
+      timeStyle: short
+      hour12: false
+
+- search:
+    provider: google
+    focus: true
+    target: _blank

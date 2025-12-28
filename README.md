@@ -121,6 +121,7 @@ pangolin-stack/
 │   │   └── rules/
 │   │       └── dynamic_config.yml  # Middlewares & routes
 │   ├── crowdsec/               # CrowdSec configuration
+│   ├── crowdsec-web-ui/        # CrowdSec Web UI data (gitignored)
 │   ├── middleware-manager/     # Middleware Manager config
 │   ├── maxmind/                # GeoIP databases
 │   └── letsencrypt/            # SSL certificates
@@ -129,69 +130,7 @@ pangolin-stack/
 └── logs/                       # Log files (gitignored)
 ```
 
-## Services Reference
-
-| Service | Port | Description |
-|---------|------|-------------|
-| Pangolin | 3001 (internal) | Management dashboard |
-| Gerbil | 51820/udp, 80, 443 | WireGuard tunnel + web traffic |
-| Traefik | (via Gerbil) | Reverse proxy |
-| CrowdSec | 6060 | Security engine |
-| Middleware Manager | 3456 | Middleware UI (addon) |
-| Traefik Agent | 5000 | Log collector (addon) |
-| Traefik Dashboard | 3457 | Analytics UI (addon) |
-
-## Security Features
-
-### CrowdSec Integration
-
-CrowdSec provides:
-- Real-time IP reputation checking
-- Automatic blocking of malicious IPs
-- Community-driven threat intelligence
-- AppSec virtual patching
-
-### Fail2ban Plugin
-
-Built-in rate limiting:
-- Ban time: 3 hours
-- Find time: 10 minutes
-- Max retries: 4
-
-### Security Headers
-
-All responses include:
-- HSTS with 2-year max-age
-- X-Content-Type-Options: nosniff
-- X-Frame-Options: SAMEORIGIN
-- Strict Referrer-Policy
-
-## Configuration Reference
-
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `BASE_DOMAIN` | Your base domain |
-| `PANGOLIN_SECRET` | Session encryption key |
-| `PANGOLIN_ADMIN_EMAIL` | Initial admin email |
-| `PANGOLIN_ADMIN_PASSWORD` | Initial admin password |
-| `SMTP_*` | Email configuration |
-| `CROWDSEC_LAPI_KEY` | CrowdSec bouncer API key |
-| `TRAEFIK_DASHBOARD_TOKEN` | Dashboard auth token |
-| `MAXMIND_*` | GeoIP database credentials |
-
-### Generating Secrets
-
-```bash
-# Generate random secret
-openssl rand -hex 32
-
-# Generate CrowdSec bouncer key
-docker exec crowdsec cscli bouncers add traefik-bouncer
-```
-
-## Backup & Restore
+## Maintenance
 
 ### Backup
 
@@ -207,17 +146,7 @@ tar -czvf backup-$(date +%Y%m%d).tar.gz \
   .env
 ```
 
-### Restore
-
-```bash
-# Extract backup
-tar -xzvf backup-YYYYMMDD.tar.gz
-
-# Start services
-docker compose up -d
-```
-
-## Updating
+### Updating
 
 ```bash
 # Pull latest images
@@ -226,34 +155,3 @@ docker compose pull
 # Restart services
 docker compose up -d
 ```
-
-## Troubleshooting
-
-### Check Service Status
-
-```bash
-docker compose ps
-docker compose logs -f SERVICE_NAME
-```
-
-### Common Issues
-
-**CrowdSec middleware not working:**
-- Ensure the LAPI key is correct in `dynamic_config.yml`
-- Check CrowdSec is healthy: `docker exec crowdsec cscli capi status`
-
-**SSL certificates not issued:**
-- Ensure ports 80 and 443 are open
-- Check DNS is pointing to your server
-- View Traefik logs: `docker compose logs traefik`
-
-**GeoIP not working:**
-- Run the maxmind-updater tool
-- Check MaxMind credentials are correct
-
-## License
-
-This stack configuration is provided as-is. Individual components have their own licenses:
-- [Pangolin](https://github.com/fosrl/pangolin)
-- [Traefik](https://github.com/traefik/traefik)
-- [CrowdSec](https://github.com/crowdsecurity/crowdsec)

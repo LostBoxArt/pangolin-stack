@@ -38,6 +38,7 @@ config/traefik/logs/*.log
 # CrowdSec database and logs
 config/crowdsec/db/
 config/crowdsec_logs/
+config/crowdsec-web-ui/
 
 # =============================================================================
 # GEOIP DATABASES (large binary files)

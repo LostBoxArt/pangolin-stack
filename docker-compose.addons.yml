@@ -52,6 +52,68 @@ services:
       - ./config/traefik/logs:/logs:ro
       - ./config/maxmind:/geoip:ro
 
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Jerusalem
+      - HOMEPAGE_ALLOWED_HOSTS=home.example.com
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`home.example.com`)"
+      - "traefik.http.routers.homepage.entrypoints=websecure"
+      - "traefik.http.routers.homepage.tls.certresolver=letsencrypt"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+
+  dashdot:
+    image: mauricenino/dashdot:latest
+    container_name: dashdot
+    restart: unless-stopped
+    ports:
+      - 3001:3001
+    environment:
+      - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
+    volumes:
+      - /:/mnt/host:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashdot.rule=Host(`dash.example.com`)"
+      - "traefik.http.routers.dashdot.entrypoints=websecure"
+      - "traefik.http.routers.dashdot.tls.certresolver=letsencrypt"
+      - "traefik.http.services.dashdot.loadbalancer.server.port=3001"
+
+  linkstack:
+    image: linkstackorg/linkstack:latest
+    container_name: linkstack
+    restart: unless-stopped
+    environment:
+      - HTTP_SERVER_NAME=example.com
+      - HTTPS_SERVER_NAME=example.com
+      - LOG_LEVEL=info
+      - PHP_MEMORY_LIMIT=256M
+      - UPLOAD_MAX_FILESIZE=8M
+      - TZ=Asia/Jerusalem
+      - SERVER_ADMIN=admin@example.com
+    volumes:
+      - linkstack_data:/htdocs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkstack.rule=Host(`example.com`)"
+      - "traefik.http.routers.linkstack.entrypoints=websecure"
+      - "traefik.http.routers.linkstack.tls.certresolver=letsencrypt"
+      - "traefik.http.services.linkstack.loadbalancer.server.port=80"
+      - "traefik.http.routers.linkstack-ip.rule=Host(`203.0.113.1`)"
+      - "traefik.http.routers.linkstack-ip.entrypoints=websecure"
+      - "traefik.http.routers.linkstack-ip.tls.certresolver=letsencrypt"
+
   traefik-dashboard:
     container_name: traefik-dashboard
     image: hhftechnology/traefik-log-dashboard:latest
@@ -75,3 +137,10 @@ services:
     volumes:
       - ./config/maxmind/GeoLite2-City.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-City.mmdb:ro
       - ./config/maxmind/GeoLite2-Country.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-Country.mmdb:ro
+
+volumes:
+  linkstack_data:
+    external: true
+    name: linkstack_linkstack_data
+
+

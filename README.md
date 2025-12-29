@@ -31,6 +31,7 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 | **Traefik Dashboard** | Log analytics & GeoIP | 3457 |
 | **CrowdSec Web UI** | Security dashboard | (via Traefik) |
 | **Portainer** | Docker management | 9000 |
+| **Brave** | VPS-based browser for internal access | 3000 |
 
 ## Quick Start
 
@@ -110,6 +111,7 @@ docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 | Pangolin | https://pangolin.dennisb.xyz |
 | CrowdSec | https://crowdsec.dennisb.xyz |
 | Traefik Logs | https://traefik-logs.dennisb.xyz |
+| Brave Browser | https://brave.dennisb.xyz |
 
 ## Documentation
 

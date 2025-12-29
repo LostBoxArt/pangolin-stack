@@ -171,6 +171,33 @@ services:
       - ./config/maxmind/GeoLite2-City.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-City.mmdb:ro
       - ./config/maxmind/GeoLite2-Country.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-Country.mmdb:ro
 
+  brave:
+    image: lscr.io/linuxserver/brave:latest
+    container_name: brave
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Jerusalem
+    volumes:
+      - ./config/brave:/config
+    shm_size: "1gb"
+    restart: unless-stopped
+    extra_hosts:
+      - "sonarr.dennisb.xyz:192.168.0.10"
+      - "radarr.dennisb.xyz:192.168.0.10"
+      - "request.dennisb.xyz:192.168.0.10"
+      - "bazarr.dennisb.xyz:192.168.0.10"
+      - "prowlarr.dennisb.xyz:192.168.0.10"
+      - "portainer.dennisb.xyz:192.168.0.10"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.brave.rule=Host(`brave.dennisb.xyz`)"
+      - "traefik.http.routers.brave.entrypoints=websecure"
+      - "traefik.http.routers.brave.tls.certresolver=letsencrypt"
+      - "traefik.http.services.brave.loadbalancer.server.port=3000"
+
 volumes:
   linkstack_data:
     external: true

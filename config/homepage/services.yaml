@@ -84,6 +84,10 @@
         icon: pocket-id.png
         href: https://auth.dennisb.xyz
         description: Identity Provider
+    - Brave:
+        icon: brave.png
+        href: https://brave.dennisb.xyz
+        description: Private Browser
     - Pangolin:
         icon: pangolin.png
         href: https://pangolin.dennisb.xyz

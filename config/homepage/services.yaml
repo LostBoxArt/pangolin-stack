@@ -60,10 +60,6 @@
         icon: dashdot.png
         href: https://dash.dennisb.xyz
         description: System Monitor
-    - Filebrowser:
-        icon: filebrowser.png
-        href: https://filebrowser.dennisb.xyz
-        description: File Manager
     - Portainer:
         icon: portainer.png
         href: https://portainer.dennisb.xyz

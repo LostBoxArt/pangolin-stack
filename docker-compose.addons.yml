@@ -190,7 +190,6 @@ services:
       - "request.dennisb.xyz:192.168.0.10"
       - "bazarr.dennisb.xyz:192.168.0.10"
       - "prowlarr.dennisb.xyz:192.168.0.10"
-      - "portainer.dennisb.xyz:192.168.0.10"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.brave.rule=Host(`brave.dennisb.xyz`)"

@@ -10,48 +10,35 @@
 
 ---
 
-## Instructions for Agent on Nasus
+## Instructions for Agent on Nasus (Asustor ADM)
 
-Please perform the following steps on the `nasus` server:
+Since Asustor ADM makes it difficult to modify the Docker daemon configuration directly, the best solution is to run a lightweight **proxy container**. This exposes the remote API without modifying system files.
 
-### 1. Configure Docker Daemon to Expose TCP Port
+### Solution: Deploy Docker Socket Proxy
 
-You need to add the TCP socket to the Docker configuration. Check if `/etc/docker/daemon.json` exists.
-
-**Option A: If using `daemon.json` (Recommended)**
-
-1.  Edit `/etc/docker/daemon.json`:
-    ```json
-    {
-      "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"]
-    }
-    ```
-    *Note: Keep any existing settings in the JSON file. If `hosts` key already exists, just add the tcp socket.*
-
-**Option B: If using systemd override**
-
-If `daemon.json` cannot be used (e.g., conflicting with systemd flags), configure via systemd:
-
-1.  Create/Edit override file:
-    ```bash
-    sudo mkdir -p /etc/systemd/system/docker.service.d/
-    sudo nano /etc/systemd/system/docker.service.d/override.conf
-    ```
-2.  Add the following:
-    ```ini
-    [Service]
-    ExecStart=
-    ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
-    ```
-
-### 2. Restart Docker Service
-
-Apply the changes:
+Run the following command on `nasus` to create a bridge between the internal socket and a TCP port:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+docker run -d \
+  --name docker-socket-proxy \
+  --restart unless-stopped \
+  -p 2375:2375 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  tecnativa/docker-socket-proxy
 ```
+
+### Verification
+
+1.  Check if the container is running:
+    ```bash
+    docker ps | grep docker-socket-proxy
+    ```
+2.  Test connectivity from within `nasus`:
+    ```bash
+    curl http://localhost:2375/version
+    ```
+
+Once this container is running, the VPS will be able to connect to `http://192.168.0.10:2375` via the tunnel.
 
 ### 3. Verify Configuration
 

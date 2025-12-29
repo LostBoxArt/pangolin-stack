@@ -6,14 +6,28 @@
         icon: jellyseerr.png
         href: https://request.dennisb.xyz
         description: Media Requests
+        widget:
+          type: jellyseerr
+          url: https://request.dennisb.xyz
+          key: MTc2MDA3MzYyODE1M2NmMDJkMTI4LTY4NjQtNDgxMS1iZWZhLWYxY2QwYTFjOGU5Mw==
     - Sonarr:
         icon: sonarr.png
         href: https://sonarr.dennisb.xyz
         description: TV Shows
+        widget:
+          type: sonarr
+          url: https://sonarr.dennisb.xyz
+          key: 132c31692b9b44a19757132faffd09bc
+          enableQueue: true
     - Radarr:
         icon: radarr.png
         href: https://radarr.dennisb.xyz
         description: Movies
+        widget:
+          type: radarr
+          url: https://radarr.dennisb.xyz
+          key: 031904b9e146426fbdba6730ee712d17
+          enableQueue: true
     - Bazarr:
         icon: bazarr.png
         href: https://bazarr.dennisb.xyz
@@ -27,7 +41,7 @@
     - Huntarr:
         icon: lidarr.png
         href: https://huntarr.dennisb.xyz
-        description: Music/Books
+        description: Torrent Management
     - qBittorrent:
         icon: qbittorrent.png
         href: https://torrent.dennisb.xyz
@@ -35,18 +49,21 @@
     - Flood:
         icon: flood.png
         href: https://flood.dennisb.xyz
-        description: rTorrent UI
+        description: Torrent UI
     - Firefox:
         icon: firefox.png
         href: https://firefox.dennisb.xyz
         description: Browser
 
 - Infrastructure:
-    - Nasus:
-        icon: asustor.png
-        href: https://nasus.dennisb.xyz
-        description: NAS Storage
     - Dashdot:
+        icon: dashdot.png
+        href: https://dash.dennisb.xyz
+        description: System Monitor
+    - Filebrowser:
+        icon: filebrowser.png
+        href: https://filebrowser.dennisb.xyz
+        description: File Manager
     - Portainer:
         icon: portainer.png
         href: https://portainer.dennisb.xyz

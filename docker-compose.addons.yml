@@ -28,6 +28,8 @@ services:
         condition: service_healthy
     ports:
       - "3456:3456"
+    group_add:
+      - "986"  # docker group
     environment:
       - PANGOLIN_API_URL=http://pangolin:3001/api/v1
       - TRAEFIK_API_URL=http://gerbil:8080
@@ -48,6 +50,8 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    group_add:
+      - "986"  # docker group
     environment:
       - TRAEFIK_LOG_DASHBOARD_ACCESS_PATH=/logs/access.log
       - TRAEFIK_LOG_DASHBOARD_ERROR_PATH=/logs/traefik.log
@@ -78,9 +82,9 @@ services:
       - ./config/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
+    group_add:
+      - "986"  # docker group
     environment:
-      - PUID=1000
-      - PGID=1000
       - TZ=Asia/Jerusalem
       - HOMEPAGE_ALLOWED_HOSTS=home.dennisb.xyz
     extra_hosts:
@@ -102,6 +106,8 @@ services:
     restart: unless-stopped
     ports:
       - 3001:3001
+    group_add:
+      - "986"  # docker group
     environment:
       - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
     volumes:
@@ -117,6 +123,8 @@ services:
     image: linkstackorg/linkstack:latest
     container_name: linkstack
     restart: unless-stopped
+    group_add:
+      - "986"  # docker group
     environment:
       - HTTP_SERVER_NAME=dennisb.xyz
       - HTTPS_SERVER_NAME=dennisb.xyz
@@ -146,6 +154,8 @@ services:
         condition: service_healthy
     ports:
       - "3457:3000"
+    group_add:
+      - "986"  # docker group
     environment:
       - AGENT_API_URL=http://traefik-agent:5000
       - AGENT_API_TOKEN=${TRAEFIK_DASHBOARD_TOKEN}

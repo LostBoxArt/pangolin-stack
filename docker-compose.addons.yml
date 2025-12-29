@@ -2,6 +2,23 @@
 # Usage: docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 
 services:
+  olm:
+    image: ghcr.io/fosrl/olm:1.3.0
+    container_name: olm
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    command:
+      - "--id"
+      - "zeo3s979u4jif3x"
+      - "--secret"
+      - "ax4okcnq7e6k6p1d2pxl7lhk7ajprkog3zfabac9anjst6ds"
+      - "--endpoint"
+      - "https://pangolin.example.com"
+
   middleware-manager:
     container_name: middleware-manager
     image: hhftechnology/middleware-manager:latest
@@ -66,6 +83,12 @@ services:
       - PGID=1000
       - TZ=Asia/Jerusalem
       - HOMEPAGE_ALLOWED_HOSTS=home.example.com
+    extra_hosts:
+      - "sonarr.example.com:192.168.1.10"
+      - "radarr.example.com:192.168.1.10"
+      - "request.example.com:192.168.1.10"
+      - "bazarr.example.com:192.168.1.10"
+      - "prowlarr.example.com:192.168.1.10"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage.rule=Host(`home.example.com`)"

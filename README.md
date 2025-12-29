@@ -155,3 +155,37 @@ docker compose pull
 # Restart services
 docker compose up -d
 ```
+
+## Olm Tunnel for Homepage Integration
+
+This stack includes an Olm client to enable Homepage dashboard access to home services (*arr stack) running on the local homelab network.
+
+### How It Works
+
+- **Olm** creates a WireGuard tunnel from this CloudNode to the home network via Pangolin
+- **DNS overrides** in Homepage container route service domains to local IP (192.168.1.10)
+- **Homepage widgets** access services through the tunnel, bypassing Cloudflare restrictions
+
+### Configuration
+
+The Olm service is configured in `docker-compose.addons.yml` with:
+- Pangolin endpoint and credentials
+- Host networking mode for tunnel creation
+- NET_ADMIN capability and /dev/net/tun device access
+
+Homepage container includes `extra_hosts` entries to override DNS:
+```yaml
+extra_hosts:
+  - "sonarr.example.com:192.168.1.10"
+  - "radarr.example.com:192.168.1.10"
+  - "request.example.com:192.168.1.10"
+```
+
+### Verification
+
+Check Olm tunnel status:
+```bash
+docker logs olm
+ip addr show olm
+ping 192.168.1.10
+```

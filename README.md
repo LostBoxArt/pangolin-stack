@@ -189,3 +189,37 @@ docker logs olm
 ip addr show olm
 ping 192.168.1.10
 ```
+
+## Homepage Dashboard Integration
+
+The stack includes a Homepage dashboard with:
+
+### Service Widgets
+Service widgets (Sonarr, Radarr, Jellyseerr, etc.) connect to home services via the Olm tunnel:
+- **Olm** creates a WireGuard tunnel from this CloudNode to the home network via Pangolin
+- **DNS overrides** in Homepage container route service domains to local IP (192.168.1.10)
+- Widgets access services through the tunnel, bypassing Cloudflare restrictions
+
+### Docker Container Monitoring
+Homepage displays Docker container status for all containers running on this CloudNode:
+- Containers are auto-discovered via Docker integration
+- Status shows: HEALTHY, RUNNING, UNKNOWN, UNHEALTHY
+- Configured in `config/homepage/docker.yaml`
+
+### Configuration Files
+- `config/homepage/services.yaml` - Service definitions and widgets
+- `config/homepage/settings.yaml` - Layout and theme settings
+- `config/homepage/docker.yaml` - Docker server connections
+
+### Troubleshooting
+```bash
+# Check Olm tunnel status
+docker logs olm
+ping 192.168.1.10
+
+# Check Homepage logs
+docker logs homepage
+
+# Restart Olm if tunnel disconnected
+docker restart olm
+```

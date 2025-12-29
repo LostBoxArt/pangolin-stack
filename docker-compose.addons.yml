@@ -190,6 +190,7 @@ services:
       - "request.example.com:192.168.1.10"
       - "bazarr.example.com:192.168.1.10"
       - "prowlarr.example.com:192.168.1.10"
+      - "portainer.example.com:192.168.1.10"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.brave.rule=Host(`brave.example.com`)"

@@ -31,6 +31,7 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **Traefik Dashboard** | Log analytics & GeoIP | 3457 |
 | **CrowdSec Web UI** | Security dashboard | (via Traefik) |
 | **Portainer** | Docker management | 9000 |
+| **Brave** | CloudNode-based browser for internal access | 3000 |
 
 ## Quick Start
 
@@ -110,6 +111,7 @@ docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 | Pangolin | https://pangolin.example.com |
 | CrowdSec | https://crowdsec.example.com |
 | Traefik Logs | https://traefik-logs.example.com |
+| Brave Browser | https://brave.example.com |
 
 ## Documentation
 

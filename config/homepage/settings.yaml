@@ -20,13 +20,13 @@ layout:
       columns: 3
   - Downloads:
       style: row
-      columns: 3
-  - Infrastructure:
-      style: row
-      columns: 3
-  - VPS Containers:
+      columns: 4
+  - Network & Security:
       style: row
       columns: 4
+  - System & Tools:
+      style: row
+      columns: 3
 
 headerStyle: clean
 fullWidth: true

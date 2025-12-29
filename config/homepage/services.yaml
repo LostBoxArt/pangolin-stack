@@ -2,6 +2,10 @@
 # See https://gethomepage.dev/configs/services/
 
 - Media:
+    - Nasus:
+        icon: asustor.png
+        href: https://nasus.dennisb.xyz
+        description: NAS Storage
     - Request:
         icon: jellyseerr.png
         href: https://request.dennisb.xyz
@@ -32,64 +36,109 @@
         icon: bazarr.png
         href: https://bazarr.dennisb.xyz
         description: Subtitles
+        widget:
+          type: docker
+          server: nasus
+          container: bazarr
     - Prowlarr:
         icon: prowlarr.png
         href: https://prowlarr.dennisb.xyz
         description: Indexer Manager
+        widget:
+          type: docker
+          server: nasus
+          container: prowlarr
 
 - Downloads:
-    - Huntarr:
-        icon: lidarr.png
-        href: https://huntarr.dennisb.xyz
-        description: Torrent Management
     - qBittorrent:
         icon: qbittorrent.png
         href: https://torrent.dennisb.xyz
         description: Torrent Client
+        widget:
+          type: docker
+          server: nasus
+          container: qbittorrent
     - Flood:
         icon: flood.png
         href: https://flood.dennisb.xyz
-        description: Torrent UI
-    - Firefox:
-        icon: firefox.png
-        href: https://firefox.dennisb.xyz
-        description: Browser
-
-- Infrastructure:
-    - Dashdot:
-        icon: dashdot.png
-        href: https://dash.dennisb.xyz
-        description: System Monitor
-    - Portainer:
-        icon: portainer.png
-        href: https://portainer.dennisb.xyz
-        description: Docker Management
-    - AdGuard:
-        icon: adguard-home.png
-        href: https://adguard.dennisb.xyz
-        description: DNS & Ad Blocking
+        description: rTorrent UI
+        widget:
+          type: docker
+          server: nasus
+          container: flood
+    - Huntarr:
+        icon: lidarr.png
+        href: https://huntarr.dennisb.xyz
+        description: Music/Books
+        widget:
+          type: docker
+          server: nasus
+          container: huntarr
     - Cleanuparr:
         icon: mdi-broom
         href: https://cleanuparr.dennisb.xyz
         description: Media Cleanup
+
+- Network & Security:
     - Traefik:
         icon: traefik.png
         href: https://traefik-logs.dennisb.xyz/dashboard
         description: Reverse Proxy
+        widget:
+          type: docker
+          server: my-docker
+          container: traefik
     - CrowdSec:
         icon: crowdsec.png
         href: https://crowdsec.dennisb.xyz
         description: Security Engine
+        widget:
+          type: docker
+          server: my-docker
+          container: crowdsec
+    - AdGuard:
+        icon: adguard-home.png
+        href: https://adguard.dennisb.xyz
+        description: DNS & Ad Blocking
     - Pocket ID:
         icon: pocket-id.png
         href: https://auth.dennisb.xyz
         description: Identity Provider
-    - Brave:
-        icon: brave.png
-        href: https://brave.dennisb.xyz
-        description: Private Browser
+        widget:
+          type: docker
+          server: my-docker
+          container: pocket-id
+
+- System & Tools:
+    - Portainer:
+        icon: portainer.png
+        href: https://portainer.dennisb.xyz
+        description: Docker Management
+        widget:
+          type: docker
+          server: my-docker
+          container: portainer
+    - Dashdot:
+        icon: dashdot.png
+        href: https://dash.dennisb.xyz
+        description: System Monitor
+        widget:
+          type: docker
+          server: my-docker
+          container: dashdot
     - Pangolin:
         icon: pangolin.png
         href: https://pangolin.dennisb.xyz
         description: Dashboard Manager
-
+        widget:
+          type: docker
+          server: my-docker
+          container: pangolin
+    - Brave:
+        icon: brave.png
+        href: https://brave.dennisb.xyz
+        description: Secure Browser
+        widget:
+          type: docker
+          server: my-docker
+          container: brave

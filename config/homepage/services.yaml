@@ -61,7 +61,7 @@
     - Flood:
         icon: flood.png
         href: https://flood.dennisb.xyz
-        description: rTorrent UI
+        description: Torrent UI
         widget:
           type: docker
           server: nasus
@@ -69,7 +69,7 @@
     - Huntarr:
         icon: lidarr.png
         href: https://huntarr.dennisb.xyz
-        description: Music/Books
+        description: Torrent Automation
         widget:
           type: docker
           server: nasus
@@ -96,10 +96,6 @@
           type: docker
           server: my-docker
           container: crowdsec
-    - AdGuard:
-        icon: adguard-home.png
-        href: https://adguard.dennisb.xyz
-        description: DNS & Ad Blocking
     - Pocket ID:
         icon: pocket-id.png
         href: https://auth.dennisb.xyz
@@ -108,8 +104,24 @@
           type: docker
           server: my-docker
           container: pocket-id
+    - AdGuard:
+        icon: adguard-home.png
+        href: https://adguard.dennisb.xyz
+        description: DNS & Ad Blocking
+    - Router:
+        icon: mdi-router-wireless
+        href: http://192.168.0.1
+        description: Router
 
 - System & Tools:
+    - Termix:
+        icon: termix.png
+        href: https://termix.dennisb.xyz
+        description: SSH Manager
+        widget:
+          type: docker
+          server: nasus
+          container: termix  
     - Portainer:
         icon: portainer.png
         href: https://portainer.dennisb.xyz

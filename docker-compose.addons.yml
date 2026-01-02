@@ -2,22 +2,22 @@
 # Usage: docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 
 services:
-  olm:
-    image: ghcr.io/fosrl/olm:1.3.0
-    container_name: olm
-    restart: unless-stopped
-    network_mode: host
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    command:
-      - "--id"
-      - "zeo3s979u4jif3x"
-      - "--secret"
-      - "ax4okcnq7e6k6p1d2pxl7lhk7ajprkog3zfabac9anjst6ds"
-      - "--endpoint"
-      - "https://pangolin.dennisb.xyz"
+  #olm:
+   # image: ghcr.io/fosrl/olm:1.3.0
+   # container_name: olm
+   # restart: unless-stopped
+   # network_mode: host
+   # cap_add:
+   #   - NET_ADMIN
+   # devices:
+   #   - /dev/net/tun:/dev/net/tun
+   # command:
+   #   - "--id"
+   #   - "zeo3s979u4jif3x"
+   #   - "--secret"
+   #   - "ax4okcnq7e6k6p1d2pxl7lhk7ajprkog3zfabac9anjst6ds"
+   #   - "--endpoint"
+   #   - "https://pangolin.dennisb.xyz"
 
   middleware-manager:
     container_name: middleware-manager

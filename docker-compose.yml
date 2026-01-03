@@ -226,15 +226,13 @@ services:
         ls -la /data
       "
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v1.16.0
+    image: ghcr.io/pocket-id/pocket-id:v2
     container_name: pocket-id
     restart: unless-stopped
     environment:
       - APP_URL=${POCKET_ID_APP_URL}
       - ENCRYPTION_KEY=${POCKET_ID_ENCRYPTION_KEY}
       - TRUST_PROXY=${POCKET_ID_TRUST_PROXY}
-      - PUID=${PUID}
-      - PGID=${PGID}
     volumes:
       - ./data:/app/data
     labels:

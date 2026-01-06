@@ -28,8 +28,7 @@ This document provides detailed infrastructure documentation for AI agents and d
 │         │ Routes requests                      │ WireGuard                            │
 │         ▼                                      │ tunnel                               │
 │  ┌─────────────┐    ┌─────────────┐            │                                      │
-│  │  Homepage   │    │     Olm     │────────────┘                                      │
-│  │   :3000     │    │ host network│                                                   │
+
 │  └─────────────┘    └──────┬──────┘                                                   │
 │                            │                                                          │
 └────────────────────────────┼──────────────────────────────────────────────────────────┘
@@ -61,8 +60,8 @@ graph TD
     end
     
     subgraph "Add-ons"
-        Homepage --> Olm
-        Homepage --> Docker[Docker Socket]
+
+
         TraefikDashboard --> TraefikAgent
     end
     
@@ -78,19 +77,19 @@ graph TD
 | File | Purpose | Services |
 |------|---------|----------|
 | `docker-compose.yml` | Core infrastructure | traefik, pangolin, gerbil, crowdsec, portainer |
-| `docker-compose.addons.yml` | Dashboard & tools | homepage, olm, middleware-manager, traefik-dashboard, crowdsec-web-ui, dashdot, linkstack, brave |
+| `docker-compose.addons.yml` | Dashboard & tools | olm, middleware-manager, traefik-dashboard, crowdsec-web-ui, dashdot, linkstack |
 | `docker-compose.tools.yml` | Utilities | maxmind-updater |
 
 ## Olm Tunnel Configuration
 
-Olm creates a WireGuard tunnel from the VPS to the home network, enabling Homepage to access internal services.
+Olm creates a WireGuard tunnel from the VPS to the home network, enabling dashboard to access internal services.
 
 ### How It Works
 
 1. **Olm** connects to Pangolin/Gerbil endpoint
 2. **WireGuard tunnel** established to home Newt instance
 3. **Route** to `192.168.0.0/24` added via `olm` interface
-4. **Homepage** uses `extra_hosts` to override DNS for service domains
+4. **Dashboard** uses `extra_hosts` to override DNS for service domains
 5. **Requests** to `*.dennisb.xyz` resolve to `192.168.0.10` inside container
 6. **Traffic** flows through Olm tunnel to home Traefik
 
@@ -113,32 +112,7 @@ olm:
     - "https://pangolin.dennisb.xyz"
 ```
 
-### DNS Overrides in Homepage
 
-```yaml
-homepage:
-  extra_hosts:
-    - "sonarr.dennisb.xyz:192.168.0.10"
-    - "radarr.dennisb.xyz:192.168.0.10"
-    - "request.dennisb.xyz:192.168.0.10"
-```
-
-## Homepage Configuration
-
-### Files
-
-| File | Purpose |
-|------|---------|
-| `config/homepage/services.yaml` | Service cards and widgets |
-| `config/homepage/settings.yaml` | Layout, theme, columns |
-| `config/homepage/docker.yaml` | Docker server connections |
-| `config/homepage/widgets.yaml` | Top bar widgets |
-
-### Docker Integration
-
-- Local Docker: `/var/run/docker.sock` (mounted read-only)
-- Container runs as root with docker group (986) for socket access
-- Do NOT use PUID/PGID - breaks socket permissions
 
 ### Widget Access Pattern
 
@@ -173,18 +147,7 @@ ip route | grep 192.168.0
 docker restart olm
 ```
 
-### Homepage
 
-```bash
-# Check logs
-docker logs homepage --tail 50
-
-# Verify DNS override works inside container
-docker exec homepage getent hosts sonarr.dennisb.xyz
-
-# Check process permissions
-docker exec homepage cat /proc/1/status | grep -E "Uid|Gid|Groups"
-```
 
 ### CrowdSec
 
@@ -212,12 +175,12 @@ Key variables in `.env`:
 
 | Path | Required Owner | Why |
 |------|----------------|-----|
-| `config/homepage/` | Container writable | Live config reload |
+
 | `config/crowdsec-web-ui/` | Container writable | SQLite database |
 | `/var/run/docker.sock` | root:docker (986) | Docker API access |
 
 If permissions break, fix with:
 ```bash
 sudo chmod 666 config/crowdsec-web-ui/crowdsec.db*
-sudo chown -R jesus:jesus config/homepage/
+
 ```

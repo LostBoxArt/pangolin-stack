@@ -25,13 +25,13 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 
 | Component | Purpose | Port |
 |-----------|---------|------|
-| **Homepage** | Dashboard with service widgets | 3000 |
+
 | **Olm** | WireGuard client to home network | host network |
 | **Middleware Manager** | Traefik middleware UI | 3456 |
 | **Traefik Dashboard** | Log analytics & GeoIP | 3457 |
 | **CrowdSec Web UI** | Security dashboard | (via Traefik) |
 | **Portainer** | Docker management | 9000 |
-| **Brave** | VPS-based browser for internal access | 3000 |
+
 
 ## Quick Start
 
@@ -56,7 +56,7 @@ pangolin-stack/
 ├── docker-compose.addons.yml   # Add-ons: Homepage, Olm, Dashboard tools
 ├── docker-compose.tools.yml    # Utilities: GeoIP updater
 ├── config/
-│   ├── homepage/               # Dashboard configuration
+
 │   ├── pangolin/               # Pangolin config
 │   ├── traefik/                # Traefik rules and certs
 │   ├── crowdsec/               # CrowdSec configuration
@@ -66,15 +66,15 @@ pangolin-stack/
 
 ## Olm Tunnel (Home Network Access)
 
-Homepage widgets access home services (*arr stack) via Olm tunnel:
+Widgets access home services (*arr stack) via Olm tunnel:
 
 ```
-Homepage → DNS override → Olm tunnel → Pangolin/Gerbil → Newt → Home Traefik → Services
+Dashboard → DNS override → Olm tunnel → Pangolin/Gerbil → Newt → Home Traefik → Services
 ```
 
 **Configuration:**
 - Olm credentials in `docker-compose.addons.yml`
-- DNS overrides via `extra_hosts` in Homepage container
+- DNS overrides via `extra_hosts` in dashboard container
 - Home subnet route: `192.168.0.0/24`
 
 **Troubleshooting:**
@@ -107,11 +107,11 @@ docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 
 | Service | URL |
 |---------|-----|
-| Homepage | https://home.dennisb.xyz |
+
 | Pangolin | https://pangolin.dennisb.xyz |
 | CrowdSec | https://crowdsec.dennisb.xyz |
 | Traefik Logs | https://traefik-logs.dennisb.xyz |
-| Brave Browser | https://brave.dennisb.xyz |
+
 
 ## Documentation
 

@@ -124,26 +124,6 @@ http:
             service: "20-crowedsec-service@http"
             tls:
                 certResolver: "letsencrypt"
-        21-brave-router-auth:
-            entryPoints:
-                - websecure
-            middlewares:
-                - badger@http
-            priority: 200
-            rule: "Host(`brave.dennisb.xyz`)"
-            service: "21-brave-service@http"
-            tls:
-                certResolver: "letsencrypt"
-        22-termix-router-auth:
-            entryPoints:
-                - websecure
-            middlewares:
-                - badger@http
-            priority: 200
-            rule: "Host(`termix.dennisb.xyz`)"
-            service: "22-termix-service@http"
-            tls:
-                certResolver: "letsencrypt"
     services:
         1-base-service@file:
             loadBalancer:
@@ -164,11 +144,11 @@ http:
         7-dash-service@file:
             loadBalancer:
                 servers:
-                    - url: "http://dashdot:3001"
+                    - url: "http://172.17.0.1:9980"
         14-home-service@file:
             loadBalancer:
                 servers:
-                    - url: "http://homepage:3000"
+                    - url: "http://172.17.0.1:7575"
         16-auth-service@file:
             loadBalancer:
                 servers:
@@ -189,14 +169,6 @@ http:
             loadBalancer:
                 servers:
                     - url: "http://crowdsec-web-ui:3000"
-        21-brave-service@file:
-            loadBalancer:
-                servers:
-                    - url: "http://brave:3000"
-        22-termix-service@file:
-            loadBalancer:
-                servers:
-                    - url: "http://100.89.128.4:40403"
         api-service@file:
             loadBalancer:
                 passHostHeader: "true"

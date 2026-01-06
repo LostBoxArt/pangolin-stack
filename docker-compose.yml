@@ -30,7 +30,7 @@ services:
     image: crowdsecurity/crowdsec:latest
     labels:
       - traefik.enable=false
-      - com.centurylinklabs.watchtower.enable=false
+
     ports:
       - 6060:6060
       - 8080:8080
@@ -80,8 +80,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./config/:/var/config
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
+
   pangolin:
     container_name: pangolin
     healthcheck:
@@ -97,15 +96,13 @@ services:
     restart: unless-stopped
     volumes:
       - ./config:/app/config
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
+
   traefik:
     command:
       - --configFile=/etc/traefik/traefik_config.yml
     container_name: traefik
     labels:
       - wud.watch=false
-      - com.centurylinklabs.watchtower.enable=false
     depends_on:
       pangolin:
         condition: service_healthy
@@ -141,18 +138,7 @@ services:
       - PORT=3456
     ports:
       - "3456:3456"
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=3600
-      - DOCKER_API_VERSION=1.44
-      - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
-    restart: unless-stopped
+
   traefik-agent:
     image: hhftechnology/traefik-log-dashboard-agent:latest
     container_name: traefik-agent
@@ -233,6 +219,8 @@ services:
       - APP_URL=${POCKET_ID_APP_URL}
       - ENCRYPTION_KEY=${POCKET_ID_ENCRYPTION_KEY}
       - TRUST_PROXY=${POCKET_ID_TRUST_PROXY}
+      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
+      - MAXMIND_ACCOUNT_ID=${MAXMIND_ACCOUNT_ID}
     volumes:
       - ./data:/app/data
     labels:

@@ -26,6 +26,16 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
+echo -e "${YELLOW}Pulling latest images...${NC}"
+echo ""
+
+# Pull latest images
+docker compose \
+    -f docker-compose.yml \
+    -f docker-compose.addons.yml \
+    -f docker-compose.tools.yml \
+    pull
+
 echo -e "${YELLOW}Starting Pangolin Stack services...${NC}"
 echo ""
 
@@ -34,7 +44,7 @@ docker compose \
     -f docker-compose.yml \
     -f docker-compose.addons.yml \
     -f docker-compose.tools.yml \
-    up -d
+    up -d --remove-orphans
 
 echo ""
 echo -e "${GREEN}✓ All services started successfully!${NC}"

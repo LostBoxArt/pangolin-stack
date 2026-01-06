@@ -38,9 +38,8 @@ services:
     volumes:
       - ./config/crowdsec:/etc/crowdsec
       - ./config/crowdsec/db:/var/lib/crowdsec/data
-      - ./config/crowdsec_logs/auth.log:/var/log/auth.log:ro
-      - ./config/crowdsec_logs/syslog:/var/log/syslog:ro
-      - ./config/crowdsec_logs:/var/log
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - /var/log/syslog:/var/log/syslog:ro
       - ./config/traefik/logs:/var/log/traefik
   crowdsec-web-ui:
     image: ghcr.io/theduffman85/crowdsec-web-ui:latest

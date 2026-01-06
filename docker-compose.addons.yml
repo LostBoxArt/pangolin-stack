@@ -148,6 +148,27 @@ services:
       - ./config/maxmind/GeoLite2-Country.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-Country.mmdb:ro
 
 
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - /opt/homarr/appdata:/appdata
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 7575:7575
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
+      - TZ=Asia/Jerusalem
+    extra_hosts:
+      - "torrent.example.com:192.168.1.10"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homarr.rule=Host(`home.example.com`)"
+      - "traefik.http.routers.homarr.entrypoints=websecure"
+      - "traefik.http.routers.homarr.tls.certresolver=letsencrypt"
+      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+
 volumes:
   linkstack_data:
     external: true

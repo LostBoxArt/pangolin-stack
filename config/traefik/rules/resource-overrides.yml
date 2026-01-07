@@ -61,7 +61,7 @@ http:
                 - badger@http
             priority: 200
             rule: "Host(`dash.dennisb.xyz`)"
-            service: "7-dash-service@http"
+            service: "dashdot-service"
             tls:
                 certResolver: "letsencrypt"
         14-home-router-auth:
@@ -141,10 +141,10 @@ http:
             loadBalancer:
                 servers:
                     - url: "https://portainer:9443"
-        7-dash-service@file:
+        dashdot-service:
             loadBalancer:
                 servers:
-                    - url: "http://172.17.0.1:9980"
+                    - url: "http://dashdot:3001"
         14-home-service@file:
             loadBalancer:
                 servers:

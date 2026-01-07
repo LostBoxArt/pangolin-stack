@@ -61,7 +61,7 @@ http:
                 - badger@http
             priority: 200
             rule: "Host(`dash.example.com`)"
-            service: "dashdot-service"
+            service: "7-dash-service@http"
             tls:
                 certResolver: "letsencrypt"
         14-home-router-auth:
@@ -82,16 +82,6 @@ http:
             priority: 200
             rule: "Host(`auth.example.com`)"
             service: "16-auth-service@http"
-            tls:
-                certResolver: "letsencrypt"
-        17-firefox-router-auth:
-            entryPoints:
-                - websecure
-            middlewares:
-                - badger@http
-            priority: 200
-            rule: "Host(`firefox.example.com`)"
-            service: "17-firefox-service@http"
             tls:
                 certResolver: "letsencrypt"
         18-middleware-router-auth:
@@ -141,10 +131,10 @@ http:
             loadBalancer:
                 servers:
                     - url: "https://portainer:9443"
-        dashdot-service:
+        7-dash-service@file:
             loadBalancer:
                 servers:
-                    - url: "http://dashdot:3001"
+                    - url: "http://172.17.0.1:9980"
         14-home-service@file:
             loadBalancer:
                 servers:

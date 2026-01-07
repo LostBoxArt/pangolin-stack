@@ -41,11 +41,15 @@ This document provides detailed infrastructure documentation for AI agents and d
 │                              HOME NETWORK (192.168.1.0/24)                            │
 │                                                                                       │
 │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐            │
-│  │    Newt     │    │   Traefik   │    │   Sonarr    │    │   Radarr    │            │
-│  │  (tunnel)   │    │  :80, :443  │    │   :8989     │    │   :7878     │            │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘            │
-│                                                                                       │
-│                     └─── homenode (192.168.1.10) ───┘                                   │
+│  │   Traefik   │◄───│  Pangolin   │    │   Gerbil    │    │  CrowdSec   │            │
+│  │  :80, :443  │    │   :3001     │    │  :51820/udp │    │   :8080     │            │
+│  └──────┬──────┘    └─────────────┘    └──────┬──────┘    └─────────────┘            │
+│         │                                      │                                      │
+│         ▼                                      │ WireGuard tunnel                     │
+│  ┌─────────────┐    ┌─────────────┐            │ (to Home Newt)                       │
+│  │   Homarr    │◄───┤  qbit-proxy │◄───────────┘                                      │
+│  │   :7575     │    │   :8081     │  (via OLM)                                       │
+│  └─────────────┘    └─────────────┘                                                   │
 └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -60,13 +64,13 @@ graph TD
     end
     
     subgraph "Add-ons"
-
-
+        Homarr --> qbit-proxy
+        qbit-proxy -- "OLM Tunnel" --> HomeTraefik
         TraefikDashboard --> TraefikAgent
     end
     
     subgraph "Remote"
-        Olm --> Gerbil
+        OlmSystemd[Olm - Systemd] --> Gerbil
         Gerbil --> Newt
         Newt --> HomeServices[Home Services]
     end
@@ -82,37 +86,33 @@ graph TD
 
 ## Olm Tunnel Configuration
 
-Olm creates a WireGuard tunnel from the CloudNode to the home network, enabling dashboard to access internal services.
+Olm is currently running as a **systemd service** on the CloudNode host to ensure it has the necessary network permissions and stability.
 
-### How It Works
-
-1. **Olm** connects to Pangolin/Gerbil endpoint
-2. **WireGuard tunnel** established to home Newt instance
-3. **Route** to `192.168.1.0/24` added via `olm` interface
-4. **Dashboard** uses `extra_hosts` to override DNS for service domains
-5. **Requests** to `*.example.com` resolve to `192.168.1.10` inside container
-6. **Traffic** flows through Olm tunnel to home Traefik
-
-### Configuration in docker-compose.addons.yml
-
-```yaml
-olm:
-  image: ghcr.io/fosrl/olm:1.3.0
-  network_mode: host
-  cap_add:
-    - NET_ADMIN
-  devices:
-    - /dev/net/tun:/dev/net/tun
-  command:
-    - "--id"
-    - "<OLM_ID>"
-    - "--secret"
-    - "<OLM_SECRET>"
-    - "--endpoint"
-    - "https://pangolin.example.com"
+### Management
+```bash
+sudo systemctl status olm
+sudo journalctl -u olm -f
 ```
 
+## qBittorrent Proxy Sidecar
 
+Homarr v0.15+ has a known issue with qBittorrent v5.1.4+ API responses when served over HTTPS with "Secure" cookies. The `qbit-proxy` service acts as a bridge:
+
+1. **Strips Secure Flag**: Removes `secure;` from cookies so Homarr can see them.
+2. **Handles SNI**: Properly sets the `Host: torrent.example.com` header.
+3. **Internal HTTP**: Allows Homarr to connect via plain HTTP internally.
+
+### Access Pattern
+
+```
+Widget URL: http://qbit-proxy:8081
+    ↓ Proxy translation
+Destination: https://192.168.1.10:443
+    ↓ SNI injection
+Host Header: torrent.example.com
+    ↓ OLM tunnel
+Home Traefik
+```
 
 ### Widget Access Pattern
 

@@ -180,9 +180,21 @@ services:
       - "traefik.http.routers.homarr.tls.certresolver=letsencrypt"
       - "traefik.http.services.homarr.loadbalancer.server.port=7575"
 
+  termix:
+    image: ghcr.io/lukegus/termix:latest
+    container_name: termix
+    restart: unless-stopped
+    volumes:
+      - termix_data:/app/data
+    environment:
+      - PORT=8080
+
 volumes:
   linkstack_data:
     external: true
     name: linkstack_linkstack_data
+
+  termix_data:
+    driver: local
 
 

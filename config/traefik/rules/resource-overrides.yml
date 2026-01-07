@@ -114,6 +114,16 @@ http:
             service: "20-crowedsec-service@http"
             tls:
                 certResolver: "letsencrypt"
+        21-termix-router-auth:
+            entryPoints:
+                - websecure
+            middlewares:
+                - badger@http
+            priority: 200
+            rule: "Host(`termix.example.com`)"
+            service: "21-termix-service@http"
+            tls:
+                certResolver: "letsencrypt"
     services:
         1-base-service@file:
             loadBalancer:
@@ -159,6 +169,10 @@ http:
             loadBalancer:
                 servers:
                     - url: "http://crowdsec-web-ui:3000"
+        21-termix-service@file:
+            loadBalancer:
+                servers:
+                    - url: "http://termix:8080"
         api-service@file:
             loadBalancer:
                 passHostHeader: "true"

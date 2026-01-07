@@ -148,10 +148,21 @@ services:
       - ./config/maxmind/GeoLite2-Country.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-Country.mmdb:ro
 
 
+  qbit-proxy:
+    container_name: qbit-proxy
+    build:
+      context: ./qbit-proxy
+    restart: unless-stopped
+    environment:
+      - TARGET_HOST=torrent.dennisb.xyz
+      - TARGET_IP=192.168.0.10
+
   homarr:
     container_name: homarr
     image: ghcr.io/homarr-labs/homarr:latest
     restart: unless-stopped
+    depends_on:
+      - qbit-proxy
     volumes:
       - /opt/homarr/appdata:/appdata
       - /var/run/docker.sock:/var/run/docker.sock

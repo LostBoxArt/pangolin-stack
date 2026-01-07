@@ -69,20 +69,30 @@ pangolin-stack/
 Widgets access home services (*arr stack) via Olm tunnel:
 
 ```
-Dashboard → DNS override → Olm tunnel → Pangolin/Gerbil → Newt → Home Traefik → Services
+Dashboard → qbit-proxy (optional) → Olm tunnel → Pangolin/Gerbil → Newt → Home Traefik → Services
 ```
 
 **Configuration:**
-- Olm credentials in `docker-compose.addons.yml`
-- DNS overrides via `extra_hosts` in dashboard container
+- Olm runs as a **systemd service** on the host.
+- DNS overrides via `extra_hosts` in dashboard containers.
 - Home subnet route: `192.168.0.0/24`
 
 **Troubleshooting:**
 ```bash
-docker logs olm --tail 20        # Check tunnel status
-ping 192.168.0.10                # Test connectivity
-docker restart olm               # Reconnect if disconnected
+sudo journalctl -u olm -f       # Check systemd tunnel logs
+ip addr show olm                # Verify interface exists
+ping 192.168.0.10               # Test connectivity to NASUS
+sudo systemctl restart olm      # Restart tunnel
 ```
+
+## Widgets & Integrations (Troubleshooting)
+
+### qBittorrent Authorization Errors
+If Homarr shows "Authorization error" for qBittorrent v5.1.4+:
+1. Use the **qbit-proxy** sidecar: Set URL to `http://qbit-proxy:8081`.
+2. Disable **CSRF** and **Host Validation** in qBittorrent Web UI.
+3. Disable **Secure Cookie** in qBittorrent (Web UI).
+4. Add `100.90.128.0/24` to the **Waitlist/Bypass Auth** in qBittorrent.
 
 ## Common Commands
 

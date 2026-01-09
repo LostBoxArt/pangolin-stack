@@ -19,31 +19,6 @@ services:
    #   - "--endpoint"
    #   - "https://pangolin.example.com"
 
-  middleware-manager:
-    container_name: middleware-manager
-    image: hhftechnology/middleware-manager:latest
-    restart: unless-stopped
-    depends_on:
-      pangolin:
-        condition: service_healthy
-    ports:
-      - "3456:3456"
-    group_add:
-      - "986"  # docker group
-    environment:
-      - PANGOLIN_API_URL=http://pangolin:3001/api/v1
-      - TRAEFIK_API_URL=http://gerbil:8080
-      - TRAEFIK_CONF_DIR=/conf
-      - TRAEFIK_STATIC_CONFIG_PATH=/etc/traefik/traefik_config.yml
-      - DB_PATH=/data/middleware.db
-      - PORT=3456
-    volumes:
-      - ./data:/data
-      - ./config/traefik/rules:/conf
-      - ./config/traefik:/etc/traefik
-      - ./config/middleware-manager/templates.yaml:/app/config/templates.yaml
-      - ./config/middleware-manager/config.json:/app/config/config.json
-
   traefik-agent:
     container_name: traefik-agent
     image: hhftechnology/traefik-log-dashboard-agent:latest

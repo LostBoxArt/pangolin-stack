@@ -126,14 +126,7 @@ do_backup() {
     mkdir -p "${BACKUP_PATH}/config"
     cp "${STACK_DIR}/config/key" "${BACKUP_PATH}/config/" 2>/dev/null || true
 
-    # 7. Middleware Manager
-    echo -e "${YELLOW}[7/10] Middleware Manager config and database...${NC}"
-    mkdir -p "${BACKUP_PATH}/config/middleware-manager"
-    mkdir -p "${BACKUP_PATH}/data"
-    cp -r "${STACK_DIR}/config/middleware-manager/"* "${BACKUP_PATH}/config/middleware-manager/" 2>/dev/null || true
-    cp "${STACK_DIR}/data/middleware.db" "${BACKUP_PATH}/data/" 2>/dev/null || true
-
-    # 8. Pocket ID data
+    # 7. Pocket ID data
     echo -e "${YELLOW}[8/10] Pocket ID data...${NC}"
     cp -r "${STACK_DIR}/data/"* "${BACKUP_PATH}/data/" 2>/dev/null || true
 
@@ -286,10 +279,9 @@ do_restore() {
     cp "${RESTORE_FROM}/config/key" "${STACK_DIR}/config/" 2>/dev/null || true
     chmod 600 "${STACK_DIR}/config/key" 2>/dev/null || true
 
-    # 7. Middleware + data
-    echo -e "${YELLOW}[7/9] Restoring Middleware Manager and data...${NC}"
-    mkdir -p "${STACK_DIR}/config/middleware-manager" "${STACK_DIR}/data"
-    cp -r "${RESTORE_FROM}/config/middleware-manager/"* "${STACK_DIR}/config/middleware-manager/" 2>/dev/null || true
+    # 7. Data directory
+    echo -e "${YELLOW}[7/9] Restoring data directory...${NC}"
+    mkdir -p "${STACK_DIR}/data"
     cp -r "${RESTORE_FROM}/data/"* "${STACK_DIR}/data/" 2>/dev/null || true
 
     # 8. Homarr

@@ -33,24 +33,22 @@ echo ""
 docker compose \
     -f docker-compose.yml \
     -f docker-compose.addons.yml \
-    -f docker-compose.tools.yml \
     pull
 
 echo -e "${YELLOW}Starting Pangolin Stack services...${NC}"
 echo ""
 
-# Start all services (main stack + addons + tools)
+# Start all services (main stack + addons)
 docker compose \
     -f docker-compose.yml \
     -f docker-compose.addons.yml \
-    -f docker-compose.tools.yml \
     up -d --remove-orphans
 
 echo ""
 echo -e "${GREEN}✓ All services started successfully!${NC}"
 echo ""
 echo "You can check the status with:"
-echo "  docker compose -f docker-compose.yml -f docker-compose.addons.yml -f docker-compose.tools.yml ps"
+echo "  docker compose -f docker-compose.yml -f docker-compose.addons.yml ps"
 echo ""
 echo "View logs with:"
-echo "  docker compose -f docker-compose.yml -f docker-compose.addons.yml -f docker-compose.tools.yml logs -f"
+echo "  docker compose -f docker-compose.yml -f docker-compose.addons.yml logs -f"

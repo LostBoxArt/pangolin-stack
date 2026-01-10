@@ -51,15 +51,12 @@ docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 
 ```
 pangolin-stack/
-├── docker-compose.yml          # Core: Pangolin, Gerbil, Traefik, CrowdSec
-├── docker-compose.addons.yml   # Add-ons: Homepage, Olm, Dashboard tools
-├── docker-compose.tools.yml    # Utilities: GeoIP updater
+├── docker-compose.yml          # Core: Pangolin, Gerbil, Traefik, CrowdSec, Traefik Dashboard
+├── docker-compose.addons.yml   # Add-ons: Homarr, LinkStack, Dashdot, Termix
 ├── config/
-
 │   ├── pangolin/               # Pangolin config
 │   ├── traefik/                # Traefik rules and certs
-│   ├── crowdsec/               # CrowdSec configuration
-│   └── maxmind/                # GeoIP databases
+│   └── crowdsec/               # CrowdSec configuration
 └── data/                       # Runtime data (gitignored)
 ```
 

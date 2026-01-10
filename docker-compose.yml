@@ -112,7 +112,6 @@ services:
       - ./config/traefik:/etc/traefik:ro
       - ./config/letsencrypt:/letsencrypt
       - ./config/traefik/logs:/var/log/traefik
-      - ./config/traefik/logs:/var/log/traefik
       - ./config/traefik/rules:/rules
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -125,15 +124,11 @@ services:
     volumes:
       - ./data/positions:/data
       - ./config/traefik/logs:/logs:ro
-      - ./config/maxmind:/geoip:ro
     environment:
       - TRAEFIK_LOG_DASHBOARD_ACCESS_PATH=/logs/access.log
       - TRAEFIK_LOG_DASHBOARD_ERROR_PATH=/logs/traefik.log
       - TRAEFIK_LOG_DASHBOARD_AUTH_TOKEN=${TRAEFIK_DASHBOARD_TOKEN}
       - TRAEFIK_LOG_DASHBOARD_SYSTEM_MONITORING=true
-      - TRAEFIK_LOG_DASHBOARD_GEOIP_ENABLED=true
-      - TRAEFIK_LOG_DASHBOARD_GEOIP_CITY_DB=/geoip/GeoLite2-City.mmdb
-      - TRAEFIK_LOG_DASHBOARD_GEOIP_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb
       - TRAEFIK_LOG_DASHBOARD_LOG_FORMAT=json
       - PORT=5000
     healthcheck:
@@ -148,9 +143,6 @@ services:
     restart: unless-stopped
     ports:
       - "3457:3000"
-    volumes:
-      - ./config/maxmind/GeoLite2-City.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-City.mmdb:ro
-      - ./config/maxmind/GeoLite2-Country.mmdb:/app/node_modules/geolite2-redist/dist/GeoLite2-Country.mmdb:ro
     environment:
       - AGENT_API_URL=http://traefik-agent:5000
       - AGENT_API_TOKEN=${TRAEFIK_DASHBOARD_TOKEN}
@@ -165,29 +157,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-  maxmind-updater:
-    image: alpine:latest
-    container_name: maxmind-updater
-    restart: "no"
-    volumes:
-      - ./config/maxmind:/data
-    environment:
-      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
-    command: >
-      sh -c "
-        apk add --no-cache wget tar &&
-        cd /data &&
-        echo 'Downloading GeoLite2-City database...' &&
-        wget -O GeoLite2-City.tar.gz 'https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz' --user=${MAXMIND_ACCOUNT_ID} --password='${MAXMIND_LICENSE_KEY}' &&
-        tar --wildcards -xzf GeoLite2-City.tar.gz --strip-components=1 '*/GeoLite2-City.mmdb' &&
-        rm -f GeoLite2-City.tar.gz &&
-        echo 'Downloading GeoLite2-Country database...' &&
-        wget -O GeoLite2-Country.tar.gz 'https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz' --user=${MAXMIND_ACCOUNT_ID} --password='${MAXMIND_LICENSE_KEY}' &&
-        tar --wildcards -xzf GeoLite2-Country.tar.gz --strip-components=1 '*/GeoLite2-Country.mmdb' &&
-        rm -f GeoLite2-Country.tar.gz &&
-        echo 'GeoIP databases downloaded successfully!' &&
-        ls -la /data
-      "
   pocket-id:
     image: ghcr.io/pocket-id/pocket-id:v2
     container_name: pocket-id

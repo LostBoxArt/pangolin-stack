@@ -227,7 +227,6 @@ do_backup() {
     echo -e "\n${YELLOW}[1/9] Docker Compose files...${NC}"
     cp "${STACK_DIR}/docker-compose.yml" "${BACKUP_PATH}/"
     cp "${STACK_DIR}/docker-compose.addons.yml" "${BACKUP_PATH}/"
-    cp "${STACK_DIR}/docker-compose.tools.yml" "${BACKUP_PATH}/" 2>/dev/null || true
     cp "${STACK_DIR}/startup.sh" "${BACKUP_PATH}/" 2>/dev/null || true
     cp "${STACK_DIR}/backup.sh" "${BACKUP_PATH}/" 2>/dev/null || true
 
@@ -394,7 +393,6 @@ do_restore() {
     echo -e "\n${YELLOW}[1/9] Restoring Docker Compose files...${NC}"
     cp "${RESTORE_FROM}/docker-compose.yml" "${STACK_DIR}/"
     cp "${RESTORE_FROM}/docker-compose.addons.yml" "${STACK_DIR}/"
-    cp "${RESTORE_FROM}/docker-compose.tools.yml" "${STACK_DIR}/" 2>/dev/null || true
     cp "${RESTORE_FROM}/startup.sh" "${STACK_DIR}/" 2>/dev/null || true
     cp "${RESTORE_FROM}/backup.sh" "${STACK_DIR}/" 2>/dev/null || true
 

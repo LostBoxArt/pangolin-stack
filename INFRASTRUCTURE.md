@@ -80,9 +80,8 @@ graph TD
 
 | File | Purpose | Services |
 |------|---------|----------|
-| `docker-compose.yml` | Core infrastructure | traefik, pangolin, gerbil, crowdsec, portainer |
-| `docker-compose.addons.yml` | Dashboard & tools | olm, traefik-dashboard, crowdsec-web-ui, dashdot, linkstack |
-| `docker-compose.tools.yml` | Utilities | maxmind-updater |
+| `docker-compose.yml` | Core infrastructure | traefik, pangolin, gerbil, crowdsec, portainer, traefik-dashboard, traefik-agent |
+| `docker-compose.addons.yml` | Dashboard & tools | homarr, dashdot, linkstack, termix, qbit-proxy |
 
 ## Olm Tunnel Configuration
 

@@ -32,7 +32,7 @@ http:
                 - badger@http
             priority: 200
             rule: "Host(`hetzner.example.com`)"
-            service: "5-port-service@http"
+            service: "5-port-service@file"
             tls:
                 certResolver: "letsencrypt"
         7-dash-router-auth:

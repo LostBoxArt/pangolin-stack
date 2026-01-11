@@ -20,16 +20,22 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **Gerbil** | WireGuard relay for remote sites | 51820/udp |
 | **Traefik** | Reverse proxy with auto-HTTPS | 80, 443 |
 | **CrowdSec** | Threat detection & blocking | 6060, 8080 |
+| **Traefik Agent** | Log dashboard agent for Traefik | 5000 |
 
 ## Add-on Components
 
 | Component | Purpose | Port |
 |-----------|---------|------|
 | **Olm** | WireGuard client to home network | host network |
-| **Traefik Dashboard** | Log analytics & GeoIP | 3457 |
-| **CrowdSec Web UI** | Security dashboard | (via Traefik) |
+| **Traefik Dashboard** | Traefik log analytics UI | 3457 |
+| **CrowdSec Web UI** | Security dashboard | 3458 |
+| **Pocket ID** | Self-hosted auth provider | 1411 |
 | **Portainer** | Docker management | 9000, 9443 |
-| **Termix** | Web-based SSH terminal | (via Traefik) |
+| **Homarr** | Dashboard | 7575 |
+| **Dashdot** | System dashboard | 3001 |
+| **LinkStack** | Link-in-bio landing page | 80 |
+| **qbit-proxy** | qBittorrent API proxy | 8081 |
+| **Termix** | Web-based SSH terminal | 8080 |
 
 
 ## Quick Start
@@ -46,17 +52,19 @@ docker compose up -d
 # 3. Start add-ons
 docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 ```
+You can also use `./startup.sh` to pull images and start both core services and add-ons.
 
 ## File Structure
 
 ```
 pangolin-stack/
-├── docker-compose.yml          # Core: Pangolin, Gerbil, Traefik, CrowdSec, Traefik Dashboard
-├── docker-compose.addons.yml   # Add-ons: Homarr, LinkStack, Dashdot, Termix
+├── docker-compose.yml          # Core (Pangolin, Gerbil, Traefik, CrowdSec, Traefik Agent) + add-ons (Traefik Dashboard, CrowdSec Web UI, Pocket ID, Portainer)
+├── docker-compose.addons.yml   # Add-ons: Homarr, LinkStack, Dashdot, Termix, qbit-proxy
 ├── config/
 │   ├── pangolin/               # Pangolin config
 │   ├── traefik/                # Traefik rules and certs
 │   └── crowdsec/               # CrowdSec configuration
+├── qbit-proxy/                 # qBittorrent proxy (local build)
 └── data/                       # Runtime data (gitignored)
 ```
 
@@ -117,6 +125,12 @@ docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
 | CrowdSec | https://crowdsec.example.com |
 | Traefik Logs | https://traefik-logs.example.com |
 | Termix | https://termix.example.com |
+| Pocket ID | https://auth.example.com |
+| Homarr | https://home.example.com |
+| Dashdot | https://dash.example.com |
+| LinkStack | https://example.com |
+| CrowdSec Web UI | http://<cloudnode-ip>:3458 |
+| Portainer | https://<cloudnode-ip>:9443 |
 
 
 ## Documentation

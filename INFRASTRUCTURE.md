@@ -67,6 +67,8 @@ graph TD
         Homarr --> qbit-proxy
         qbit-proxy -- "OLM Tunnel" --> HomeTraefik
         TraefikDashboard --> TraefikAgent
+        CrowdSecWebUI --> CrowdSec
+        PocketID
     end
     
     subgraph "Remote"
@@ -80,7 +82,7 @@ graph TD
 
 | File | Purpose | Services |
 |------|---------|----------|
-| `docker-compose.yml` | Core infrastructure | traefik, pangolin, gerbil, crowdsec, portainer, traefik-dashboard |
+| `docker-compose.yml` | Core infrastructure + select add-ons | traefik, pangolin, gerbil, crowdsec, traefik-agent, traefik-dashboard, crowdsec-web-ui, pocket-id, portainer |
 | `docker-compose.addons.yml` | Dashboard & tools | homarr, dashdot, linkstack, termix, qbit-proxy |
 
 ## Olm Tunnel Configuration
@@ -131,7 +133,8 @@ Sonarr container
 
 ```bash
 # Check tunnel status
-docker logs olm --tail 20
+sudo systemctl status olm
+sudo journalctl -u olm -f
 
 # Verify interface exists
 ip addr show olm
@@ -143,8 +146,9 @@ ping 192.168.1.10
 ip route | grep 192.168.0
 
 # Restart tunnel
-docker restart olm
+sudo systemctl restart olm
 ```
+If you run Olm via Docker instead of systemd, use `docker logs olm` and `docker restart olm`.
 
 
 
@@ -169,12 +173,21 @@ Key variables in `.env`:
 |----------|---------|
 | `TRAEFIK_DASHBOARD_TOKEN` | Auth token for traefik-dashboard |
 | `CROWDSEC_AGENT_KEY` | CrowdSec agent registration key |
+| `CROWDSEC_WEB_UI_PASSWORD` | CrowdSec Web UI login |
+| `HOMARR_SECRET_KEY` | Homarr encryption key |
+| `PORTAINER_LICENSE_KEY` | Portainer EE license |
+| `POCKET_ID_APP_URL` | Pocket ID public URL |
+| `POCKET_ID_ENCRYPTION_KEY` | Pocket ID encryption secret |
+| `POCKET_ID_TRUST_PROXY` | Pocket ID proxy trust flag |
+| `MAXMIND_ACCOUNT_ID` | MaxMind account ID for Pocket ID |
+| `MAXMIND_LICENSE_KEY` | MaxMind license key for Pocket ID |
+| `DISABLE_ONLINE_API` | CrowdSec online API toggle |
+| `DISABLE_HUB_UPDATE` | CrowdSec hub update toggle |
 
 ## Permissions Notes
 
 | Path | Required Owner | Why |
 |------|----------------|-----|
-
 | `config/crowdsec-web-ui/` | Container writable | SQLite database |
 | `/var/run/docker.sock` | root:docker (986) | Docker API access |
 

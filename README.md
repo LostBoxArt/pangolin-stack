@@ -28,7 +28,7 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 | **Olm** | WireGuard client to home network | host network |
 | **Traefik Dashboard** | Log analytics & GeoIP | 3457 |
 | **CrowdSec Web UI** | Security dashboard | (via Traefik) |
-| **Portainer** | Docker management | 9000 |
+| **Portainer** | Docker management | 9000, 9443 |
 | **Termix** | Web-based SSH terminal | (via Traefik) |
 
 

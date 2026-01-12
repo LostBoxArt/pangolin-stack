@@ -127,6 +127,12 @@ Home Traefik (SNI routing)
 Sonarr container
 ```
 
+## Traefik Config
+
+- Static config: `config/traefik/traefik_config.yml`
+- Dynamic rules: `config/traefik/rules/`
+- Overrides are disabled and kept as `config/traefik/rules/resource-overrides.yml.back`
+
 ## Troubleshooting Commands
 
 ### Olm Tunnel

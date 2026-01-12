@@ -62,7 +62,7 @@ pangolin-stack/
 ├── docker-compose.addons.yml   # Add-ons: Homarr, LinkStack, Dashdot, Termix, qbit-proxy
 ├── config/
 │   ├── pangolin/               # Pangolin config
-│   ├── traefik/                # Traefik rules and certs
+│   ├── traefik/                # Traefik rules and certs (overrides backed up in rules/resource-overrides.yml.back)
 │   └── crowdsec/               # CrowdSec configuration
 ├── qbit-proxy/                 # qBittorrent proxy (local build)
 └── data/                       # Runtime data (gitignored)

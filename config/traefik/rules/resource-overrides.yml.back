@@ -10,7 +10,7 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`dennisb.xyz`)"
             service: "1-base-service@http"
             tls:
@@ -20,29 +20,9 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`request.dennisb.xyz`)"
             service: "3-request-service@http"
-            tls:
-                certResolver: "letsencrypt"
-        5-port-router-auth:
-            entryPoints:
-                - websecure
-            middlewares:
-                - badger@http
-            priority: 200
-            rule: "Host(`hetzner.dennisb.xyz`)"
-            service: "5-port-service@file"
-            tls:
-                certResolver: "letsencrypt"
-        7-dash-router-auth:
-            entryPoints:
-                - websecure
-            middlewares:
-                - badger@http
-            priority: 200
-            rule: "Host(`dash.dennisb.xyz`)"
-            service: "7-dash-service@http"
             tls:
                 certResolver: "letsencrypt"
         14-home-router-auth:
@@ -50,7 +30,7 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`home.dennisb.xyz`)"
             service: "14-home-service@http"
             tls:
@@ -60,7 +40,7 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`auth.dennisb.xyz`)"
             service: "16-auth-service@http"
             tls:
@@ -70,7 +50,7 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`traefik-logs.dennisb.xyz`)"
             service: "19-traefik-logs-service@http"
             tls:
@@ -80,7 +60,7 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`crowdsec.dennisb.xyz`)"
             service: "20-crowedsec-service@http"
             tls:
@@ -90,7 +70,7 @@ http:
                 - websecure
             middlewares:
                 - badger@http
-            priority: 200
+            priority: 50
             rule: "Host(`termix.dennisb.xyz`)"
             service: "21-termix-service@http"
             tls:
@@ -108,14 +88,6 @@ http:
             loadBalancer:
                 servers:
                     - url: "http://100.89.128.4:53463"
-        5-port-service@file:
-            loadBalancer:
-                servers:
-                    - url: "https://portainer:9443"
-        7-dash-service@file:
-            loadBalancer:
-                servers:
-                    - url: "http://172.17.0.1:9980"
         14-home-service@file:
             loadBalancer:
                 servers:

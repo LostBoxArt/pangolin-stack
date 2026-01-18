@@ -21,6 +21,7 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **Traefik** | Reverse proxy with auto-HTTPS | 80, 443 |
 | **CrowdSec** | Threat detection & blocking | 6060, 8080 |
 | **Traefik Agent** | Log dashboard agent for Traefik | 5000 |
+| **Dockhand** | Container management & auto-update | 3000 |
 
 ## Add-on Components
 
@@ -30,13 +31,11 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **Traefik Dashboard** | Traefik log analytics UI | 3457 |
 | **CrowdSec Web UI** | Security dashboard | 3458 |
 | **Pocket ID** | Self-hosted auth provider | 1411 |
-| **Portainer** | Docker management | 9000, 9443 |
 | **Homarr** | Dashboard | 7575 |
 | **Dashdot** | System dashboard | 3001 |
 | **LinkStack** | Link-in-bio landing page | 80 |
 | **qbit-proxy** | qBittorrent API proxy | 8081 |
 | **Termix** | Web-based SSH terminal | 8080 |
-| **Dockhand** | Container auto-update & management | 3000 |
 
 
 ## Quick Start
@@ -52,9 +51,6 @@ docker compose up -d
 
 # 3. Start add-ons
 docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
-
-# 4. Start Dockhand (testing)
-docker compose -f docker-compose.dockhand.yml up -d
 ```
 You can also use `./startup.sh` to pull images and start both core services and add-ons.
 
@@ -62,9 +58,8 @@ You can also use `./startup.sh` to pull images and start both core services and 
 
 ```
 pangolin-stack/
-├── docker-compose.yml          # Core (Pangolin, Gerbil, Traefik, CrowdSec, Traefik Agent) + add-ons (Traefik Dashboard, CrowdSec Web UI, Pocket ID, Portainer)
+├── docker-compose.yml          # Core (Pangolin, Gerbil, Traefik, CrowdSec, Traefik Agent, Dockhand) + add-ons (Traefik Dashboard, CrowdSec Web UI, Pocket ID)
 ├── docker-compose.addons.yml   # Add-ons: Homarr, LinkStack, Dashdot, Termix, qbit-proxy
-├── docker-compose.dockhand.yml # Dockhand (testing)
 ├── config/
 │   ├── pangolin/               # Pangolin config
 │   ├── traefik/                # Traefik rules and certs (overrides backed up in rules/resource-overrides.yml.back)
@@ -120,9 +115,6 @@ docker compose pull && docker compose up -d
 
 # Full restart with add-ons
 docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
-
-# Start Dockhand
-docker compose -f docker-compose.dockhand.yml up -d
 ```
 
 ## Access Points
@@ -138,7 +130,6 @@ docker compose -f docker-compose.dockhand.yml up -d
 | Dashdot | https://dash.example.com |
 | LinkStack | https://example.com |
 | CrowdSec Web UI | http://<cloudnode-ip>:3458 |
-| Portainer | https://<cloudnode-ip>:9443 |
 | Dockhand | https://dockhand.example.com |
 
 

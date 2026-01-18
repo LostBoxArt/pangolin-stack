@@ -223,11 +223,11 @@ do_backup() {
 
     mkdir -p "${BACKUP_PATH}"
 
-    # 1. Docker Compose files
-    echo -e "\n${YELLOW}[1/9] Docker Compose files...${NC}"
-    cp "${STACK_DIR}/docker-compose.yml" "${BACKUP_PATH}/"
-    cp "${STACK_DIR}/docker-compose.addons.yml" "${BACKUP_PATH}/"
+    # 1. Stack compose files
+    echo -e "\n${YELLOW}[1/9] Stack compose files...${NC}"
+    cp -r "${STACK_DIR}/stacks" "${BACKUP_PATH}/"
     cp "${STACK_DIR}/startup.sh" "${BACKUP_PATH}/" 2>/dev/null || true
+    cp "${STACK_DIR}/stackctl.sh" "${BACKUP_PATH}/" 2>/dev/null || true
     cp "${STACK_DIR}/backup.sh" "${BACKUP_PATH}/" 2>/dev/null || true
 
     # 2. Environment files
@@ -380,7 +380,7 @@ do_restore() {
     # Stop services first
     echo -e "\n${YELLOW}Stopping Docker services...${NC}"
     cd "${STACK_DIR}"
-    docker compose -f docker-compose.yml -f docker-compose.addons.yml down 2>/dev/null || true
+    ./stackctl.sh down 2>/dev/null || true
 
     # Extract archive
     echo -e "${YELLOW}Extracting backup...${NC}"
@@ -389,12 +389,13 @@ do_restore() {
     BACKUP_FOLDER=$(ls "$TEMP_DIR")
     RESTORE_FROM="${TEMP_DIR}/${BACKUP_FOLDER}"
 
-    # 1. Compose files
-    echo -e "\n${YELLOW}[1/9] Restoring Docker Compose files...${NC}"
-    cp "${RESTORE_FROM}/docker-compose.yml" "${STACK_DIR}/"
-    cp "${RESTORE_FROM}/docker-compose.addons.yml" "${STACK_DIR}/"
+    # 1. Stack compose files
+    echo -e "\n${YELLOW}[1/9] Restoring stack compose files...${NC}"
+    cp -r "${RESTORE_FROM}/stacks" "${STACK_DIR}/"
     cp "${RESTORE_FROM}/startup.sh" "${STACK_DIR}/" 2>/dev/null || true
+    cp "${RESTORE_FROM}/stackctl.sh" "${STACK_DIR}/" 2>/dev/null || true
     cp "${RESTORE_FROM}/backup.sh" "${STACK_DIR}/" 2>/dev/null || true
+    chmod +x "${STACK_DIR}/startup.sh" "${STACK_DIR}/stackctl.sh" "${STACK_DIR}/backup.sh" 2>/dev/null || true
 
     # 2. Environment
     echo -e "${YELLOW}[2/9] Restoring environment variables...${NC}"
@@ -465,7 +466,7 @@ do_restore() {
     echo -e "${GREEN}========================================${NC}"
     echo -e "\n${YELLOW}Start services:${NC}"
     echo "cd ${STACK_DIR}"
-    echo "docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d"
+    echo "./startup.sh"
 }
 
 # =============================================================================

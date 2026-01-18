@@ -78,12 +78,20 @@ graph TD
     end
 ```
 
-## Docker Compose Files
+## Docker Compose Stacks
 
-| File | Purpose | Services |
-|------|---------|----------|
-| `docker-compose.yml` | Core infrastructure + select add-ons | traefik, pangolin, gerbil, crowdsec, traefik-agent, traefik-dashboard, crowdsec-web-ui, pocket-id, dockhand |
-| `docker-compose.addons.yml` | Dashboard & tools | homarr, dashdot, linkstack, termix, qbit-proxy |
+Stacks are organized in `stacks/<stack>/docker-compose.yml`:
+
+| Stack | Purpose | Services |
+|-------|---------|----------|
+| `core` | Infrastructure (starts first) | pangolin, gerbil, traefik |
+| `security` | Protection & auth | crowdsec, crowdsec-web-ui, pocket-id |
+| `observability` | Monitoring & logs | traefik-agent, traefik-dashboard, dashdot |
+| `management` | Container orchestration | dockhand |
+| `dashboard` | User dashboards | homarr, qbit-proxy |
+| `apps` | User applications | linkstack, termix |
+
+Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everything.
 
 ## Olm Tunnel Configuration
 

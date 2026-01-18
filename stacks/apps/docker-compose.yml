@@ -1,0 +1,61 @@
+# Pangolin Stack - User Applications
+# Requires: core stack (pangolin network)
+
+name: pangolin-apps
+
+networks:
+  pangolin:
+    external: true
+
+services:
+  linkstack:
+    image: linkstackorg/linkstack:latest
+    container_name: linkstack
+    networks:
+      - pangolin
+    restart: unless-stopped
+    group_add:
+      - "986"  # docker group
+    environment:
+      - HTTP_SERVER_NAME=example.com
+      - HTTPS_SERVER_NAME=example.com
+      - LOG_LEVEL=info
+      - PHP_MEMORY_LIMIT=256M
+      - UPLOAD_MAX_FILESIZE=8M
+      - TZ=Asia/Jerusalem
+      - SERVER_ADMIN=admin@example.com
+    volumes:
+      - linkstack_data:/htdocs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkstack.rule=Host(`example.com`)"
+      - "traefik.http.routers.linkstack.entrypoints=websecure"
+      - "traefik.http.routers.linkstack.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.linkstack.middlewares=security-headers@file"
+      - "traefik.http.services.linkstack.loadbalancer.server.port=80"
+
+  termix:
+    image: ghcr.io/lukegus/termix:latest
+    container_name: termix
+    networks:
+      - pangolin
+    restart: unless-stopped
+    volumes:
+      - termix_data:/app/data
+    environment:
+      - PORT=8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.termix.rule=Host(`termix.example.com`)"
+      - "traefik.http.routers.termix.entrypoints=websecure"
+      - "traefik.http.routers.termix.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.termix.middlewares=security-headers@file"
+      - "traefik.http.services.termix.loadbalancer.server.port=8080"
+
+volumes:
+  linkstack_data:
+    external: true
+    name: linkstack_linkstack_data
+
+  termix_data:
+    driver: local

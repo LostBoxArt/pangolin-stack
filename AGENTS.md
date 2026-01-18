@@ -194,7 +194,7 @@ Dockhand replaced Portainer for container management.
   - Stacks: Headless updates via **Webhooks** (Settings -> Stacks -> Webhook).
 - **Remote Hosts**:
   - **NASUS** (Home): Connected via Hawser agent in TCP mode.
-  - Host: `192.168.0.10`, Port: `2376`, Token: Secured in `.env` and Dockhand UI.
+  - Host: `192.168.0.10`, Port: `2375`, Token: Secured in `.env` and Dockhand UI.
 
 ### Common API Endpoints
 | Action | Method | Endpoint |

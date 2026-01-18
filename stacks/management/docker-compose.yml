@@ -20,6 +20,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../../data/dockhand:/app/data
+      - /home/jesus/pangolin-stack/stacks:/home/jesus/pangolin-stack/stacks
     environment:
       - TZ=UTC
     labels:

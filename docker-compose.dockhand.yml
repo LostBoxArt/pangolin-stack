@@ -1,0 +1,30 @@
+name: pangolin-dockhand
+
+networks:
+  default:
+    name: pangolin
+    external: true
+
+services:
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
+    restart: unless-stopped
+    user: "0:0"
+    group_add:
+      - "986" # docker group
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/dockhand:/app/data
+    environment:
+      - TZ=UTC
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dockhand-redirect.rule=Host(`dockhand.dennisb.xyz`)"
+      - "traefik.http.routers.dockhand-redirect.entrypoints=web"
+      - "traefik.http.routers.dockhand-redirect.middlewares=redirect-to-https@file"
+      - "traefik.http.routers.dockhand.rule=Host(`dockhand.dennisb.xyz`)"
+      - "traefik.http.routers.dockhand.entrypoints=websecure"
+      - "traefik.http.routers.dockhand.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dockhand.middlewares=security-headers@file"
+      - "traefik.http.services.dockhand.loadbalancer.server.port=3000"

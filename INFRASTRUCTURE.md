@@ -84,6 +84,7 @@ graph TD
 |------|---------|----------|
 | `docker-compose.yml` | Core infrastructure + select add-ons | traefik, pangolin, gerbil, crowdsec, traefik-agent, traefik-dashboard, crowdsec-web-ui, pocket-id, portainer |
 | `docker-compose.addons.yml` | Dashboard & tools | homarr, dashdot, linkstack, termix, qbit-proxy |
+| `docker-compose.dockhand.yml` | Container management (testing) | dockhand |
 
 ## Olm Tunnel Configuration
 

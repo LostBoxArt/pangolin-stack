@@ -1,0 +1,79 @@
+# Pangolin Stack - Observability & Monitoring
+# Requires: core stack (pangolin network), security stack (for log access)
+
+name: pangolin-observability
+
+networks:
+  pangolin:
+    external: true
+
+services:
+  traefik-agent:
+    image: hhftechnology/traefik-log-dashboard-agent:latest
+    container_name: traefik-agent
+    networks:
+      - pangolin
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../../data/positions:/data
+      - ../../config/traefik/logs:/logs:ro
+    environment:
+      - TRAEFIK_LOG_DASHBOARD_ACCESS_PATH=/logs/access.log
+      - TRAEFIK_LOG_DASHBOARD_ERROR_PATH=/logs/traefik.log
+      - TRAEFIK_LOG_DASHBOARD_AUTH_TOKEN=${TRAEFIK_DASHBOARD_TOKEN}
+      - TRAEFIK_LOG_DASHBOARD_SYSTEM_MONITORING=true
+      - TRAEFIK_LOG_DASHBOARD_LOG_FORMAT=json
+      - PORT=5000
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/logs/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  traefik-dashboard:
+    image: hhftechnology/traefik-log-dashboard:latest
+    container_name: traefik-dashboard
+    networks:
+      - pangolin
+    restart: unless-stopped
+    ports:
+      - "3457:3000"
+    environment:
+      - AGENT_API_URL=http://traefik-agent:5000
+      - AGENT_API_TOKEN=${TRAEFIK_DASHBOARD_TOKEN}
+      - NODE_ENV=production
+      - PORT=3000
+    depends_on:
+      traefik-agent:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e 'require(\"http\").get(\"http://localhost:3000\", (res) => process.exit(res.statusCode === 200 ? 0 : 1))'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  dashdot:
+    image: mauricenino/dashdot:latest
+    container_name: dashdot
+    networks:
+      - pangolin
+    restart: unless-stopped
+    ports:
+      - 3001:3001
+    group_add:
+      - "986"  # docker group
+    environment:
+      - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
+    volumes:
+      - /:/mnt/host:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashdot.rule=Host(`dash.dennisb.xyz`)"
+      - "traefik.http.routers.dashdot.entrypoints=websecure"
+      - "traefik.http.routers.dashdot.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashdot.middlewares=security-headers@file"
+      - "traefik.http.services.dashdot.loadbalancer.server.port=3001"

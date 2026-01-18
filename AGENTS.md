@@ -9,33 +9,52 @@ This file is the one-stop overview for agents working in this repo. It captures 
 - Home network (192.168.0.0/24) is reachable via Olm on the VPS and Newt at home.
 - Traefik runs with `network_mode: service:gerbil`, so 80/443 are bound by Gerbil and shared.
 
-## Core vs Add-ons
-Core services are in `docker-compose.yml`:
-- traefik, pangolin, gerbil, crowdsec, traefik-agent
-- traefik-dashboard, crowdsec-web-ui, pocket-id, dockhand
+## Stack Organization
 
-Add-ons are in `docker-compose.addons.yml`:
-- homarr, dashdot, linkstack, termix, qbit-proxy
-- olm is commented out in compose; it runs as systemd on the VPS.
+Services are organized into 6 stacks under `stacks/`:
+
+| Stack | Services | Purpose |
+|-------|----------|---------|
+| **core** | pangolin, gerbil, traefik | Infrastructure (starts first, creates `pangolin` network) |
+| **security** | crowdsec, crowdsec-web-ui, pocket-id | Protection & auth |
+| **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
+| **management** | dockhand | Container management |
+| **dashboard** | homarr, qbit-proxy | User dashboards |
+| **apps** | linkstack, termix | User applications |
+
+### Startup Order
+1. **core** (creates network, must start first)
+2. **security**, **management** (can start in parallel)
+3. **observability**, **dashboard**, **apps** (can start in parallel)
+
+All stacks except core use `networks.pangolin: external: true`.
 
 ## Service Inventory (Ports and Roles)
 Core:
 - Pangolin: control plane, 3001 (internal).
 - Gerbil: WireGuard relay, 51820/udp and 21820/udp; also binds 80/443 for Traefik.
 - Traefik: reverse proxy, uses Gerbil network namespace, routes HTTPS via Let's Encrypt.
+
+Security:
 - CrowdSec: 6060/8080, LAPI and bouncers; ingests Traefik logs.
-- Traefik Agent: log dashboard agent, 5000.
-- Traefik Dashboard: UI for Traefik logs, 3457.
 - CrowdSec Web UI: admin UI for CrowdSec, 3458 (mapped to 3000 in container).
 - Pocket ID: auth provider, 1411 (behind Traefik).
+
+Observability:
+- Traefik Agent: log dashboard agent, 5000.
+- Traefik Dashboard: UI for Traefik logs, 3457.
+- Dashdot: system dashboard, 3001 (behind Traefik).
+
+Management:
 - Dockhand: container management & auto-update, 3000 (behind Traefik).
 
-Add-ons:
+Dashboard:
 - Homarr: dashboard, 7575 (behind Traefik).
-- Dashdot: system dashboard, 3001 (behind Traefik).
+- qbit-proxy: local proxy for qBittorrent widget, 8081 (internal).
+
+Apps:
 - LinkStack: landing page, 80 (behind Traefik).
 - Termix: web SSH, 8080 (behind Traefik).
-- qbit-proxy: local proxy for qBittorrent widget, 8081 (internal).
 
 ## Public Endpoints
 - Pangolin: https://pangolin.dennisb.xyz
@@ -50,8 +69,8 @@ Add-ons:
 - Dockhand: https://dockhand.dennisb.xyz
 
 ## Startup and Health
-- Use `./startup.sh` to pull images, start all services, and wait for health.
-- The script assumes everything is off and brings the entire stack up.
+- Use `./startup.sh` to pull images and start all stacks in phased order.
+- Use `./stackctl.sh` to manage individual stacks.
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Home Network Tunnel (Olm)
@@ -71,19 +90,30 @@ Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.
 - The proxy strips the Secure cookie flag and sets the correct Host header.
 
 ## File Layout
-- `README.md`: quick start and overview.
-- `INFRASTRUCTURE.md`: detailed architecture and troubleshooting.
-- `docker-compose.yml`: core services + select add-ons.
-- `docker-compose.addons.yml`: optional dashboards/tools.
-- `startup.sh`: start everything and wait for health.
-- `backup.sh`: backup/restore and systemd timer automation.
-- `config/`: service configs and secrets (pangolin, crowdsec, traefik).
-- `config/db/`: Pangolin database.
-- `config/traefik/rules/`: Traefik dynamic rules.
-- `config/letsencrypt/`: ACME certs (`acme.json`).
-- `qbit-proxy/`: proxy build context (`Dockerfile`, `index.js`).
-- `data/`: runtime data, used by Pocket ID and other services.
-- `logs/`: stack logs (Traefik logs live under `config/traefik/logs/`).
+```
+pangolin-stack/
+├── stacks/
+│   ├── core/docker-compose.yml         # pangolin, gerbil, traefik
+│   ├── security/docker-compose.yml     # crowdsec, crowdsec-web-ui, pocket-id
+│   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
+│   ├── management/docker-compose.yml   # dockhand
+│   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
+│   └── apps/docker-compose.yml         # linkstack, termix
+├── config/                             # service configs (pangolin, crowdsec, traefik)
+├── config/db/                          # Pangolin database
+├── config/traefik/rules/               # Traefik dynamic rules
+├── config/letsencrypt/                 # ACME certs (acme.json)
+├── qbit-proxy/                         # proxy build context (Dockerfile, index.js)
+├── data/                               # runtime data (Pocket ID, Dockhand)
+├── logs/                               # stack logs
+├── .env                                # shared environment variables
+├── startup.sh                          # start all stacks in order
+├── stackctl.sh                         # stack management utility
+├── backup.sh                           # backup/restore script
+├── README.md                           # quick start
+├── INFRASTRUCTURE.md                   # detailed architecture
+└── AGENTS.md                           # this file
+```
 
 ## Key Environment Variables
 From `.env` (all are referenced in compose):
@@ -102,7 +132,7 @@ From `.env` (all are referenced in compose):
 - DISABLE_HUB_UPDATE
 
 ## Traefik Notes
-- Traefik config lives in `config/traefik/traefik_config.yml` (example in `config/traefik/traefik_config.yml.example`).
+- Traefik config lives in `config/traefik/traefik_config.yml`.
 - Dynamic rules live in `config/traefik/rules/`.
 - Access and error logs live in `config/traefik/logs/`.
 - Traefik uses Docker socket for service discovery.
@@ -135,11 +165,25 @@ From `.env` (all are referenced in compose):
 - `torrent.dennisb.xyz` resolves via `extra_hosts` in Homarr to 192.168.0.10.
 
 ## Common Commands
+
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.addons.yml ps
-docker compose -f docker-compose.yml -f docker-compose.addons.yml logs -f
-docker compose -f docker-compose.yml -f docker-compose.addons.yml pull
-docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
+# Start all stacks
+./startup.sh
+
+# View all stack status
+./stackctl.sh status
+
+# Manage individual stacks
+./stackctl.sh start <stack>
+./stackctl.sh stop <stack>
+./stackctl.sh restart <stack>
+./stackctl.sh logs <stack>
+
+# Pull latest images
+./stackctl.sh pull
+
+# Stop everything
+./stackctl.sh down
 ```
 
 ## Dockhand Management & API
@@ -150,7 +194,7 @@ Dockhand replaced Portainer for container management.
   - Stacks: Headless updates via **Webhooks** (Settings -> Stacks -> Webhook).
 - **Remote Hosts**:
   - **NASUS** (Home): Connected via Hawser agent in TCP mode.
-  - Host: `192.168.0.10`, Port: `2376`, Token: Secured in `.env` (Telegram section) and Dockhand UI.
+  - Host: `192.168.0.10`, Port: `2376`, Token: Secured in `.env` and Dockhand UI.
 
 ### Common API Endpoints
 | Action | Method | Endpoint |
@@ -162,11 +206,6 @@ Dockhand replaced Portainer for container management.
 | Trigger Webhook | GET/POST | `/api/git/stacks/{id}/webhook` |
 | Activity Log | GET | `/api/activity` |
 
-Example Container List:
-```bash
-curl -s https://dockhand.dennisb.xyz/api/containers
-```
-
 ## When Editing Docs
 - Keep `README.md` and `INFRASTRUCTURE.md` in sync with compose files.
-- If services move between core/add-ons, update this file too.
+- If services move between stacks, update this file too.

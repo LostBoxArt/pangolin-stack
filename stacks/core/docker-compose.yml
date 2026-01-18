@@ -1,0 +1,72 @@
+# Pangolin Stack - Core Infrastructure
+# Must start first - creates the pangolin network
+
+name: pangolin-core
+
+networks:
+  pangolin:
+    driver: bridge
+    name: pangolin
+
+services:
+  pangolin:
+    container_name: pangolin
+    networks:
+      - pangolin
+    healthcheck:
+      interval: 3s
+      retries: 5
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3001/api/v1/
+      timeout: 3s
+    image: fosrl/pangolin:1.14.1
+    restart: unless-stopped
+    volumes:
+      - ../../config:/app/config
+
+  gerbil:
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    networks:
+      - pangolin
+    command:
+      - --reachableAt=http://gerbil:3003
+      - --generateAndSaveKeyTo=/var/config/key
+      - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
+      - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
+    container_name: gerbil
+    depends_on:
+      pangolin:
+        condition: service_healthy
+    image: fosrl/gerbil:latest
+    ports:
+      - 51820:51820/udp
+      - 21820:21820/udp
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+    volumes:
+      - ../../config/:/var/config
+
+  traefik:
+    command:
+      - --configFile=/etc/traefik/traefik_config.yml
+    container_name: traefik
+    labels:
+      - wud.watch=false
+    depends_on:
+      pangolin:
+        condition: service_healthy
+    image: traefik:latest
+    network_mode: service:gerbil
+    restart: unless-stopped
+    volumes:
+      - ../../config/traefik:/etc/traefik:ro
+      - ../../config/letsencrypt:/letsencrypt
+      - ../../config/traefik/logs:/var/log/traefik
+      - ../../config/traefik/rules:/rules
+      - /var/run/docker.sock:/var/run/docker.sock

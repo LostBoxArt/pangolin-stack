@@ -35,6 +35,7 @@ Add-ons:
 - Dashdot: system dashboard, 3001 (behind Traefik).
 - LinkStack: landing page, 80 (behind Traefik).
 - Termix: web SSH, 8080 (behind Traefik).
+- Dockhand: container management, 3000 (behind Traefik).
 - qbit-proxy: local proxy for qBittorrent widget, 8081 (internal).
 
 ## Public Endpoints
@@ -48,6 +49,7 @@ Add-ons:
 - LinkStack: https://example.com
 - CrowdSec Web UI: http://<cloudnode-ip>:3458
 - Portainer: https://<cloudnode-ip>:9443
+- Dockhand: https://dockhand.example.com
 
 ## Startup and Health
 - Use `./startup.sh` to pull images, start all services, and wait for health.
@@ -75,6 +77,7 @@ Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.
 - `INFRASTRUCTURE.md`: detailed architecture and troubleshooting.
 - `docker-compose.yml`: core services + select add-ons.
 - `docker-compose.addons.yml`: optional dashboards/tools.
+- `docker-compose.dockhand.yml`: Dockhand management (testing).
 - `startup.sh`: start everything and wait for health.
 - `backup.sh`: backup/restore and systemd timer automation.
 - `config/`: service configs and secrets (pangolin, crowdsec, traefik).

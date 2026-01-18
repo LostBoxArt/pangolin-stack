@@ -12,7 +12,7 @@ This file is the one-stop overview for agents working in this repo. It captures 
 ## Core vs Add-ons
 Core services are in `docker-compose.yml`:
 - traefik, pangolin, gerbil, crowdsec, traefik-agent
-- traefik-dashboard, crowdsec-web-ui, pocket-id, portainer
+- traefik-dashboard, crowdsec-web-ui, pocket-id, dockhand
 
 Add-ons are in `docker-compose.addons.yml`:
 - homarr, dashdot, linkstack, termix, qbit-proxy
@@ -28,14 +28,13 @@ Core:
 - Traefik Dashboard: UI for Traefik logs, 3457.
 - CrowdSec Web UI: admin UI for CrowdSec, 3458 (mapped to 3000 in container).
 - Pocket ID: auth provider, 1411 (behind Traefik).
-- Portainer: Docker management, 9000/9443 (and 8000).
+- Dockhand: container management & auto-update, 3000 (behind Traefik).
 
 Add-ons:
 - Homarr: dashboard, 7575 (behind Traefik).
 - Dashdot: system dashboard, 3001 (behind Traefik).
 - LinkStack: landing page, 80 (behind Traefik).
 - Termix: web SSH, 8080 (behind Traefik).
-- Dockhand: container management, 3000 (behind Traefik).
 - qbit-proxy: local proxy for qBittorrent widget, 8081 (internal).
 
 ## Public Endpoints
@@ -48,7 +47,6 @@ Add-ons:
 - Termix: https://termix.dennisb.xyz
 - LinkStack: https://dennisb.xyz
 - CrowdSec Web UI: http://<vps-ip>:3458
-- Portainer: https://<vps-ip>:9443
 - Dockhand: https://dockhand.dennisb.xyz
 
 ## Startup and Health
@@ -77,7 +75,6 @@ Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.
 - `INFRASTRUCTURE.md`: detailed architecture and troubleshooting.
 - `docker-compose.yml`: core services + select add-ons.
 - `docker-compose.addons.yml`: optional dashboards/tools.
-- `docker-compose.dockhand.yml`: Dockhand management (testing).
 - `startup.sh`: start everything and wait for health.
 - `backup.sh`: backup/restore and systemd timer automation.
 - `config/`: service configs and secrets (pangolin, crowdsec, traefik).
@@ -94,7 +91,8 @@ From `.env` (all are referenced in compose):
 - CROWDSEC_AGENT_KEY
 - CROWDSEC_WEB_UI_PASSWORD
 - HOMARR_SECRET_KEY
-- PORTAINER_LICENSE_KEY
+- TELEGRAM_BOT_TOKEN
+- TELEGRAM_CHAT_ID
 - POCKET_ID_APP_URL
 - POCKET_ID_ENCRYPTION_KEY
 - POCKET_ID_TRUST_PROXY
@@ -125,9 +123,10 @@ From `.env` (all are referenced in compose):
 - Restore stops services, restores files, and re-imports volumes.
 
 ## Docker Volumes and External Data
-- External volumes: `portainer_data`, `linkstack_linkstack_data`.
+- External volumes: `linkstack_linkstack_data`.
 - Homarr data is in `/opt/homarr/appdata` on the host.
-- Docker socket is mounted for Traefik and Homarr.
+- Dockhand data is in `./data/dockhand`.
+- Docker socket is mounted for Traefik, Homarr, and Dockhand.
 
 ## Known Operational Assumptions
 - Cloudflare DNS points `*.dennisb.xyz` to the VPS IP with proxy enabled.
@@ -141,6 +140,31 @@ docker compose -f docker-compose.yml -f docker-compose.addons.yml ps
 docker compose -f docker-compose.yml -f docker-compose.addons.yml logs -f
 docker compose -f docker-compose.yml -f docker-compose.addons.yml pull
 docker compose -f docker-compose.yml -f docker-compose.addons.yml up -d
+```
+
+## Dockhand Management & API
+Dockhand replaced Portainer for container management.
+- **Base URL**: `https://dockhand.dennisb.xyz/api/`
+- **Authentication**:
+  - REST API: Requires a session cookie from the web UI.
+  - Stacks: Headless updates via **Webhooks** (Settings -> Stacks -> Webhook).
+- **Remote Hosts**:
+  - **NASUS** (Home): Connected via Hawser agent in TCP mode.
+  - Host: `192.168.0.10`, Port: `2376`, Token: Secured in `.env` (Telegram section) and Dockhand UI.
+
+### Common API Endpoints
+| Action | Method | Endpoint |
+| :--- | :--- | :--- |
+| List Containers | GET | `/api/containers` |
+| View Logs | GET | `/api/containers/{id}/logs` |
+| Restart Container | POST | `/api/containers/{id}/restart` |
+| List Stacks | GET | `/api/stacks` |
+| Trigger Webhook | GET/POST | `/api/git/stacks/{id}/webhook` |
+| Activity Log | GET | `/api/activity` |
+
+Example Container List:
+```bash
+curl -s https://dockhand.dennisb.xyz/api/containers
 ```
 
 ## When Editing Docs

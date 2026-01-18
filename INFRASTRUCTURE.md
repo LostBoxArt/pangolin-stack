@@ -82,9 +82,8 @@ graph TD
 
 | File | Purpose | Services |
 |------|---------|----------|
-| `docker-compose.yml` | Core infrastructure + select add-ons | traefik, pangolin, gerbil, crowdsec, traefik-agent, traefik-dashboard, crowdsec-web-ui, pocket-id, portainer |
+| `docker-compose.yml` | Core infrastructure + select add-ons | traefik, pangolin, gerbil, crowdsec, traefik-agent, traefik-dashboard, crowdsec-web-ui, pocket-id, dockhand |
 | `docker-compose.addons.yml` | Dashboard & tools | homarr, dashdot, linkstack, termix, qbit-proxy |
-| `docker-compose.dockhand.yml` | Container management (testing) | dockhand |
 
 ## Olm Tunnel Configuration
 
@@ -182,7 +181,8 @@ Key variables in `.env`:
 | `CROWDSEC_AGENT_KEY` | CrowdSec agent registration key |
 | `CROWDSEC_WEB_UI_PASSWORD` | CrowdSec Web UI login |
 | `HOMARR_SECRET_KEY` | Homarr encryption key |
-| `PORTAINER_LICENSE_KEY` | Portainer EE license |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token for notifications |
+| `TELEGRAM_CHAT_ID` | Telegram chat ID for notifications |
 | `POCKET_ID_APP_URL` | Pocket ID public URL |
 | `POCKET_ID_ENCRYPTION_KEY` | Pocket ID encryption secret |
 | `POCKET_ID_TRUST_PROXY` | Pocket ID proxy trust flag |

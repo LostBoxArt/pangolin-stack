@@ -27,3 +27,12 @@ decisions:
 #   - http_default   # Set the required http parameters in /etc/crowdsec/notifications/http.yaml before enabling this.
 #   - email_default  # Set the required email parameters in /etc/crowdsec/notifications/email.yaml before enabling this.
 on_success: break
+---
+name: geo_blocking_profile
+#debug: true
+filters:
+ - Alert.Remediation == true && Alert.GetScope() == "Ip" && Alert.GetScenario() == "custom/country-block"
+decisions:
+ - type: ban
+   duration: 24h
+on_success: break

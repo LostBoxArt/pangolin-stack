@@ -42,5 +42,5 @@ services:
       - "traefik.http.routers.homarr.rule=Host(`home.dennisb.xyz`)"
       - "traefik.http.routers.homarr.entrypoints=websecure"
       - "traefik.http.routers.homarr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.homarr.middlewares=security-headers@file"
+      - "traefik.http.routers.homarr.middlewares=geoblock@file,security-headers@file"
       - "traefik.http.services.homarr.loadbalancer.server.port=7575"

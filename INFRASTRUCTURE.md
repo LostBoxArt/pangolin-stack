@@ -164,6 +164,43 @@ sudo systemctl restart olm
 ```
 If you run Olm via Docker instead of systemd, use `docker logs olm` and `docker restart olm`.
 
+## Geo-Blocking
+
+The stack implements defense-in-depth geo-blocking using both CrowdSec and Traefik to block traffic from high-risk countries.
+
+### Configuration
+
+**Blocked Countries**: CN, RU, KP, IR, VN, IN, PK, BD, NG, BR, ID, UA, KZ  
+**Whitelisted**: IL (Israel), EU member states, US, CA, GB, AU, NZ, JP, KR, SG
+
+### Components
+
+1. **CrowdSec GeoIP Enrichment** (`config/crowdsec/scenarios/country-block.yaml`)
+   - Enriches logs with country data
+   - Bans IPs from blocked countries for 24 hours
+   - Uses `crowdsecurity/geoip-enrich` parser
+
+2. **Traefik GeoBlock Middleware** (`config/traefik/rules/geoblock-middleware.yml`)
+   - Immediate edge blocking using GeoJS API
+   - Applied to: LinkStack, Termix, Homarr, Dashdot
+   - Not applied to: PocketID (has own MaxMind), Pangolin, CrowdSec, Dockhand
+
+### Management
+
+```bash
+# View geo-blocking alerts
+docker exec crowdsec cscli alerts list --origin custom/country-block
+
+# Check blocked decisions
+docker exec crowdsec cscli decisions list
+
+# Whitelist an additional country: edit both files
+# - config/crowdsec/scenarios/country-block.yaml
+# - config/traefik/rules/geoblock-middleware.yml
+# Then restart services
+docker restart crowdsec
+./stackctl.sh restart core
+```
 
 
 ### CrowdSec
@@ -177,6 +214,16 @@ docker exec crowdsec cscli bouncers list
 
 # View alerts
 docker exec crowdsec cscli alerts list
+
+# Geo-blocking metrics
+docker exec crowdsec cscli metrics
+docker exec crowdsec cscli alerts list -l 20 --origin custom/country-block
+
+# Verify GeoIP enrichment is active
+docker exec crowdsec cscli parsers list | grep geoip
+
+# Verify country-block scenario is loaded
+docker exec crowdsec cscli scenarios list | grep country
 ```
 
 ## Environment Variables

@@ -110,6 +110,17 @@ sudo systemctl restart olm      # Restart tunnel
 ### qBittorrent Authorization Errors
 Use the **qbit-proxy** sidecar in the dashboard stack. Set widget URL to `http://qbit-proxy:8081`.
 
+## Security Features
+
+### Geo-Blocking
+
+The stack blocks traffic from **13 high-risk countries** (CN, RU, KP, IR, VN, IN, PK, BD, NG, BR, ID, UA, KZ) while whitelisting Israel and EU.
+
+- **CrowdSec**: GeoIP enrichment with 24h bans for blocked countries
+- **Traefik**: Immediate edge blocking using GeoBlock middleware
+
+View geo-blocked IPs: `docker exec crowdsec cscli alerts list --origin custom/country-block`
+
 ## Documentation
 
 See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for detailed architecture documentation.

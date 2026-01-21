@@ -1,0 +1,43 @@
+http:
+  middlewares:
+    geoblock:
+      plugin:
+        geoblock:
+          # Startup and logging
+          silentStartUp: false
+          allowLocalRequests: true
+          logLocalRequests: false
+          logAllowedRequests: false
+          logApiRequests: true
+          
+          # API configuration
+          api: https://get.geojs.io/v1/ip/country/{ip}
+          apiTimeoutMs: 750
+          cacheSize: 25
+          forceMonthlyUpdate: true
+          
+          # Unknown countries handling
+          allowUnknownCountries: false
+          unknownCountryApiResponse: "nil"
+          
+          # Blacklist mode enabled
+          blackListMode: true
+          
+          # Countries to BLOCK (bad actors)
+          countries:
+            - CN  # China - Massive bot networks, state-sponsored attacks
+            - RU  # Russia - State-sponsored attacks, ransomware
+            - KP  # North Korea - State-sponsored attacks
+            - IR  # Iran - State-sponsored attacks
+            - VN  # Vietnam - Spam, phishing campaigns
+            - IN  # India - High bot traffic, credential stuffing
+            - PK  # Pakistan - Spam origins
+            - BD  # Bangladesh - Fraud attempts
+            - NG  # Nigeria - Phishing, business email scams
+            - BR  # Brazil - High scraping activity
+            - ID  # Indonesia - Bot networks
+            - UA  # Ukraine - Compromised infrastructure
+            - KZ  # Kazakhstan - Proxy abuse
+          
+          # Note: Israel (IL) and all EU countries are automatically allowed
+          # as they are NOT in the blacklist

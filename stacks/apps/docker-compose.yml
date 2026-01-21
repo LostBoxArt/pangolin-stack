@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.linkstack.rule=Host(`example.com`)"
       - "traefik.http.routers.linkstack.entrypoints=websecure"
       - "traefik.http.routers.linkstack.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.linkstack.middlewares=security-headers@file"
+      - "traefik.http.routers.linkstack.middlewares=geoblock@file,security-headers@file"
       - "traefik.http.services.linkstack.loadbalancer.server.port=80"
 
   termix:
@@ -49,7 +49,7 @@ services:
       - "traefik.http.routers.termix.rule=Host(`termix.example.com`)"
       - "traefik.http.routers.termix.entrypoints=websecure"
       - "traefik.http.routers.termix.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.termix.middlewares=security-headers@file"
+      - "traefik.http.routers.termix.middlewares=geoblock@file,security-headers@file"
       - "traefik.http.services.termix.loadbalancer.server.port=8080"
 
 volumes:

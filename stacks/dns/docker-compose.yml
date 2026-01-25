@@ -1,0 +1,86 @@
+# Pangolin Stack - DNS Services
+# Requires: core stack (pangolin network)
+
+name: pangolin-dns
+
+networks:
+  pangolin:
+    external: true
+
+services:
+  adguard-home:
+    image: adguard/adguardhome:latest
+    container_name: adguard-home
+    hostname: adguard-home
+    networks:
+      - pangolin
+    restart: unless-stopped
+    volumes:
+      - ../../config/adguard-home/work:/opt/adguardhome/work
+      - ../../config/adguard-home/conf:/opt/adguardhome/conf
+    # No ports exposed - Traefik handles all traffic
+    labels:
+      # HTTP redirect to HTTPS
+      - "traefik.enable=true"
+      - "traefik.http.routers.adguard-redirect.rule=Host(`dns.example.com`)"
+      - "traefik.http.routers.adguard-redirect.entrypoints=web"
+      - "traefik.http.routers.adguard-redirect.middlewares=redirect-to-https@file"
+      
+      # Main HTTPS router for web UI
+      - "traefik.http.routers.adguard.rule=Host(`dns.example.com`)"
+      - "traefik.http.routers.adguard.entrypoints=websecure"
+      - "traefik.http.routers.adguard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.adguard.middlewares=security-headers@file"
+      - "traefik.http.services.adguard.loadbalancer.server.port=80"
+      
+      # DoH router - separate path for DNS queries (no extra middlewares)
+      - "traefik.http.routers.adguard-doh.rule=Host(`dns.example.com`) && PathPrefix(`/dns-query`)"
+      - "traefik.http.routers.adguard-doh.entrypoints=websecure"
+      - "traefik.http.routers.adguard-doh.tls.certresolver=letsencrypt"
+      # No security-headers for DoH - could break DNS clients
+      - "traefik.http.services.adguard-doh.loadbalancer.server.port=80"
+
+      # DoT router - TCP for DNS-over-TLS on port 853
+      - "traefik.tcp.routers.adguard-dot.rule=HostSNI(`dns.example.com`)"
+      - "traefik.tcp.routers.adguard-dot.entrypoints=dns-tls"
+      - "traefik.tcp.routers.adguard-dot.tls.certresolver=letsencrypt"
+      - "traefik.tcp.services.adguard-dot.loadbalancer.server.port=53"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  adguardhome-sync:
+    image: ghcr.io/bakito/adguardhome-sync:latest
+    container_name: adguardhome-sync
+    networks:
+      - pangolin
+    restart: unless-stopped
+    command: run
+    environment:
+      # Origin - Home AdGuard (master)
+      - ORIGIN_URL=http://192.168.1.1:8080
+      - ORIGIN_USERNAME=${ADGUARD_HOME_ORIGIN_USERNAME}
+      - ORIGIN_PASSWORD=${ADGUARD_HOME_ORIGIN_PASSWORD}
+      - ORIGIN_INSECURE_SKIP_VERIFY=true
+      # Replica - CloudNode AdGuard
+      - REPLICA1_URL=http://adguard-home:80
+      - REPLICA1_USERNAME=${ADGUARD_CloudNode_USERNAME}
+      - REPLICA1_PASSWORD=${ADGUARD_CloudNode_PASSWORD}
+      # Sync settings
+      - CRON=0 */12 * * *
+      - RUN_ON_START=true
+      - CONTINUE_ON_ERROR=true
+      # Feature flags
+      - FEATURES_DHCP_SERVERCONFIG=false
+      - FEATURES_DHCP_STATICLEASES=false
+    extra_hosts:
+      # Route to home network via OLM tunnel
+      - "home-adguard:192.168.1.1"
+    depends_on:
+      adguard-home:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=false"

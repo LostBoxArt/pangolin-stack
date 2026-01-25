@@ -31,7 +31,7 @@ fi
 
 # Stack startup order (dependencies first)
 STACKS_PHASE1="core"
-STACKS_PHASE2="security management"
+STACKS_PHASE2="security dns management"
 STACKS_PHASE3="observability dashboard apps"
 
 start_stack() {

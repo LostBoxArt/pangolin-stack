@@ -18,6 +18,7 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Core infrastructure (starts first) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Security & authentication |
+| **dns** | adguard-home, adguardhome-sync | DNS-over-HTTPS with sync |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
@@ -101,9 +102,25 @@ sudo systemctl restart olm      # Restart tunnel
 | Homarr | https://home.dennisb.xyz |
 | Dashdot | https://dash.dennisb.xyz |
 | Dockhand | https://dockhand.dennisb.xyz |
+| AdGuard Home | https://dns.dennisb.xyz |
 | LinkStack | https://dennisb.xyz |
 | Termix | https://termix.dennisb.xyz |
 | CrowdSec Web UI | http://<vps-ip>:3458 |
+
+## DNS-over-HTTPS (DoH)
+
+AdGuard Home runs on the VPS and syncs blocklists from the home router every 12 hours.
+
+**DoH URL:** `https://dns.dennisb.xyz/dns-query`
+
+### Device Setup
+
+| Device | Instructions |
+|--------|--------------|
+| **iPhone/iOS** | Visit dns.dennisb.xyz → Setup Guide → Download iOS profile |
+| **Android 9+** | Settings → Network → Private DNS → `dns.dennisb.xyz` |
+| **Firefox** | Settings → Privacy → Enable DoH → Custom: `https://dns.dennisb.xyz/dns-query` |
+| **Chrome** | Settings → Privacy → Use secure DNS → Custom: `https://dns.dennisb.xyz/dns-query` |
 
 ## Troubleshooting
 

@@ -15,7 +15,7 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-STACKS="core security observability management dashboard apps"
+STACKS="core security dns observability management dashboard apps"
 
 usage() {
     echo "Usage: $0 <command> [stack]"

@@ -86,12 +86,38 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 |-------|---------|----------|
 | `core` | Infrastructure (starts first) | pangolin, gerbil, traefik |
 | `security` | Protection & auth | crowdsec, crowdsec-web-ui, pocket-id |
+| `dns` | DNS-over-HTTPS & filtering | adguard-home, adguardhome-sync |
 | `observability` | Monitoring & logs | traefik-agent, traefik-dashboard, dashdot |
 | `management` | Container orchestration | dockhand |
 | `dashboard` | User dashboards | homarr, qbit-proxy |
 | `apps` | User applications | linkstack, termix |
 
 Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everything.
+
+## AdGuard Home Sync
+
+AdGuard Home on the VPS syncs blocklists and settings from the home router (origin) every 12 hours.
+
+### Sync Features
+- Blocklists and filters
+- DNS rewrites
+- Client settings
+- General settings
+
+### Management
+```bash
+# Force immediate sync
+docker exec adguardhome-sync /app/adguardhome-sync run
+
+# Check sync logs
+docker logs adguardhome-sync --tail 50
+
+# Access web UI
+# https://dns.dennisb.xyz
+```
+
+### DoH Endpoint
+Devices can use `https://dns.dennisb.xyz/dns-query` for DNS-over-HTTPS.
 
 ## Olm Tunnel Configuration
 

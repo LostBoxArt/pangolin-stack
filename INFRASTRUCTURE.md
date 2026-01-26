@@ -228,6 +228,44 @@ docker restart crowdsec
 ./stackctl.sh restart core
 ```
 
+## Blocklist Import
+
+The stack imports 60,000+ IPs from 28 public threat feeds into CrowdSec for proactive blocking. This provides premium-level threat protection using free, curated feeds like IPsum, Spamhaus, Firehol, and Abuse.ch.
+
+### Running Manually
+
+```bash
+# Using the helper script
+./scripts/blocklist-import.sh
+
+# Or run directly
+curl -sL https://raw.githubusercontent.com/wolffcatskyy/crowdsec-blocklist-import/main/import.sh | \
+    MODE=docker CROWDSEC_CONTAINER=crowdsec bash
+```
+
+### Scheduled Import (Recommended)
+
+Add to crontab for daily refresh at 4 AM:
+
+```bash
+crontab -e
+# Add this line:
+0 4 * * * /home/jesus/pangolin-stack/scripts/blocklist-import.sh
+```
+
+### View Imported Decisions
+
+```bash
+# Count imported decisions
+docker exec crowdsec cscli decisions list | grep external_blocklist | wc -l
+
+# List recent blocklist decisions
+docker exec crowdsec cscli decisions list -l 20 | grep external_blocklist
+
+# Remove all imported decisions (if needed)
+docker exec crowdsec cscli decisions delete --all --reason external_blocklist
+```
+
 
 ### CrowdSec
 

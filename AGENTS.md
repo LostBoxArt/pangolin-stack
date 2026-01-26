@@ -140,8 +140,10 @@ From `.env` (all are referenced in compose):
 ## CrowdSec Notes
 - Configs under `config/crowdsec/`.
 - Data DB under `config/crowdsec/db/`.
+- Blocklist import: `./scripts/blocklist-import.sh` (or add to cron for daily updates)
 - Common commands:
   - `docker exec crowdsec cscli decisions list`
+  - `docker exec crowdsec cscli decisions list | grep external_blocklist | wc -l`
   - `docker exec crowdsec cscli bouncers list`
   - `docker exec crowdsec cscli alerts list`
 

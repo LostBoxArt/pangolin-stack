@@ -47,6 +47,10 @@ services:
       - /var/log/syslog:/var/log/syslog:ro
       - ../../config/traefik/logs:/var/log/traefik
 
+  # NOTE: crowdsec-blocklist-import Docker image has a bug (docker CLI not working inside container)
+  # Use the host script instead: ./scripts/blocklist-import.sh
+  # See INFRASTRUCTURE.md for cron setup
+
   crowdsec-web-ui:
     image: ghcr.io/theduffman85/crowdsec-web-ui:latest
     container_name: crowdsec-web-ui

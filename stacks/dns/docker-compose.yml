@@ -52,35 +52,3 @@ services:
       retries: 3
       start_period: 30s
 
-  adguardhome-sync:
-    image: ghcr.io/bakito/adguardhome-sync:latest
-    container_name: adguardhome-sync
-    networks:
-      - pangolin
-    restart: unless-stopped
-    command: run
-    environment:
-      # Origin - Home AdGuard (master)
-      - ORIGIN_URL=http://192.168.1.1:8080
-      - ORIGIN_USERNAME=${ADGUARD_HOME_ORIGIN_USERNAME}
-      - ORIGIN_PASSWORD=${ADGUARD_HOME_ORIGIN_PASSWORD}
-      - ORIGIN_INSECURE_SKIP_VERIFY=true
-      # Replica - CloudNode AdGuard
-      - REPLICA1_URL=http://adguard-home:80
-      - REPLICA1_USERNAME=${ADGUARD_CloudNode_USERNAME}
-      - REPLICA1_PASSWORD=${ADGUARD_CloudNode_PASSWORD}
-      # Sync settings
-      - CRON=0 */12 * * *
-      - RUN_ON_START=true
-      - CONTINUE_ON_ERROR=true
-      # Feature flags
-      - FEATURES_DHCP_SERVERCONFIG=false
-      - FEATURES_DHCP_STATICLEASES=false
-    extra_hosts:
-      # Route to home network via OLM tunnel
-      - "home-adguard:192.168.1.1"
-    depends_on:
-      adguard-home:
-        condition: service_healthy
-    labels:
-      - "traefik.enable=false"

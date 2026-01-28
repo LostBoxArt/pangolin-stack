@@ -18,7 +18,7 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Core infrastructure (starts first) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Security & authentication |
-| **dns** | adguard-home, adguardhome-sync | DNS-over-HTTPS with sync |
+| **dns** | adguard-home | DNS-over-HTTPS \u0026 filtering |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
@@ -109,9 +109,10 @@ sudo systemctl restart olm      # Restart tunnel
 
 ## DNS-over-HTTPS (DoH)
 
-AdGuard Home runs on the CloudNode and syncs blocklists from the home router every 12 hours.
+AdGuard Home runs independently on the CloudNode with its own blocklists and configuration.
 
-**DoH URL:** `https://dns.example.com/dns-query`
+**DoH URL:** `https://dns.example.com/dns-query`  
+**DoT URL:** `dns.example.com:853`
 
 ### Device Setup
 
@@ -121,6 +122,9 @@ AdGuard Home runs on the CloudNode and syncs blocklists from the home router eve
 | **Android 9+** | Settings → Network → Private DNS → `dns.example.com` |
 | **Firefox** | Settings → Privacy → Enable DoH → Custom: `https://dns.example.com/dns-query` |
 | **Chrome** | Settings → Privacy → Use secure DNS → Custom: `https://dns.example.com/dns-query` |
+
+### Configuration
+Manage blocklists and upstream DNS at `https://dns.example.com`
 
 ## Troubleshooting
 

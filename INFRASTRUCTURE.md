@@ -94,30 +94,24 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 
 Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everything.
 
-## AdGuard Home Sync
 
-AdGuard Home on the VPS syncs blocklists and settings from the home router (origin) every 12 hours.
+## AdGuard Home
 
-### Sync Features
-- Blocklists and filters
-- DNS rewrites
-- Client settings
-- General settings
+The VPS runs its own independent AdGuard Home instance with DNS-over-HTTPS (DoH) and DNS-over-TLS (DoT) support.
+
+### Access
+- **Web UI**: https://dns.dennisb.xyz
+- **DoH Endpoint**: `https://dns.dennisb.xyz/dns-query`
+- **DoT Endpoint**: `dns.dennisb.xyz:853`
 
 ### Management
 ```bash
-# Force immediate sync
-docker exec adguardhome-sync /app/adguardhome-sync run
-
-# Check sync logs
-docker logs adguardhome-sync --tail 50
-
-# Access web UI
+# Access web UI to configure blocklists and upstream DNS
 # https://dns.dennisb.xyz
-```
 
-### DoH Endpoint
-Devices can use `https://dns.dennisb.xyz/dns-query` for DNS-over-HTTPS.
+# Check query logs
+docker logs adguard-home --tail 50
+```
 
 ## Olm Tunnel Configuration
 

@@ -18,7 +18,7 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Core infrastructure (starts first) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Security & authentication |
-| **dns** | adguard-home, adguardhome-sync | DNS-over-HTTPS with sync |
+| **dns** | adguard-home | DNS-over-HTTPS \u0026 filtering |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
@@ -109,9 +109,10 @@ sudo systemctl restart olm      # Restart tunnel
 
 ## DNS-over-HTTPS (DoH)
 
-AdGuard Home runs on the VPS and syncs blocklists from the home router every 12 hours.
+AdGuard Home runs independently on the VPS with its own blocklists and configuration.
 
-**DoH URL:** `https://dns.dennisb.xyz/dns-query`
+**DoH URL:** `https://dns.dennisb.xyz/dns-query`  
+**DoT URL:** `dns.dennisb.xyz:853`
 
 ### Device Setup
 
@@ -121,6 +122,9 @@ AdGuard Home runs on the VPS and syncs blocklists from the home router every 12 
 | **Android 9+** | Settings → Network → Private DNS → `dns.dennisb.xyz` |
 | **Firefox** | Settings → Privacy → Enable DoH → Custom: `https://dns.dennisb.xyz/dns-query` |
 | **Chrome** | Settings → Privacy → Use secure DNS → Custom: `https://dns.dennisb.xyz/dns-query` |
+
+### Configuration
+Manage blocklists and upstream DNS at `https://dns.dennisb.xyz`
 
 ## Troubleshooting
 

@@ -37,6 +37,7 @@ services:
       - "traefik.http.routers.adguard-doh.rule=Host(`dns.example.com`) && PathPrefix(`/dns-query`)"
       - "traefik.http.routers.adguard-doh.entrypoints=websecure"
       - "traefik.http.routers.adguard-doh.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.adguard-doh.middlewares=doh-ratelimit@file"
       # No security-headers for DoH - could break DNS clients
       - "traefik.http.services.adguard-doh.loadbalancer.server.port=80"
 

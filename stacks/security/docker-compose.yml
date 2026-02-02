@@ -9,7 +9,6 @@ networks:
 
 services:
   crowdsec:
-    command: -t
     container_name: crowdsec
     networks:
       - pangolin

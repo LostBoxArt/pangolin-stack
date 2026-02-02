@@ -86,7 +86,7 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 |-------|---------|----------|
 | `core` | Infrastructure (starts first) | pangolin, gerbil, traefik |
 | `security` | Protection & auth | crowdsec, crowdsec-web-ui, pocket-id |
-| `dns` | DNS-over-HTTPS & filtering | adguard-home, adguardhome-sync |
+| `dns` | DNS-over-HTTPS & filtering | adguard-home |
 | `observability` | Monitoring & logs | traefik-agent, traefik-dashboard, dashdot |
 | `management` | Container orchestration | dockhand |
 | `dashboard` | User dashboards | homarr, qbit-proxy |

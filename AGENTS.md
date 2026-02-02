@@ -11,12 +11,13 @@ This file is the one-stop overview for agents working in this repo. It captures 
 
 ## Stack Organization
 
-Services are organized into 6 stacks under `stacks/`:
+Services are organized into 7 stacks under `stacks/`:
 
 | Stack | Services | Purpose |
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Infrastructure (starts first, creates `pangolin` network) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Protection & auth |
+| **dns** | adguard-home | DNS-over-HTTPS & filtering |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
@@ -24,7 +25,7 @@ Services are organized into 6 stacks under `stacks/`:
 
 ### Startup Order
 1. **core** (creates network, must start first)
-2. **security**, **management** (can start in parallel)
+2. **security**, **management**, **dns** (can start in parallel)
 3. **observability**, **dashboard**, **apps** (can start in parallel)
 
 All stacks except core use `networks.pangolin: external: true`.
@@ -39,6 +40,9 @@ Security:
 - CrowdSec: 6060/8080, LAPI and bouncers; ingests Traefik logs.
 - CrowdSec Web UI: admin UI for CrowdSec, 3458 (mapped to 3000 in container).
 - Pocket ID: auth provider, 1411 (behind Traefik).
+
+DNS:
+- AdGuard Home: DNS-over-HTTPS/DoT, 3000/53/853 (behind Traefik for UI).
 
 Observability:
 - Traefik Agent: log dashboard agent, 5000.
@@ -67,6 +71,7 @@ Apps:
 - LinkStack: https://example.com
 - CrowdSec Web UI: http://<cloudnode-ip>:3458
 - Dockhand: https://dockhand.example.com
+- AdGuard Home: https://dns.example.com
 
 ## Startup and Health
 - Use `./startup.sh` to pull images and start all stacks in phased order.
@@ -159,6 +164,12 @@ From `.env` (all are referenced in compose):
 - Homarr data is in `/opt/homarr/appdata` on the host.
 - Dockhand data is in `./data/dockhand`.
 - Docker socket is mounted for Traefik, Homarr, and Dockhand.
+
+## AdGuard Home (DNS)
+- Web UI: https://dns.example.com
+- DoH Endpoint: `https://dns.example.com/dns-query`
+- DoT Endpoint: `dns.example.com:853`
+- Manage blocklists and upstream DNS via the web UI.
 
 ## Known Operational Assumptions
 - Cloudflare DNS points `*.example.com` to the CloudNode IP with proxy enabled.

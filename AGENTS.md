@@ -78,13 +78,30 @@ Apps:
 - Use `./stackctl.sh` to manage individual stacks.
 - Health waits for container status to be running and healthchecks to be healthy.
 
+## Version and Upgrade Policy
+- Core pins: Pangolin `1.15.4`, Gerbil `1.3.0`, Traefik Badger plugin `v1.3.1`.
+- NASUS Newt is pinned to `1.9.1`.
+- VPS Olm runs as systemd binary `1.3.0` with `--override-dns=false`.
+- Before upgrades, read:
+  - `https://docs.pangolin.net/self-host/how-to-update`
+  - `https://github.com/fosrl/pangolin/releases`
+  - `https://github.com/fosrl/gerbil/releases`
+  - `https://github.com/fosrl/newt/releases`
+  - `https://github.com/fosrl/olm/releases`
+  - `https://github.com/fosrl/badger/releases`
+
 ## Home Network Tunnel (Olm)
 - Olm is a systemd service on the VPS (not a container).
 - Commands:
   - `sudo systemctl status olm`
   - `sudo journalctl -u olm -f`
   - `sudo systemctl restart olm`
+  - `sudo systemctl status olm-watchdog.timer`
 - Tunnel route used: 192.168.0.0/24.
+
+### Tunnel Watchdogs
+- VPS: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
+- NASUS: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
 
 ## qBittorrent Widget Fix
 Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.

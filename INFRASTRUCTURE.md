@@ -94,6 +94,16 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 
 Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everything.
 
+## Pinned Versions
+
+- Pangolin: `fosrl/pangolin:1.15.4`
+- Gerbil: `fosrl/gerbil:1.3.0`
+- Traefik Badger plugin: `github.com/fosrl/badger@v1.3.1`
+- Newt (NASUS): `fosrl/newt:1.9.1`
+- Olm (VPS systemd binary): `1.3.0` with `--override-dns=false`
+
+Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
+
 
 ## AdGuard Home
 
@@ -121,7 +131,13 @@ Olm is currently running as a **systemd service** on the VPS host to ensure it h
 ```bash
 sudo systemctl status olm
 sudo journalctl -u olm -f
+sudo systemctl status olm-watchdog.timer
 ```
+
+### Reliability Guards
+
+- VPS watchdog: `/usr/local/sbin/olm-watchdog.sh` with systemd timer `olm-watchdog.timer`.
+- NASUS watchdog: `/usr/local/bin/newt-watchdog.sh` from root crontab every minute.
 
 ## qBittorrent Proxy Sidecar
 

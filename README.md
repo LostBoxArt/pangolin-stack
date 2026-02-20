@@ -24,6 +24,21 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **dashboard** | homarr, qbit-proxy | User dashboards |
 | **apps** | linkstack, termix | User applications |
 
+## Version Pins
+
+- Pangolin: `fosrl/pangolin:1.15.4`
+- Gerbil: `fosrl/gerbil:1.3.0`
+- Traefik Badger plugin: `v1.3.1`
+- Newt (HomeNode): `fosrl/newt:1.9.1`
+
+When upgrading, check the official update guide and release notes first:
+- https://docs.pangolin.net/self-host/how-to-update
+- https://github.com/fosrl/pangolin/releases
+- https://github.com/fosrl/gerbil/releases
+- https://github.com/fosrl/newt/releases
+- https://github.com/fosrl/olm/releases
+- https://github.com/fosrl/badger/releases
+
 ## Quick Start
 
 ```bash
@@ -89,7 +104,10 @@ sudo journalctl -u olm -f       # Check logs
 ip addr show olm                # Verify interface
 ping 192.168.1.10               # Test connectivity
 sudo systemctl restart olm      # Restart tunnel
+sudo systemctl status olm-watchdog.timer  # Watchdog timer status
 ```
+
+`olm` is pinned to run with `--override-dns=false` to prevent DNS lockout during tunnel flaps.
 
 ## Access Points
 

@@ -94,3 +94,4 @@ config/traefik/rules/resource-overrides.yml
 config/traefik/traefik_config.yml
 config/db/db.sqlite
 config/adguard-home/conf/AdGuardHome.yaml
+pass.secret

@@ -26,10 +26,13 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 
 ## Version Pins
 
-- Pangolin: `fosrl/pangolin:1.15.4`
+- Pangolin: `fosrl/pangolin:1.16.2`
 - Gerbil: `fosrl/gerbil:1.3.0`
 - Traefik Badger plugin: `v1.3.1`
-- Newt (HomeNode): `fosrl/newt:1.9.1`
+- Newt (HomeNode): `fosrl/newt:1.10.1`
+- Olm (CloudNode systemd binary): `1.4.2` with `--override-dns=false`
+
+Newt `1.10.x` adds the Pangolin SSH site-connector support introduced in Pangolin `1.16.x`. If you only update Newt while staying on Pangolin `1.15.x`, the connector update is still valid, but the new SSH capability is not used.
 
 When upgrading, check the official update guide and release notes first:
 - https://docs.pangolin.net/self-host/how-to-update
@@ -75,6 +78,31 @@ cp .env.example .env && nano .env
 # Stop everything
 ./stackctl.sh down
 ```
+
+## Dockhand API
+
+For scripted Dockhand API use, call the Dockhand container on the CloudNode over SSH instead of the public `https://dockhand.example.com` URL. The public URL is fronted by Pangolin auth and redirects browser flows.
+
+Verified flow:
+
+```bash
+ssh user@example.com '
+DOCKHAND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}" dockhand | awk "{print \$1}")
+curl -sk -c /tmp/dockhand.cookie \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"admin\",\"password\":\"<dockhand-local-password>\"}" \
+  "http://${DOCKHAND_IP}:3000/api/auth/login"
+
+TOKEN=$(awk "/dockhand_session/ {print \$7}" /tmp/dockhand.cookie)
+curl -sk -H "Cookie: dockhand_session=${TOKEN}" \
+  "http://${DOCKHAND_IP}:3000/api/stacks?env=2"
+'
+```
+
+Environment IDs:
+- `1` = CloudNode
+- `2` = HomeNode
 
 ## File Structure
 

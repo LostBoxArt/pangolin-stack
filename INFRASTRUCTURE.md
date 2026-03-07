@@ -96,11 +96,13 @@ Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everyth
 
 ## Pinned Versions
 
-- Pangolin: `fosrl/pangolin:1.15.4`
+- Pangolin: `fosrl/pangolin:1.16.2`
 - Gerbil: `fosrl/gerbil:1.3.0`
 - Traefik Badger plugin: `github.com/fosrl/badger@v1.3.1`
-- Newt (HomeNode): `fosrl/newt:1.9.1`
-- Olm (CloudNode systemd binary): `1.3.0` with `--override-dns=false`
+- Newt (HomeNode): `fosrl/newt:1.10.1`
+- Olm (CloudNode systemd binary): `1.4.2` with `--override-dns=false`
+
+Compatibility note: Newt `1.10.x` adds Pangolin SSH support and aligns with Pangolin `1.16.x`. If Pangolin remains on `1.15.x`, updating Newt alone is still supported, but that new SSH path is not active.
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 
@@ -138,6 +140,40 @@ sudo systemctl status olm-watchdog.timer
 
 - CloudNode watchdog: `/usr/local/sbin/olm-watchdog.sh` with systemd timer `olm-watchdog.timer`.
 - HomeNode watchdog: `/usr/local/bin/newt-watchdog.sh` from root crontab every minute.
+
+## Dockhand API
+
+Use the Dockhand container's internal HTTP endpoint over SSH to the CloudNode for automation. The public `https://dockhand.example.com` URL is fronted by Pangolin auth and is not the right path for CLI API calls.
+
+Verified flow:
+
+```bash
+ssh user@example.com '
+DOCKHAND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}" dockhand | awk "{print \$1}")
+
+curl -skD /tmp/dockhand.headers \
+  -c /tmp/dockhand.cookie \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"admin\",\"password\":\"<dockhand-local-password>\"}" \
+  "http://${DOCKHAND_IP}:3000/api/auth/login"
+
+TOKEN=$(awk "/dockhand_session/ {print \$7}" /tmp/dockhand.cookie)
+curl -sk -H "Cookie: dockhand_session=${TOKEN}" \
+  "http://${DOCKHAND_IP}:3000/api/stacks?env=2"
+'
+```
+
+Environment IDs:
+- `1` = CloudNode
+- `2` = HomeNode
+
+Common API endpoints:
+- `GET /api/containers?env=<id>`
+- `GET /api/stacks?env=<id>`
+- `GET /api/git/stacks?env=<id>`
+- `POST /api/git/stacks/{id}/deploy?env=<id>`
+- `POST /api/containers/{id}/restart?env=<id>`
 
 ## qBittorrent Proxy Sidecar
 

@@ -79,9 +79,10 @@ Apps:
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.15.4`, Gerbil `1.3.0`, Traefik Badger plugin `v1.3.1`.
-- NASUS Newt is pinned to `1.9.1`.
-- VPS Olm runs as systemd binary `1.3.0` with `--override-dns=false`.
+- Core pins: Pangolin `1.16.2`, Gerbil `1.3.0`, Traefik Badger plugin `v1.3.1`.
+- NASUS Newt is pinned to `1.10.1`.
+- VPS Olm runs as systemd binary `1.4.2` with `--override-dns=false`.
+- Newt `1.10.x` aligns with Pangolin `1.16.x` for the newer SSH-capable site connector flow.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`
@@ -222,9 +223,36 @@ Dockhand replaced Portainer for container management.
 - **Authentication**:
   - REST API: Requires a session cookie from the web UI.
   - Stacks: Headless updates via **Webhooks** (Settings -> Stacks -> Webhook).
+- **Verified internal API flow**:
+  - Use SSH to the VPS and call Dockhand on its container IP, not through the public URL.
+  - Discover the current internal URL with `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' dockhand`, then use `http://<dockhand-ip>:3000`.
+  - Local login works with `POST /api/auth/login` and JSON `{"username":"...","password":"..."}`.
+  - Successful login sets the `dockhand_session` cookie.
+  - Reuse that cookie in a `Cookie: dockhand_session=<token>` header for later API calls.
 - **Remote Hosts**:
   - **NASUS** (Home): Connected via Hawser agent in TCP mode.
   - Host: `192.168.0.10`, Port: `2375`, Token: Secured in `.env` and Dockhand UI.
+
+### Verified CLI Login Flow
+```bash
+# Run on the VPS over SSH. Public HTTPS goes through Pangolin auth and is not ideal for automation.
+DOCKHAND_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' dockhand | awk '{print $1}')
+
+curl -skD /tmp/dockhand.headers \
+  -c /tmp/dockhand.cookie \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"jesus","password":"<dockhand-local-password>"}' \
+  "http://${DOCKHAND_IP}:3000/api/auth/login"
+
+TOKEN=$(awk '/dockhand_session/ {print $7}' /tmp/dockhand.cookie)
+curl -sk -H "Cookie: dockhand_session=${TOKEN}" \
+  "http://${DOCKHAND_IP}:3000/api/stacks?env=2"
+```
+
+### Environment IDs
+- `env=1`: VPS
+- `env=2`: NASUS
 
 ### Common API Endpoints
 | Action | Method | Endpoint |
@@ -233,6 +261,8 @@ Dockhand replaced Portainer for container management.
 | View Logs | GET | `/api/containers/{id}/logs` |
 | Restart Container | POST | `/api/containers/{id}/restart` |
 | List Stacks | GET | `/api/stacks` |
+| List Git Stacks | GET | `/api/git/stacks` |
+| Deploy Git Stack | POST | `/api/git/stacks/{id}/deploy` |
 | Trigger Webhook | GET/POST | `/api/git/stacks/{id}/webhook` |
 | Activity Log | GET | `/api/activity` |
 

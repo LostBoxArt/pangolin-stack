@@ -54,6 +54,7 @@ services:
       - ../../config/:/var/config
 
   traefik:
+    # Shares Gerbil's network namespace. If Gerbil is recreated, Traefik must be recreated too.
     command:
       - --configFile=/etc/traefik/traefik_config.yml
     container_name: traefik

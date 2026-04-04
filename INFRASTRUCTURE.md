@@ -108,6 +108,16 @@ Operational note: CrowdSec Web UI is pinned to `2026.3.1` because the `latest` t
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 
+## Core Stack Coupling
+
+- Traefik uses `network_mode: service:gerbil`, so it shares Gerbil's network namespace and does not have its own Docker network attachment.
+- If `gerbil` is recreated or replaced during an upgrade, `traefik` must also be recreated afterward. Otherwise Traefik can remain attached to the old Gerbil container namespace and public `80/443` can fail even though both containers show as running.
+- Recovery command:
+
+```bash
+docker compose -f stacks/core/docker-compose.yml --env-file .env up -d --force-recreate traefik
+```
+
 
 ## AdGuard Home
 

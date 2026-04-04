@@ -35,6 +35,11 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 
 Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging, site provisioning keys, and the newer site provisioning flow.
 CrowdSec Web UI is pinned to `2026.3.1` because the moving `latest` tag pulled a broken image on March 30, 2026.
+Traefik shares Gerbil's network namespace. If `gerbil` is recreated during an upgrade, recreate `traefik` immediately afterward:
+
+```bash
+docker compose -f stacks/core/docker-compose.yml --env-file .env up -d --force-recreate traefik
+```
 
 When upgrading, check the official update guide and release notes first:
 - https://docs.pangolin.net/self-host/how-to-update

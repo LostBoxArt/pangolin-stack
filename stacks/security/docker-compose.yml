@@ -51,7 +51,8 @@ services:
   # See INFRASTRUCTURE.md for cron setup
 
   crowdsec-web-ui:
-    image: ghcr.io/theduffman85/crowdsec-web-ui:latest
+    # Pin a known-good release; the moving latest tag pulled a broken image on 2026-03-30.
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1
     container_name: crowdsec-web-ui
     networks:
       - pangolin

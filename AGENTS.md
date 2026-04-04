@@ -160,6 +160,9 @@ From `.env` (all are referenced in compose):
 - Dynamic rules live in `config/traefik/rules/`.
 - Access and error logs live in `config/traefik/logs/`.
 - Traefik uses Docker socket for service discovery.
+- Traefik shares Gerbil's network namespace via `network_mode: service:gerbil`.
+- If `gerbil` is recreated or replaced, `traefik` must also be recreated afterward or public `80/443` can fail because Traefik remains attached to the old container namespace.
+- Recovery command: `docker compose -f stacks/core/docker-compose.yml --env-file .env up -d --force-recreate traefik`
 
 ## CrowdSec Notes
 - Configs under `config/crowdsec/`.

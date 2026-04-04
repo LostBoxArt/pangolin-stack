@@ -79,10 +79,11 @@ Apps:
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.16.2`, Gerbil `1.3.0`, Traefik Badger plugin `v1.3.1`.
-- NASUS Newt is pinned to `1.10.1`.
-- VPS Olm runs as systemd binary `1.4.2` with `--override-dns=false`.
-- Newt `1.10.x` aligns with Pangolin `1.16.x` for the newer SSH-capable site connector flow.
+- Core pins: Pangolin `1.17.0`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
+- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1` because the moving `latest` tag pulled a broken image on 2026-03-30.
+- NASUS Newt is pinned to `1.11.0`.
+- VPS Olm runs as systemd binary `1.4.4` with `--override-dns=false`.
+- Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging and provisioning-key site creation.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`

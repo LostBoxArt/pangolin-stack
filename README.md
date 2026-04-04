@@ -26,13 +26,15 @@ Internet → Cloudflare → VPS (51.195.100.11) → Traefik → Services
 
 ## Version Pins
 
-- Pangolin: `fosrl/pangolin:1.16.2`
-- Gerbil: `fosrl/gerbil:1.3.0`
-- Traefik Badger plugin: `v1.3.1`
-- Newt (NASUS): `fosrl/newt:1.10.1`
-- Olm (VPS systemd binary): `1.4.2` with `--override-dns=false`
+- Pangolin: `fosrl/pangolin:1.17.0`
+- Gerbil: `fosrl/gerbil:1.3.1`
+- Traefik Badger plugin: `v1.4.0`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`
+- Newt (NASUS): `fosrl/newt:1.11.0`
+- Olm (VPS systemd binary): `1.4.4` with `--override-dns=false`
 
-Newt `1.10.x` adds the Pangolin SSH site-connector support introduced in Pangolin `1.16.x`. If you only update Newt while staying on Pangolin `1.15.x`, the connector update is still valid, but the new SSH capability is not used.
+Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging, site provisioning keys, and the newer site provisioning flow.
+CrowdSec Web UI is pinned to `2026.3.1` because the moving `latest` tag pulled a broken image on March 30, 2026.
 
 When upgrading, check the official update guide and release notes first:
 - https://docs.pangolin.net/self-host/how-to-update

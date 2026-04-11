@@ -113,7 +113,7 @@ Environment IDs:
 
 ## HomeNode Healthchecks
 
-The HomeNode compose files are host-side and not stored in this repo. Current live Docker healthchecks exist for:
+The repo now keeps source-controlled copies of the current HomeNode host-side compose files under `host-configs/homenode/`. Current live Docker healthchecks exist for:
 
 - `sonarr`
 - `radarr`
@@ -127,10 +127,15 @@ The HomeNode compose files are host-side and not stored in this repo. Current li
 - `seerr`
 - `hawser`
 
-Host-side compose locations:
+Live host paths:
 
 - `/volume1/docker/config/<service>/docker-compose.yml`
 - `/volume1/docker/traefik/docker-compose.yml`
+
+Repo backup paths:
+
+- `host-configs/homenode/<service>/docker-compose.yml`
+- `host-configs/homenode/traefik/docker-compose.yml`
 
 ## File Structure
 

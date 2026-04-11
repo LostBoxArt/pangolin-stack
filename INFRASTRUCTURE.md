@@ -171,7 +171,7 @@ Healthy output includes:
 
 ### HomeNode Container Healthchecks
 
-HomeNode healthchecks are defined in host-side compose files, not in this repo. Current live healthchecks exist for:
+HomeNode healthchecks are defined in host-side compose files, and the repo now keeps source-controlled copies under `host-configs/homenode/`. Current live healthchecks exist for:
 
 - `sonarr`
 - `radarr`
@@ -185,10 +185,15 @@ HomeNode healthchecks are defined in host-side compose files, not in this repo. 
 - `seerr`
 - `hawser`
 
-Host-side compose locations:
+Live host paths:
 
 - `/volume1/docker/config/<service>/docker-compose.yml`
 - `/volume1/docker/traefik/docker-compose.yml`
+
+Repo backup paths:
+
+- `host-configs/homenode/<service>/docker-compose.yml`
+- `host-configs/homenode/traefik/docker-compose.yml`
 
 ## Dockhand API
 

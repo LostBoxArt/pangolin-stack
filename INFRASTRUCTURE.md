@@ -140,12 +140,28 @@ docker logs adguard-home --tail 50
 ## Olm Tunnel Configuration
 
 Olm is currently running as a **systemd service** on the VPS host to ensure it has the necessary network permissions and stability.
+The VPS also pins `pangolin.dennisb.xyz` to `51.195.100.11` in `/etc/hosts` so Olm does not depend on external resolver behavior for its own endpoint.
 
 ### Management
 ```bash
 sudo systemctl status olm
 sudo journalctl -u olm -f
 sudo systemctl status olm-watchdog.timer
+```
+
+### Failure Check
+
+If Dockhand on the VPS cannot reach NASUS at `192.168.0.10:2375`, verify that Olm still owns the home-network route:
+
+```bash
+ip route | grep 192.168.0.0/24
+sudo journalctl -u olm -n 100 --no-pager
+```
+
+Healthy output includes:
+
+```bash
+192.168.0.0/24 dev olm
 ```
 
 ### Reliability Guards

@@ -94,6 +94,7 @@ Apps:
 
 ## Home Network Tunnel (Olm)
 - Olm is a systemd service on the VPS (not a container).
+- Pin `pangolin.dennisb.xyz` to `51.195.100.11` in `/etc/hosts` on the VPS. This avoids resolver drift inside Olm and keeps the UDP hole-punch path stable.
 - Commands:
   - `sudo systemctl status olm`
   - `sudo journalctl -u olm -f`
@@ -104,6 +105,7 @@ Apps:
 ### Tunnel Watchdogs
 - VPS: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
 - NASUS: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
+- If Dockhand on the VPS cannot reach NASUS at `192.168.0.10:2375`, first check for `192.168.0.0/24 dev olm`. If it is missing, inspect `journalctl -u olm` and restart `olm`.
 
 ## qBittorrent Widget Fix
 Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.

@@ -140,12 +140,28 @@ docker logs adguard-home --tail 50
 ## Olm Tunnel Configuration
 
 Olm is currently running as a **systemd service** on the CloudNode host to ensure it has the necessary network permissions and stability.
+The CloudNode also pins `pangolin.example.com` to `203.0.113.1` in `/etc/hosts` so Olm does not depend on external resolver behavior for its own endpoint.
 
 ### Management
 ```bash
 sudo systemctl status olm
 sudo journalctl -u olm -f
 sudo systemctl status olm-watchdog.timer
+```
+
+### Failure Check
+
+If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`, verify that Olm still owns the home-network route:
+
+```bash
+ip route | grep 192.168.1.0/24
+sudo journalctl -u olm -n 100 --no-pager
+```
+
+Healthy output includes:
+
+```bash
+192.168.1.0/24 dev olm
 ```
 
 ### Reliability Guards

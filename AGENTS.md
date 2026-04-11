@@ -94,6 +94,7 @@ Apps:
 
 ## Home Network Tunnel (Olm)
 - Olm is a systemd service on the CloudNode (not a container).
+- Pin `pangolin.example.com` to `203.0.113.1` in `/etc/hosts` on the CloudNode. This avoids resolver drift inside Olm and keeps the UDP hole-punch path stable.
 - Commands:
   - `sudo systemctl status olm`
   - `sudo journalctl -u olm -f`
@@ -104,6 +105,7 @@ Apps:
 ### Tunnel Watchdogs
 - CloudNode: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
 - HomeNode: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
+- If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`, first check for `192.168.1.0/24 dev olm`. If it is missing, inspect `journalctl -u olm` and restart `olm`.
 
 ## qBittorrent Widget Fix
 Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.

@@ -171,7 +171,7 @@ Healthy output includes:
 
 ### NASUS Container Healthchecks
 
-NASUS healthchecks are defined in host-side compose files, not in this repo. Current live healthchecks exist for:
+NASUS healthchecks are defined in host-side compose files, and the repo now keeps source-controlled copies under `host-configs/nasus/`. Current live healthchecks exist for:
 
 - `sonarr`
 - `radarr`
@@ -185,10 +185,15 @@ NASUS healthchecks are defined in host-side compose files, not in this repo. Cur
 - `seerr`
 - `hawser`
 
-Host-side compose locations:
+Live host paths:
 
 - `/volume1/docker/config/<service>/docker-compose.yml`
 - `/volume1/docker/traefik/docker-compose.yml`
+
+Repo backup paths:
+
+- `host-configs/nasus/<service>/docker-compose.yml`
+- `host-configs/nasus/traefik/docker-compose.yml`
 
 ## Dockhand API
 

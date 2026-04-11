@@ -113,7 +113,7 @@ Environment IDs:
 
 ## NASUS Healthchecks
 
-The NASUS compose files are host-side and not stored in this repo. Current live Docker healthchecks exist for:
+The repo now keeps source-controlled copies of the current NASUS host-side compose files under `host-configs/nasus/`. Current live Docker healthchecks exist for:
 
 - `sonarr`
 - `radarr`
@@ -127,10 +127,15 @@ The NASUS compose files are host-side and not stored in this repo. Current live 
 - `seerr`
 - `hawser`
 
-Host-side compose locations:
+Live host paths:
 
 - `/volume1/docker/config/<service>/docker-compose.yml`
 - `/volume1/docker/traefik/docker-compose.yml`
+
+Repo backup paths:
+
+- `host-configs/nasus/<service>/docker-compose.yml`
+- `host-configs/nasus/traefik/docker-compose.yml`
 
 ## File Structure
 

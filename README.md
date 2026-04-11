@@ -111,6 +111,27 @@ Environment IDs:
 - `1` = CloudNode
 - `2` = HomeNode
 
+## HomeNode Healthchecks
+
+The HomeNode compose files are host-side and not stored in this repo. Current live Docker healthchecks exist for:
+
+- `sonarr`
+- `radarr`
+- `prowlarr`
+- `bazarr`
+- `qbittorrent`
+- `flaresolverr`
+- `plex`
+- `traefik`
+- `qui`
+- `seerr`
+- `hawser`
+
+Host-side compose locations:
+
+- `/volume1/docker/config/<service>/docker-compose.yml`
+- `/volume1/docker/traefik/docker-compose.yml`
+
 ## File Structure
 
 ```

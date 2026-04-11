@@ -169,6 +169,27 @@ Healthy output includes:
 - CloudNode watchdog: `/usr/local/sbin/olm-watchdog.sh` with systemd timer `olm-watchdog.timer`.
 - HomeNode watchdog: `/usr/local/bin/newt-watchdog.sh` from root crontab every minute.
 
+### HomeNode Container Healthchecks
+
+HomeNode healthchecks are defined in host-side compose files, not in this repo. Current live healthchecks exist for:
+
+- `sonarr`
+- `radarr`
+- `prowlarr`
+- `bazarr`
+- `qbittorrent`
+- `flaresolverr`
+- `plex`
+- `traefik`
+- `qui`
+- `seerr`
+- `hawser`
+
+Host-side compose locations:
+
+- `/volume1/docker/config/<service>/docker-compose.yml`
+- `/volume1/docker/traefik/docker-compose.yml`
+
 ## Dockhand API
 
 Use the Dockhand container's internal HTTP endpoint over SSH to the CloudNode for automation. The public `https://dockhand.example.com` URL is fronted by Pangolin auth and is not the right path for CLI API calls.

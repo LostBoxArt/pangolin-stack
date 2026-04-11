@@ -106,6 +106,8 @@ Apps:
 - VPS: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
 - NASUS: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
 - If Dockhand on the VPS cannot reach NASUS at `192.168.0.10:2375`, first check for `192.168.0.0/24 dev olm`. If it is missing, inspect `journalctl -u olm` and restart `olm`.
+- NASUS Docker healthchecks currently exist for `sonarr`, `radarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr`, `plex`, `traefik`, `qui`, `seerr`, and `hawser`.
+- Those compose files are host-side under `/volume1/docker/config/*/docker-compose.yml` plus `/volume1/docker/traefik/docker-compose.yml`, not tracked in this repo.
 
 ## qBittorrent Widget Fix
 Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.

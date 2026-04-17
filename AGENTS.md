@@ -79,7 +79,7 @@ Apps:
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.17.0`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
+- Core pins: Pangolin `1.17.1`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
 - Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1` because the moving `latest` tag pulled a broken image on 2026-03-30.
 - HomeNode Newt is pinned to `1.11.0`.
 - CloudNode Olm runs as systemd binary `1.4.4` with `--override-dns=false`.

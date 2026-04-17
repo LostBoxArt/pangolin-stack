@@ -1,0 +1,99 @@
+# Pangolin Stack Wiki - Compact Context
+
+This file is a compact one-read handoff for agents working in
+`/home/jesus/pangolin-stack`.
+
+## Scope
+- This repo documents both the VPS-hosted Pangolin stack and NASUS.
+- Human index: `docs/wiki/README.md`
+- Machine manifest: `docs/wiki/llms.txt`
+
+## Read Order
+1. `AGENTS.md`
+2. `docs/wiki/README.md`
+3. `docs/wiki/system-overview.md`
+4. the relevant dated review under `docs/wiki/`
+5. relevant `docs/wiki/services/<service>.md` or `docs/wiki/services-nasus/<service>.md`
+
+## Topology
+- Internet -> Cloudflare -> VPS -> Traefik -> services
+- Pangolin is the control plane
+- Gerbil is the WireGuard relay
+- Olm on VPS and Newt at home provide `192.168.0.0/24` reachability
+- VPS Traefik shares Gerbil's network namespace
+- NASUS services all share one external network: `traefik_traefik`
+
+## VPS Stacks
+- core: pangolin, gerbil, traefik
+- security: crowdsec, crowdsec-web-ui, pocket-id
+- dns: adguard-home
+- observability: traefik-log-dashboard, dashdot
+- management: dockhand
+- dashboard: homarr, qbit-proxy
+- apps: linkstack, termix
+
+## NASUS Groups
+- edge/tunnel: traefik, hawser, newt
+- arr suite: sonarr, radarr, bazarr, prowlarr, profilarr, recyclarr
+- torrent: qbittorrent, qui, flaresolverr, cleanuparr
+- media: plex, seerr
+- observability: dashdot
+
+## Critical Rules
+- Pinned components stay pinned: Pangolin, Gerbil, Newt, Olm, Badger, CrowdSec Web UI.
+- If Gerbil is recreated, Traefik must be recreated too.
+- Pocket-ID's shared-data bug is still open.
+- NASUS `NC1` and `NC2` remain open compromise-risk surfaces.
+- NASUS changes flow live host first, then repo sync, then wiki update.
+- Cite wiki paths directly in answers.
+
+## Highest-Priority Findings
+### VPS
+- `F-POCKETID-1` / `C1`: Pocket-ID mounts shared `data/`
+- `F-TRAEFIK-1` / `H1`: Traefik image is `:latest`
+- `H2`: CrowdSec Traefik log mount should be read-only
+
+### NASUS
+- `F-N-TRAEFIK-1` / `NC1`: Traefik dashboard exposed on `:9080` with `--api.insecure=true`
+- `F-N-HAWSER-1` / `NC2`: Hawser can start with an empty token while publishing its Docker API proxy
+- `F-N-TRAEFIK-2` / `NH2`: NASUS Traefik is `:latest`
+- `NM1`: only 8 of 16 NASUS compose files are tracked in `host-configs/nasus/`
+
+## Core Pages
+- `docs/wiki/index.md`
+- `docs/wiki/glossary.md`
+- `docs/wiki/system-overview.md`
+- `docs/wiki/maintenance-workflow.md`
+- `docs/wiki/llm-wiki-pattern.md`
+- `docs/wiki/log.md`
+- `docs/wiki/compose-review-2026-04-17.md`
+- `docs/wiki/nasus-review-2026-04-17.md`
+
+## Namespace Reminder
+- VPS pages live under `docs/wiki/services/`
+- NASUS pages live under `docs/wiki/services-nasus/`
+- duplicate names like `traefik.md` and `dashdot.md` exist in both namespaces
+
+## Maintenance Expectations
+- Keep README, `llms.txt`, and `llms-full.txt` in sync.
+- Add new dated review files instead of rewriting old audits.
+- Log structural wiki changes in `docs/wiki/log.md`.
+- For compose edits, capture the reasoning in the wiki first or at the same time.
+
+
+## Hosts and Networks
+- Hosts: `docs/wiki/hosts/vps.md`, `docs/wiki/hosts/nasus.md`
+- Networks: `docs/wiki/networks/pangolin.md`, `docs/wiki/networks/traefik-traefik.md`
+
+## Runbooks
+- `docs/wiki/runbooks/recreate-traefik-after-gerbil.md`
+- `docs/wiki/runbooks/fix-pocket-id-shared-data.md`
+- `docs/wiki/runbooks/check-nasus-reachability-via-olm.md`
+
+## Tooling
+- Mechanical lint script: `scripts/wiki_lint.py`
+
+
+## Concepts and Decisions
+- Concept page: `docs/wiki/concepts/port-matrix.md`
+- Decisions: `docs/wiki/decisions/0001-core-version-pin-policy.md`, `docs/wiki/decisions/0002-vps-traefik-shares-gerbil-namespace.md`, `docs/wiki/decisions/0003-nasus-live-first-sync.md`

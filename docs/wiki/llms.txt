@@ -1,0 +1,108 @@
+# Pangolin Stack Wiki
+
+> LLM-oriented manifest for the homelab wiki in this repo.
+
+This wiki is the authoritative knowledge base for the Pangolin stack and its
+related homelab services as documented in `/home/jesus/pangolin-stack`.
+
+## How to Use This Wiki
+
+- Read `AGENTS.md` first for repo-level operational rules.
+- Then read `docs/wiki/README.md` for coverage and page map.
+- Then read `docs/wiki/system-overview.md` for topology and critical rules.
+- Then read the relevant dated review and the relevant service page before
+  making claims or edits.
+- Cite wiki paths directly in answers.
+
+## Key Entry Points
+
+- [README](./README.md): index and current coverage boundaries
+- [System Overview](./system-overview.md): architecture, startup order, critical
+  operational rules
+- [Maintenance Workflow](./maintenance-workflow.md): answer, edit, and lint
+  workflow for agents
+- [Index](./index.md): flat content catalog for fast navigation
+- [Glossary](./glossary.md): compact definitions for recurring terms
+- [LLM Wiki Pattern](./llm-wiki-pattern.md): adopted external best practices
+- [Wiki Log](./log.md): append-only structural maintenance log
+- [Compose Review 2026-04-17](./compose-review-2026-04-17.md): latest VPS audit
+- [NASUS Review 2026-04-17](./nasus-review-2026-04-17.md): latest NASUS audit
+
+## Service Pages
+
+### VPS services
+- [pangolin](./services/pangolin.md)
+- [gerbil](./services/gerbil.md)
+- [traefik](./services/traefik.md)
+- [crowdsec](./services/crowdsec.md)
+- [crowdsec-web-ui](./services/crowdsec-web-ui.md)
+- [pocket-id](./services/pocket-id.md)
+- [adguard-home](./services/adguard-home.md)
+- [traefik-log-dashboard](./services/traefik-log-dashboard.md)
+- [dashdot](./services/dashdot.md)
+- [dockhand](./services/dockhand.md)
+- [homarr](./services/homarr.md)
+- [qbit-proxy](./services/qbit-proxy.md)
+- [linkstack](./services/linkstack.md)
+- [termix](./services/termix.md)
+
+### NASUS services
+- [traefik (NASUS)](./services-nasus/traefik.md)
+- [hawser](./services-nasus/hawser.md)
+- [newt](./services-nasus/newt.md)
+- [sonarr](./services-nasus/sonarr.md)
+- [radarr](./services-nasus/radarr.md)
+- [bazarr](./services-nasus/bazarr.md)
+- [prowlarr](./services-nasus/prowlarr.md)
+- [profilarr](./services-nasus/profilarr.md)
+- [recyclarr](./services-nasus/recyclarr.md)
+- [qbittorrent](./services-nasus/qbittorrent.md)
+- [qui](./services-nasus/qui.md)
+- [flaresolverr](./services-nasus/flaresolverr.md)
+- [cleanuparr](./services-nasus/cleanuparr.md)
+- [plex](./services-nasus/plex.md)
+- [seerr](./services-nasus/seerr.md)
+- [dashdot (NASUS)](./services-nasus/dashdot.md)
+
+## Critical Rules
+
+- Pangolin, Gerbil, Newt, Olm, Badger, and CrowdSec Web UI stay pinned.
+- If Gerbil is recreated, Traefik must be recreated too.
+- Pocket-ID shared-data bug remains unfixed until the service page says
+  otherwise.
+- NASUS `NC1` and `NC2` are still open compromise-risk surfaces.
+- NASUS compose changes flow **live host -> repo**, not repo -> live host.
+- When touching NASUS, update the live file, `host-configs/nasus/<service>/docker-compose.yml`, and the matching `services-nasus` page together.
+
+## Preferred Editing Behavior
+
+- Use existing findings and remediation snippets when available.
+- If a requested change is not covered, research upstream and add a traceable
+  finding before editing compose.
+- Keep dated review files append-only.
+- Update machine entry points when the wiki structure changes.
+- For NASUS, read `docs/wiki/nasus-review-2026-04-17.md` and the matching
+  `docs/wiki/services-nasus/<service>.md` before editing.
+
+
+## Supporting Pages
+
+- [Index](./index.md)
+- [Glossary](./glossary.md)
+- [VPS Host](./hosts/vps.md)
+- [NASUS Host](./hosts/nasus.md)
+- [pangolin network](./networks/pangolin.md)
+- [traefik_traefik network](./networks/traefik-traefik.md)
+- [Runbooks](./runbooks/recreate-traefik-after-gerbil.md), [Pocket-ID data fix](./runbooks/fix-pocket-id-shared-data.md), [Olm reachability](./runbooks/check-nasus-reachability-via-olm.md)
+
+
+## Lint Surface
+
+- Mechanical lint script: `scripts/wiki_lint.py`
+
+
+### Knowledge Pages
+- [Port Matrix](./concepts/port-matrix.md)
+- [0001 Core version pin policy](./decisions/0001-core-version-pin-policy.md)
+- [0002 VPS Traefik shares Gerbil network namespace](./decisions/0002-vps-traefik-shares-gerbil-namespace.md)
+- [0003 NASUS live-first sync workflow](./decisions/0003-nasus-live-first-sync.md)

@@ -13,7 +13,7 @@ sources: ["docs/wiki/README.md"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-18
 ---
 
 # Wiki Index
@@ -29,10 +29,21 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Wiki Index`](./index.md) — Flat catalog of the current wiki contents. This is the fastest content map for both humans and agents.
 - [`Glossary`](./glossary.md) — Short definitions for recurring Pangolin homelab terms.
 - [`Wiki Log`](./log.md) — Append-only record of structural wiki changes, maintenance passes, and review artifacts.
+- [`Raw Sources`](./raw/README.md) — Immutable ingest area for external articles, vendor docs, and other clipped source material.
+- [`Source Pages`](./sources/README.md) — Synthesized summaries of external raw sources, used by future health checks and cron maintenance.
 
 ## Reviews
-- [`Compose-File Review — 2026-04-17`](./compose-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `stacks/` against upstream documentation and reference compose files. Findings, severities, and remediation steps are collected here. Per-service detail lives in the
-- [`HomeNode Compose-File Review — 2026-04-17`](./homenode-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `/volume1/docker/` on HomeNode (`192.168.1.10`) against upstream references. Findings, severities, and remediation follow the same conventions as the
+- [`Compose-File Review — 2026-04-17`](./compose-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `stacks/` against upstream documentation and reference compose files. Findings, severities, and remediation steps are collected there, with per-service detail in `docs/wiki/services/`.
+- [`HomeNode Compose-File Review — 2026-04-17`](./homenode-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `/volume1/docker/` on HomeNode (`192.168.1.10`) against upstream references. Findings, severities, and remediation follow the same conventions as the CloudNode review.
+
+## Raw Sources
+- [`Raw Sources`](./raw/README.md) — Immutable ingest area for external source captures.
+- [`Raw Article Captures`](./raw/articles/README.md) — Index of article and post captures kept as raw evidence.
+- [`2026-04-17 AskVibecoders Karpathy LLM KB implementation guide excerpt`](./raw/articles/2026-04-17-askvibecoders-karpathy-llm-kb-implementation-guide.md) — Partial raw capture based on an operator-pasted excerpt from a Reddit thread that could not be fetched directly from this environment.
+
+## Source Pages
+- [`Source Pages`](./sources/README.md) — Index of synthesized summaries for important external sources.
+- [`AskVibecoders excerpt on implementing Karpathy's LLM knowledge base`](./sources/askvibecoders-karpathy-llm-kb-implementation-guide-2026-04-17.md) — Applicability note for the Reddit excerpt that prompted the wiki ingest and health-check workflow improvements.
 
 ## Concepts
 - [`Port Matrix`](./concepts/port-matrix.md) — This page is the quickest view of which host or service owns which important port, whether it is public, tunneled, LAN-only, or considered a risk surface.
@@ -56,14 +67,17 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Recreate CloudNode Traefik after recreating Gerbil`](./runbooks/recreate-traefik-after-gerbil.md) — Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.
 
 ## CloudNode Services
-- [`adguard-home`](./services/adguard-home.md) — Network-wide DNS filtering. Exposed publicly as:
+- [`badger`](./services/badger.md) — Local database and configuration store for the Pangolin control plane. Holds primary system state used by all Fossorial services.
+- [`olm`](./services/olm.md) — VPN/SSH endpoint that establishes tunnels to remote sites (Newt) and provides access to HomeNode-backed services via Traefik. Runs as a systemd binary on the CloudNode.
+- [`adguard-home`](./services/adguard-home.md) — Network-wide DNS filtering exposed as `https://dns.example.com`, with DoH at `/dns-query` and DoT on `dns.example.com:853`.
 - [`crowdsec-web-ui`](./services/crowdsec-web-ui.md) — Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image (not shipped by CrowdSec team).
 - [`crowdsec`](./services/crowdsec.md) — IDS/IPS that reads Traefik's access log (and host `auth.log`/`syslog`), classifies suspicious behavior, and pushes decisions to bouncers (Traefik Badger plugin + host firewall).
 - [`dashdot`](./services/dashdot.md) — Lightweight CloudNode system dashboard (CPU, RAM, storage, network). Runs behind Traefik at `dash.example.com`.
 - [`dockhand`](./services/dockhand.md) — Modern replacement for Portainer — container + compose-stack management, both for the CloudNode (local docker.sock) and HomeNode (remote Hawser agent over TCP). Fronted at `dockhand.example.com`.
 - [`gerbil`](./services/gerbil.md) — Fossorial Gerbil — WireGuard relay between the CloudNode and remote sites. Also owns the public HTTP/HTTPS ports (80/443); Traefik shares its network namespace via `network_mode: service:gerbil`.
 - [`homarr`](./services/homarr.md) — Personal landing / dashboard page at `home.example.com`. Embeds widgets for media services, torrents, system status, etc.
-- [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement — single-page "all my links" landing page at the apex `example.com`.
+- [`landing`](./services/landing.md) — Custom-built static landing page at the apex `example.com`. Replaced LinkStack with a single HTML+CSS page served by nginx.
+- [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
 - [`pangolin`](./services/pangolin.md) — Fossorial Pangolin — control plane, dashboard, API, and database for the whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read config from it.
 - [`pocket-id`](./services/pocket-id.md) — OIDC / passkey-first identity provider. Used as the SSO gateway behind Traefik for admin UIs (`auth.example.com`).
 - [`qbit-proxy`](./services/qbit-proxy.md) — Local reverse-proxy sidecar for Homarr's qBittorrent widget. Built from in-repo Dockerfile.
@@ -74,10 +88,10 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 ## HomeNode Services
 - [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
 - [`cleanuparr`](./services-homenode/cleanuparr.md) — Automated cleanup for qBit / Sonarr / Radarr — removes failed / stalled / redundant downloads so they stop taking up disk and swarm slots.
-- [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](../services/dashdot.md)).
+- [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](./services/dashdot.md)).
 - [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr and the *arr apps proxy indexer requests through it when hitting sites protected by Cloudflare's Under-Attack Mode / Turnstile.
 - [`hawser`](./services-homenode/hawser.md) — Dockhand's remote agent. The CloudNode Dockhand connects to this agent over TCP to manage HomeNode containers in the same UI as CloudNode containers.
-- [`newt`](./services-homenode/newt.md) — Fossorial Newt — Pangolin site connector. Establishes the outbound tunnel from HomeNode to the CloudNode Pangolin so that LAN services can be reached from the public `*.example.com` without opening inbound ports on the home
+- [`newt`](./services-homenode/newt.md) — Fossorial Newt, the Pangolin site connector that establishes the outbound tunnel from HomeNode to the CloudNode so home services are reachable without opening inbound ports on the router.
 - [`plex`](./services-homenode/plex.md) — Plex Media Server. Serves `plex.example.com` (Traefik-routed) and direct LAN clients. Hardware transcoding enabled via `/dev/dri`.
 - [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality definitions, and naming schemes in sync across the *arr apps from a central spec.
 - [`prowlarr`](./services-homenode/prowlarr.md) — Indexer manager for the *arr suite — federates torrent/usenet indexers into one API that Sonarr/Radarr query.

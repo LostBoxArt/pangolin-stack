@@ -13,7 +13,7 @@ sources: ["docs/wiki/README.md"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-18
 ---
 # Wiki Log
 
@@ -65,4 +65,100 @@ artifacts.
 - Added `docs/wiki/concepts/port-matrix.md` as the first cross-cutting topology concept page.
 - Added initial decision records for version pinning, CloudNode Traefik/Gerbil namespace sharing, and HomeNode live-first sync workflow.
 - Refreshed `index.md`, `README.md`, `llms.txt`, `llms-full.txt`, and `system-overview.md` to expose the new knowledge-layer pages.
+
+## [2026-04-17] maintenance | index wording cleanup
+- Tightened truncated descriptions in `docs/wiki/index.md` for the CloudNode review, HomeNode review, `services/adguard-home.md`, and `services-homenode/newt.md` entries so the flat catalog reads cleanly for future agents.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-17] maintenance | AGENTS read-path clarification
+- Added a maintenance-workflow note that if a broad repo scan flags `AGENTS.md`, agents should read it directly rather than skip the repo briefing.
+- Re-ran `scripts/wiki_lint.py` after the note update and kept the wiki clean.
+
+## [2026-04-17] structure | raw/source ingest layer and semantic health-check loop
+- Added `docs/wiki/raw/README.md` and `docs/wiki/raw/articles/README.md` as the new immutable ingest layer for external source captures.
+- Added `docs/wiki/sources/README.md` plus a source-summary page for the AskVibecoders excerpt about Karpathy-style LLM wiki maintenance.
+- Added a paired raw capture for the user-pasted AskVibecoders excerpt because Reddit blocked direct retrieval from this environment.
+- Updated `README.md`, `index.md`, `maintenance-workflow.md`, `llm-wiki-pattern.md`, `llms.txt`, and `llms-full.txt` so future cron runs know to use `raw/`, `sources/`, and semantic health checks as part of continuous wiki optimization.
+
+## [2026-04-18] maintenance | AGENTS direct-read surfaced in machine entry points
+- Added the `AGENTS.md` direct-read fallback note to `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so future agents do not skip the repo briefing when broad scans flag it.
+- Patched the `pangolin-stack-wiki-maintenance` skill with the same repo-specific pitfall.
+
+## [2026-04-18] maintenance | home-only boundary surfaced in machine entry points
+- Added a home-only scope-boundary note to `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so future agents do not mix work/HPC guidance into homelab answers.
+
+## [2026-04-18] maintenance | stale memory fact removed and index link fixed
+- Removed the stale Hermes memory fact claiming `hermes web` is an alias for `hermes dashboard`, plus the related garbage entity rows extracted from it.
+- Fixed the inline CloudNode dashdot backlink in `docs/wiki/index.md` so the HomeNode dashdot entry points to the correct wiki path.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-19] maintenance | gerbil service page backfilled
+- Added `docs/wiki/services/gerbil.md` so the existing README, index, manifest, host, decision, and runbook backlinks now resolve to a concrete CloudNode service page.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-19] maintenance | workflow boundary cleanup
+- Corrected `docs/wiki/maintenance-workflow.md` so dated reviews and service pages remain classified as synthesized wiki content rather than raw sources.
+- Added a cron-maintenance guardrail to the freshness loop so routine wiki upkeep does not create duplicate or self-referential cron jobs/prompts.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-19] maintenance | cron guardrail surfaced in machine entry points
+- Added the no-recursive-cron maintenance guardrail to `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so future agents see it before making routine wiki changes.
+- Patched the `pangolin-stack-wiki-maintenance` skill to match the same cron-maintenance restriction.
+
+## [2026-04-19] maintenance | latest-review selection clarified
+- Updated `docs/wiki/README.md`, `docs/wiki/llms.txt`, `docs/wiki/llms-full.txt`, and `docs/wiki/maintenance-workflow.md` so future agents explicitly prefer the newest dated CloudNode/HomeNode review files instead of assuming the currently named ones stay latest forever.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-19] maintenance | dockhand and hawser live-update findings captured
+- Updated `docs/wiki/services/dockhand.md` with the verified post-update Dockhand state: app version `1.0.18`, health-check verification, DB backup path, and the note that `pending_container_updates` can remain stale after manual updates.
+- Updated `docs/wiki/services-homenode/hawser.md` with the verified Hawser recovery/update result: `0.2.24 -> 0.2.40`, current digest, and the control-path caveat for agent self-updates.
+- Updated `docs/wiki/hosts/homenode.md` with the SSH-plus-sudo recovery note for Hawser on HomeNode.
+
+## [2026-04-19] maintenance | safe-wrapper command path surfaced
+- Updated `AGENTS.md` to use `/usr/local/sbin/hermes-safe-service` and `/usr/local/sbin/hermes-safe-logs` for Olm status/log/restart examples instead of raw `sudo systemctl` or `journalctl`.
+- Refreshed `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so future agents see the same CloudNode safe-wrapper rule before operating on `olm`, `olm-watchdog`, or `hermes-gateway`.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-20] maintenance | cron no-compose-edit rule surfaced
+- Refreshed `docs/wiki/maintenance-workflow.md`, `docs/wiki/llms.txt`, and `docs/wiki/llms-full.txt` so routine wiki-maintenance cron runs explicitly avoid compose-file edits as well as recursive cron churn.
+- Re-ran `scripts/wiki_lint.py` and kept the wiki clean.
+
+## [2026-04-20] maintenance | HomeNode repo-sync gap surfaced in machine guidance
+- Clarified in `docs/wiki/maintenance-workflow.md` that HomeNode service work must use the live compose first and create the matching `host-configs/homenode/` tracked copy when `NM1` means no repo copy exists yet.
+- Refreshed `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so future agents do not assume every HomeNode service already has a tracked repo compose file.
+
+## [2026-04-20] maintenance | HomeNode tracked-copy creation rule aligned
+- Refreshed `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so HomeNode service work now explicitly says to create `host-configs/homenode/<service>/docker-compose.yml` when `NM1` means the tracked mirror is still missing.
+- Patched the `pangolin-stack-wiki-maintenance` skill with the same repo-specific pitfall.
+
+## [2026-04-20] maintenance | missing wiki index entries and frontmatter fixed
+- Added `aliases: ["badger"]` to `services/badger.md` frontmatter (was the only CloudNode service page missing it).
+- Added `badger` and `olm` entries to `docs/wiki/index.md` CloudNode Services section so the flat catalog covers all service pages.
+- Re-ran `scripts/wiki_lint.py` — all 58 files pass clean.
+
+## [2026-04-20] maintenance | AGENTS.md inventory and llms-full.txt deduplicated
+- Removed duplicate `apps` row and corrected `homenode-apps` in `AGENTS.md` (dropped `badger`, `pocket-id`, `quay`; fixed `flaresolverr` spelling; added `qbittorrent`, `dashdot`).
+- Removed redundant duplicate intro paragraph in `docs/wiki/llms-full.txt`.
+- Re-ran `scripts/wiki_lint.py` — all 58 files pass clean.
+
+## [2026-04-21] maintenance | badger and olm service pages corrected to match repo reality
+- Rewrote `docs/wiki/services/badger.md` so it describes Badger as the Traefik CrowdSec bouncer plugin (`config/traefik/traefik_config.yml`, `v1.4.0`) rather than a non-existent container.
+- Rewrote `docs/wiki/services/olm.md` so it describes Olm as the CloudNode systemd tunnel service (`1.4.4`, `--override-dns=false`, `hermes-safe-service` wrappers) rather than a non-existent container.
+- Added `badger` and `olm` to `docs/wiki/README.md` Core section and to `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` CloudNode service lists.
+- Completed the truncated `docs/wiki/maintenance-workflow.md` "Additional high-value page families" section.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
+## [2026-04-21] service | linkstack replaced by bespoke landing page
+- Added `docs/wiki/services/landing.md` documenting the new static landing page
+  at `example.com` (nginx:alpine, `sites/example-landing/`).
+- Archived `docs/wiki/services/linkstack.md` — marked `status: archived`, added
+  archive note, and cross-linked to `landing.md`.
+- Updated `stacks/apps/docker-compose.yml` to replace the `linkstack` service
+  with `landing`.
+- Updated `docs/wiki/README.md`, `docs/wiki/index.md`, `docs/wiki/system-overview.md`
+  to reference `landing` instead of `linkstack`.
+- Updated `docs/wiki/compose-review-2026-04-17.md` scoreboard and upstream
+  reference table to reflect the replacement; added changelog entry.
+- Updated `AGENTS.md` inventory and volume notes.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
 

@@ -56,6 +56,7 @@ Control and tunnel flow:
 ### Core
 - `pangolin` — control plane
 - `gerbil` — relay and edge port owner
+- `olm` — WireGuard endpoint for LAN reachability
 - `traefik` — reverse proxy
 
 ### Security
@@ -78,7 +79,7 @@ Control and tunnel flow:
 - `qbit-proxy`
 
 ### Apps
-- `linkstack`
+- `landing`
 - `termix`
 
 ## HomeNode Service Layout

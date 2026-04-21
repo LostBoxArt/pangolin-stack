@@ -37,7 +37,8 @@ Primary public edge and control-plane server.
 - [[../services/dockhand.md]]
 - [[../services/homarr.md]]
 - [[../services/qbit-proxy.md]]
-- [[../services/linkstack.md]]
+- [[../services/landing.md]]
+- [[../services/linkstack.md]] (archived)
 - [[../services/termix.md]]
 
 ## Networks

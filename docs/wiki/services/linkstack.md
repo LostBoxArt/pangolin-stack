@@ -2,20 +2,25 @@
 title: "linkstack"
 slug: cloudnode-linkstack
 type: service
-status: active
-tags: ["homelab", "cloudnode", "service", "linkstack"]
+status: archived
+tags: ["homelab", "cloudnode", "service", "linkstack", "archived"]
 aliases: ["linkstack"]
 entities:
   primary: cloudnode-linkstack
   mentions: []
-related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md"]
+related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md", "./landing.md"]
 sources: ["stacks/apps/docker-compose.yml"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-21
 ---
+
 # linkstack
+n
+> **ARCHIVED** — Replaced by [landing](./landing.md) on 2026-04-21.
+> LinkStack was overkill (PHP + SQLite for 5 buttons). The new landing page
+> is a single static HTML+CSS file served by nginx.
 
 Self-hosted Linktree replacement — single-page "all my links" landing page
 at the apex `example.com`.
@@ -68,9 +73,9 @@ services:
 Upstream assumes MySQL. LinkStack *also* supports SQLite out of the box,
 which is what we use to keep the stack lighter.
 
-## Our Compose (relevant slice)
+## Historical Compose (relevant slice)
 
-```11:35:stacks/apps/docker-compose.yml
+```yaml
   linkstack:
     image: linkstackorg/linkstack:latest
     container_name: linkstack
@@ -100,7 +105,7 @@ which is what we use to keep the stack lighter.
 
 And:
 
-```55:58:stacks/apps/docker-compose.yml
+```yaml
 volumes:
   linkstack_data:
     external: true
@@ -185,3 +190,10 @@ check `docker exec linkstack id apache` for the actual UID/GID.)
   without a full backup** — losing it loses the site.
 - Config lives inside the volume at `/htdocs/.env` and `/htdocs/database/`.
 - Default admin account is created through the first-run web wizard.
+
+## Archive Note
+
+Service removed from `stacks/apps/docker-compose.yml` on 2026-04-21. The
+`linkstack` container was stopped and removed with `--remove-orphans`. The
+old Docker volume `linkstack_linkstack_data` still exists on the host for
+safety but is no longer referenced by any compose file.

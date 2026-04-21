@@ -8,24 +8,14 @@ networks:
     external: true
 
 services:
-  linkstack:
-    image: linkstackorg/linkstack:latest
-    container_name: linkstack
+  landing:
+    image: nginx:alpine
+    container_name: landing
     networks:
       - pangolin
     restart: unless-stopped
-    group_add:
-      - "986"  # docker group
-    environment:
-      - HTTP_SERVER_NAME=example.com
-      - HTTPS_SERVER_NAME=example.com
-      - LOG_LEVEL=info
-      - PHP_MEMORY_LIMIT=256M
-      - UPLOAD_MAX_FILESIZE=8M
-      - TZ=Asia/Jerusalem
-      - SERVER_ADMIN=admin@example.com
     volumes:
-      - linkstack_data:/htdocs
+      - /opt/homelab/sites/example-landing:/usr/share/nginx/html:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.linkstack.rule=Host(`example.com`)"
@@ -53,9 +43,5 @@ services:
       - "traefik.http.services.termix.loadbalancer.server.port=8080"
 
 volumes:
-  linkstack_data:
-    external: true
-    name: linkstack_linkstack_data
-
   termix_data:
     driver: local

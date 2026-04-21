@@ -8,7 +8,7 @@ aliases: ["wiki", "pangolin stack wiki"]
 entities:
   primary: wiki-readme
   mentions: []
-related: ["./system-overview.md", "./maintenance-workflow.md", "./index.md"]
+related: ["./system-overview.md", "./maintenance-workflow.md", "./index.md", "./raw/README.md", "./sources/README.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
@@ -43,14 +43,18 @@ Coverage spans **two hosts**:
   answer from, lint, and update this wiki.
 - [LLM Wiki Pattern](./llm-wiki-pattern.md) — design notes for how this wiki
   adopts current LLM-wiki and `llms.txt` best practices.
-- [Compose Review 2026-04-17](./compose-review-2026-04-17.md) — CloudNode audit with
-  findings, severities, and remediation steps.
-- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md) — HomeNode audit with
-  findings, severities, remediation order, and rollback guidance.
+- [Compose Review 2026-04-17](./compose-review-2026-04-17.md) — current latest
+  CloudNode audit; if a newer `compose-review-*.md` exists, use that instead.
+- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md) — current latest
+  HomeNode audit; if a newer `homenode-review-*.md` exists, use that instead.
 - [Index](./index.md) — flat content catalog of the current wiki.
 - [Glossary](./glossary.md) — compact definitions for recurring homelab terms.
 - [Wiki Log](./log.md) — append-only maintenance log for wiki updates, audits,
   and structural changes.
+- [Raw Sources](./raw/README.md) — immutable ingest layer for clipped articles,
+  vendor docs, transcripts, and other external inputs.
+- [Source Pages](./sources/README.md) — LLM-written summaries of ingested raw
+  sources, with applicability notes and backlinks into the rest of the wiki.
 - [llms.txt](./llms.txt) — machine-oriented manifest for agents.
 - [llms-full.txt](./llms-full.txt) — compact compiled context file for agents
   that need the wiki map and top operational rules in one read.
@@ -71,6 +75,10 @@ Each page follows the same structure:
 
 - [Index](./index.md) — flat catalog of all current wiki pages.
 - [Glossary](./glossary.md) — recurring homelab terms and shorthand.
+- [Raw Sources](./raw/README.md) — immutable ingest area for external source
+  material that should remain separate from synthesized knowledge.
+- [Source Pages](./sources/README.md) — one page per ingested external source,
+  used to keep future semantic health checks traceable.
 - [Hosts](./hosts/cloudnode.md) / [HomeNode host](./hosts/homenode.md) — host-level summaries.
 - [Networks](./networks/pangolin.md) and [traefik_traefik](./networks/traefik-traefik.md) — current network model.
 - [Runbooks](./runbooks/recreate-traefik-after-gerbil.md) and peers — operator procedures grounded in existing wiki facts.
@@ -82,6 +90,8 @@ Each page follows the same structure:
 - [pangolin](./services/pangolin.md)
 - [gerbil](./services/gerbil.md)
 - [traefik](./services/traefik.md)
+- [olm](./services/olm.md) — systemd tunnel endpoint (CloudNode)
+- [badger](./services/badger.md) — Traefik CrowdSec bouncer plugin
 
 ### Security (`stacks/security/docker-compose.yml`)
 
@@ -109,8 +119,10 @@ Each page follows the same structure:
 
 ### Apps (`stacks/apps/docker-compose.yml`)
 
-- [linkstack](./services/linkstack.md)
+- [landing](./services/landing.md)
 - [termix](./services/termix.md)
+
+> Historical: [linkstack](./services/linkstack.md) was replaced by `landing` on 2026-04-21.
 
 ## HomeNode — `/volume1/docker/`
 
@@ -179,6 +191,9 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 
 - Mechanical lint script: `scripts/wiki_lint.py`
 - Current job: check frontmatter, broken links, duplicate slugs, missing service entries in `index.md`, and required top-level entry points.
+- Semantic health checks should additionally look for stale upstream references,
+  conceptual gaps, contradictions, and missing source-page coverage for new
+  external material.
 
 
 ## Knowledge Layers

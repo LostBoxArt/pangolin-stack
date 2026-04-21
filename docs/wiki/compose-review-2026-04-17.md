@@ -39,7 +39,7 @@ remediation steps are collected here. Per-service detail lives in the
 | observability | `stacks/observability/docker-compose.yml` | traefik-agent, traefik-dashboard, dashdot | 0 | 2 | 2 | 1 |
 | management | `stacks/management/docker-compose.yml` | dockhand | 0 | 0 | 1 | 0 |
 | dashboard | `stacks/dashboard/docker-compose.yml` | homarr, qbit-proxy | 0 | 0 | 0 | 2 |
-| apps | `stacks/apps/docker-compose.yml` | linkstack, termix | 0 | 0 | 2 | 2 |
+| apps | `stacks/apps/docker-compose.yml` | landing, termix | 0 | 0 | 2 | 2 |
 | **total** | — | 14 | **1** | **5** | **11** | **7** |
 
 ---
@@ -65,18 +65,6 @@ remediation steps are collected here. Per-service detail lives in the
 
 ## High Findings
 
-### H1. Traefik image is `:latest`, upstream pins `v3.6`
-- **Service**: [traefik](./services/traefik.md)
-- **File**: `stacks/core/docker-compose.yml`
-- **Upstream** (`fosrl/pangolin/install/config/docker-compose.yml`):
-  `image: docker.io/traefik:v3.6`
-- **Risk**: Traefik majors frequently break middleware syntax and plugin
-  compat. The Badger plugin is already pinned (`v1.4.0`) but if a new
-  `traefik:latest` lands incompatible middleware changes, a restart pulls it
-  and the proxy fails. Contradicts the "pin core" policy in `AGENTS.md`.
-- **Remediation**: `image: traefik:v3.6` and add to `AGENTS.md` version
-  policy section.
-
 ### H2. CrowdSec Traefik log mount is read-write; upstream is `:ro`
 - **Service**: [crowdsec](./services/crowdsec.md)
 - **File**: `stacks/security/docker-compose.yml`
@@ -86,10 +74,7 @@ remediation steps are collected here. Per-service detail lives in the
   access log. A rogue parser bug could truncate/rotate logs unexpectedly.
 - **Remediation**: add `:ro` suffix.
 
-### H3. Pocket-ID `data` volume (see C1)
-Also counts as a high/critical bug.
-
-### H4. Traefik-log-dashboard uses legacy env-var scheme
+### H3. Traefik-log-dashboard uses legacy env-var scheme
 - **Service**: [traefik-log-dashboard](./services/traefik-log-dashboard.md)
 - **File**: `stacks/observability/docker-compose.yml`
 - **Upstream** (`hhftechnology/traefik-log-dashboard/docker-compose.yml`):
@@ -100,7 +85,7 @@ Also counts as a high/critical bug.
 - **Remediation**: rewrite the dashboard's `environment:` block, see
   service page for the exact diff.
 
-### H5. Dashboard state has no persistent volume
+### H4. Dashboard state has no persistent volume
 - **Service**: [traefik-log-dashboard](./services/traefik-log-dashboard.md)
 - **File**: `stacks/observability/docker-compose.yml`
 - **Upstream**: declares a named volume `dashboard-data:/data`.
@@ -142,7 +127,7 @@ release shipped as `latest` could corrupt state. Pin to a known tag. See
 
 ### M7. LinkStack runs as root in container
 Upstream compose sets `user: apache:apache`. Ours doesn't. See
-[linkstack](./services/linkstack.md).
+[linkstack](./services/linkstack.md) (archived — replaced by [landing](./services/landing.md) on 2026-04-21).
 
 ### M8. Termix is missing the `guacd` sidecar
 Upstream ships with `guacamole/guacd` for RDP/VNC support. If you only ever
@@ -153,7 +138,7 @@ SSH through Termix this is fine; if you ever want RDP/VNC it will fail. See
 Timestamps in logs will be UTC. See [adguard-home](./services/adguard-home.md).
 
 ### M10. Most service images use `:latest`
-Specifically `traefik`, `adguardhome`, `dockhand`, `homarr`, `linkstack`,
+Specifically `traefik`, `adguardhome`, `dockhand`, `homarr`, `landing`,
 `termix`, `dashdot`, `crowdsec`, `traefik-log-dashboard*`. Drift risk per
 `AGENTS.md` policy. See each service page.
 
@@ -171,7 +156,7 @@ Low-risk cruft. See [crowdsec](./services/crowdsec.md).
   is trivial. [gerbil](./services/gerbil.md).
 - **L3**. Homarr has no healthcheck. [homarr](./services/homarr.md).
 - **L4**. LinkStack/Termix have no healthcheck.
-  [linkstack](./services/linkstack.md), [termix](./services/termix.md).
+  [linkstack](./services/linkstack.md) (archived), [termix](./services/termix.md).
 - **L5**. Dashdot: we already use `group_add: "986"` instead of upstream's
   `privileged: true`. **This is better than upstream** — recorded so nobody
   "helpfully" adds `privileged: true` back. [dashdot](./services/dashdot.md).
@@ -228,12 +213,15 @@ git restore -- stacks/security/docker-compose.yml
 | dashdot | `https://getdashdot.com/docs/installation/docker-compose` + repo README |
 | dockhand | `https://github.com/Finsys/dockhand/blob/main/docker-compose.yaml` + `https://dockhand.pro/manual/` |
 | homarr | `https://homarr.dev/docs/getting-started/installation/docker/` |
-| linkstack | `https://raw.githubusercontent.com/LinkStackOrg/linkstack-docker/main/docker-compose.yml` |
+| landing | N/A (bespoke static page) |
 | termix | `https://docs.termix.site/install/server/docker` |
 
 ---
 
 ## Changelog
 
+- 2026-04-21 — LinkStack replaced by bespoke `landing` static page. See
+  [landing.md](./services/landing.md) for the new service and
+  [linkstack.md](./services/linkstack.md) for the archived page.
 - 2026-04-17 — Added: initial compose review, findings, and per-service wiki
   pages. No compose edits performed this session.

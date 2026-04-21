@@ -21,7 +21,9 @@ Services are organized into 7 stacks under `stacks/`:
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | linkstack, termix | User applications |
+| **apps** | landing, termix | User applications |
+| **homenode-core** | olm, gerbil, pangolin | Tunnel, relay, control plane |
+| **homenode-apps** | newt, prowlarr, profilarr, recyclarr, seerr, sonarr, radarr, bazarr, qui, cleanuparr, flaresolverr, plex, qbittorrent, dashdot | Monitoring, storage, auth, torrent, media, DNS, apps |
 
 ### Startup Order
 1. **core** (creates network, must start first)
@@ -96,17 +98,17 @@ Apps:
 - Olm is a systemd service on the CloudNode (not a container).
 - Pin `pangolin.example.com` to `203.0.113.1` in `/etc/hosts` on the CloudNode. This avoids resolver drift inside Olm and keeps the UDP hole-punch path stable.
 - Commands:
-  - `sudo systemctl status olm`
-  - `sudo journalctl -u olm -f`
-  - `sudo systemctl restart olm`
-  - `sudo systemctl status olm-watchdog.timer`
+  - `/usr/local/sbin/hermes-safe-service status olm`
+  - `/usr/local/sbin/hermes-safe-logs olm --since 30m`
+  - `/usr/local/sbin/hermes-safe-service restart olm`
+  - `/usr/local/sbin/hermes-safe-service status olm-watchdog.timer`
 - Tunnel route used: 192.168.1.0/24.
 
 ### Tunnel Watchdogs
 - CloudNode: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
 - HomeNode: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
-- If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`, first check for `192.168.1.0/24 dev olm`. If it is missing, inspect `journalctl -u olm` and restart `olm`.
-- HomeNode Docker healthchecks currently exist for `sonarr`, `radarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr`, `plex`, `traefik`, `qui`, `seerr`, and `hawser`.
+- If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`, first check for `192.168.1.0/24 dev olm`. If it is missing, inspect `/usr/local/sbin/hermes-safe-logs olm --since 30m` and restart `olm` with `/usr/local/sbin/hermes-safe-service restart olm`.
+- HomeNode Docker healthchecks currently exist for `sonarr`, `radarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr`, `plex`, `traefik`, `qui`, `seerr`, `hawser`, `newt`, `badger`, `olm`, and `cleanuparr`.
 - Those compose files are live on HomeNode under `/volume1/docker/config/*/docker-compose.yml` plus `/volume1/docker/traefik/docker-compose.yml`.
 - Source-controlled backup copies live in this repo under `host-configs/homenode/`.
 
@@ -127,7 +129,7 @@ pangolin-stack/
 │   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
 │   ├── management/docker-compose.yml   # dockhand
 │   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
-│   └── apps/docker-compose.yml         # linkstack, termix
+|   ├── apps/docker-compose.yml         # landing, termix
 ├── config/                             # service configs (pangolin, crowdsec, traefik)
 ├── config/db/                          # Pangolin database
 ├── config/traefik/rules/               # Traefik dynamic rules
@@ -187,7 +189,8 @@ From `.env` (all are referenced in compose):
 - Restore stops services, restores files, and re-imports volumes.
 
 ## Docker Volumes and External Data
-- External volumes: `linkstack_linkstack_data`.
+- External volumes: none (landing uses a bind-mounted `sites/` directory; termix
+  uses a named local volume `termix_data`).
 - Homarr data is in `/opt/homarr/appdata` on the host.
 - Dockhand data is in `./data/dockhand`.
 - Docker socket is mounted for Traefik, Homarr, and Dockhand.

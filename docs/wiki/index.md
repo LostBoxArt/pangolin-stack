@@ -29,21 +29,14 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Wiki Index`](./index.md) — Flat catalog of the current wiki contents. This is the fastest content map for both humans and agents.
 - [`Glossary`](./glossary.md) — Short definitions for recurring Pangolin homelab terms.
 - [`Wiki Log`](./log.md) — Append-only record of structural wiki changes, maintenance passes, and review artifacts.
-- [`Raw Sources`](./raw/README.md) — Immutable ingest area for external articles, vendor docs, and other clipped source material.
-- [`Source Pages`](./sources/README.md) — Synthesized summaries of external raw sources, used by future health checks and cron maintenance.
 
 ## Reviews
 - [`Compose-File Review — 2026-04-17`](./compose-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `stacks/` against upstream documentation and reference compose files. Findings, severities, and remediation steps are collected there, with per-service detail in `docs/wiki/services/`.
 - [`HomeNode Compose-File Review — 2026-04-17`](./homenode-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `/volume1/docker/` on HomeNode (`192.168.1.10`) against upstream references. Findings, severities, and remediation follow the same conventions as the CloudNode review.
 
 ## Raw Sources
-- [`Raw Sources`](./raw/README.md) — Immutable ingest area for external source captures.
-- [`Raw Article Captures`](./raw/articles/README.md) — Index of article and post captures kept as raw evidence.
-- [`2026-04-17 AskVibecoders Karpathy LLM KB implementation guide excerpt`](./raw/articles/2026-04-17-askvibecoders-karpathy-llm-kb-implementation-guide.md) — Partial raw capture based on an operator-pasted excerpt from a Reddit thread that could not be fetched directly from this environment.
 
 ## Source Pages
-- [`Source Pages`](./sources/README.md) — Index of synthesized summaries for important external sources.
-- [`AskVibecoders excerpt on implementing Karpathy's LLM knowledge base`](./sources/askvibecoders-karpathy-llm-kb-implementation-guide-2026-04-17.md) — Applicability note for the Reddit excerpt that prompted the wiki ingest and health-check workflow improvements.
 
 ## Concepts
 - [`Port Matrix`](./concepts/port-matrix.md) — This page is the quickest view of which host or service owns which important port, whether it is public, tunneled, LAN-only, or considered a risk surface.
@@ -67,8 +60,8 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Recreate CloudNode Traefik after recreating Gerbil`](./runbooks/recreate-traefik-after-gerbil.md) — Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.
 
 ## CloudNode Services
-- [`badger`](./services/badger.md) — Local database and configuration store for the Pangolin control plane. Holds primary system state used by all Fossorial services.
-- [`olm`](./services/olm.md) — VPN/SSH endpoint that establishes tunnels to remote sites (Newt) and provides access to HomeNode-backed services via Traefik. Runs as a systemd binary on the CloudNode.
+-
+-
 - [`adguard-home`](./services/adguard-home.md) — Network-wide DNS filtering exposed as `https://dns.example.com`, with DoH at `/dns-query` and DoT on `dns.example.com:853`.
 - [`crowdsec-web-ui`](./services/crowdsec-web-ui.md) — Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image (not shipped by CrowdSec team).
 - [`crowdsec`](./services/crowdsec.md) — IDS/IPS that reads Traefik's access log (and host `auth.log`/`syslog`), classifies suspicious behavior, and pushes decisions to bouncers (Traefik Badger plugin + host firewall).

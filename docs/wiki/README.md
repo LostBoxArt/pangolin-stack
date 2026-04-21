@@ -8,7 +8,7 @@ aliases: ["wiki", "pangolin stack wiki"]
 entities:
   primary: wiki-readme
   mentions: []
-related: ["./system-overview.md", "./maintenance-workflow.md", "./index.md", "./raw/README.md", "./sources/README.md"]
+related: ["./system-overview.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
@@ -51,9 +51,7 @@ Coverage spans **two hosts**:
 - [Glossary](./glossary.md) — compact definitions for recurring homelab terms.
 - [Wiki Log](./log.md) — append-only maintenance log for wiki updates, audits,
   and structural changes.
-- [Raw Sources](./raw/README.md) — immutable ingest layer for clipped articles,
   vendor docs, transcripts, and other external inputs.
-- [Source Pages](./sources/README.md) — LLM-written summaries of ingested raw
   sources, with applicability notes and backlinks into the rest of the wiki.
 - [llms.txt](./llms.txt) — machine-oriented manifest for agents.
 - [llms-full.txt](./llms-full.txt) — compact compiled context file for agents
@@ -75,9 +73,7 @@ Each page follows the same structure:
 
 - [Index](./index.md) — flat catalog of all current wiki pages.
 - [Glossary](./glossary.md) — recurring homelab terms and shorthand.
-- [Raw Sources](./raw/README.md) — immutable ingest area for external source
   material that should remain separate from synthesized knowledge.
-- [Source Pages](./sources/README.md) — one page per ingested external source,
   used to keep future semantic health checks traceable.
 - [Hosts](./hosts/cloudnode.md) / [HomeNode host](./hosts/homenode.md) — host-level summaries.
 - [Networks](./networks/pangolin.md) and [traefik_traefik](./networks/traefik-traefik.md) — current network model.
@@ -90,8 +86,8 @@ Each page follows the same structure:
 - [pangolin](./services/pangolin.md)
 - [gerbil](./services/gerbil.md)
 - [traefik](./services/traefik.md)
-- [olm](./services/olm.md) — systemd tunnel endpoint (CloudNode)
-- [badger](./services/badger.md) — Traefik CrowdSec bouncer plugin
+-
+-
 
 ### Security (`stacks/security/docker-compose.yml`)
 

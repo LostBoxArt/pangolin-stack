@@ -9,7 +9,7 @@ entities:
   primary: wiki-log
   mentions: []
 related: ["./README.md", "./maintenance-workflow.md", "./index.md"]
-sources: ["docs/wiki/README.md"]
+sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17

@@ -15,7 +15,7 @@ related homelab services as documented in `/opt/homelab`.
   - `compose-review-*.md` for CloudNode work or `homenode-review-*.md` for HomeNode work.
   - The current latest review for both hosts is dated `2026-04-17`.
 - If an external article or post is involved, read the matching page under
-  `docs/wiki/sources/` and the paired raw capture under `docs/wiki/raw/`.
+
 - Cite wiki paths directly in answers.
 
 ## Key Entry Points
@@ -85,8 +85,6 @@ related homelab services as documented in `/opt/homelab`.
 - Do not assume every HomeNode service already has a tracked `host-configs/homenode/<service>/docker-compose.yml` copy. `NM1` still applies: only 8 of 16 HomeNode compose files are currently tracked in repo.
 - When touching HomeNode, update the live file, the matching `host-configs/homenode/<service>/docker-compose.yml` tracked copy if it exists or create that tracked copy when `NM1` means it is still missing, and the matching `services-homenode` page together.
 - When an external article meaningfully changes the maintenance model, preserve
-  it under `docs/wiki/raw/` and summarize it under `docs/wiki/sources/`.
-
 ## Preferred Editing Behavior
 
 - Use existing findings and remediation snippets when available.
@@ -99,8 +97,6 @@ related homelab services as documented in `/opt/homelab`.
 - For HomeNode, read `docs/wiki/homenode-review-2026-04-17.md` and the matching
   `docs/wiki/services-homenode/<service>.md` before editing.
 - When an external article meaningfully changes the maintenance model, preserve
-  it under `docs/wiki/raw/` and summarize it under `docs/wiki/sources/`.
-
 ## Supporting Pages
 
 - [Index](./index.md)

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from collections import defaultdict
 
-ROOT = Path('/opt/homelab')
+ROOT = Path(__file__).resolve().parent.parent
 WIKI = ROOT / 'docs/wiki'
 REQUIRED_FRONTMATTER = {
     'title', 'slug', 'type', 'status', 'tags', 'aliases', 'entities', 'related',

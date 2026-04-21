@@ -65,7 +65,7 @@ Control and tunnel flow:
 - `pocket-id`
 
 ### DNS
-- `adguard-home`
+- ~~`adguard-home`~~ — **Removed 2026-04-21**. iPhone uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
 
 ### Observability
 - `traefik-log-dashboard`

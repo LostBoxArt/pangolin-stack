@@ -41,7 +41,6 @@ related homelab services as documented in `/opt/homelab`.
 - [crowdsec](./services/crowdsec.md)
 - [crowdsec-web-ui](./services/crowdsec-web-ui.md)
 - [pocket-id](./services/pocket-id.md)
-- [adguard-home](./services/adguard-home.md)
 - [traefik-log-dashboard](./services/traefik-log-dashboard.md)
 - [dashdot](./services/dashdot.md)
 - [dockhand](./services/dockhand.md)

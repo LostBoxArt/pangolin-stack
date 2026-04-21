@@ -51,6 +51,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`traefik_traefik Docker Network`](./networks/traefik-traefik.md) — Single shared external Docker network for HomeNode services.
 
 ## Runbooks
+- [`All sites return 403`](./runbooks/403-all-sites.md) — When every Cloudflare-fronted site returns 403 simultaneously. Covers CrowdSec container exit, Cloudflare false leads, and origin health checks.
 - [`Check HomeNode reachability via Olm`](./runbooks/check-homenode-reachability-via-olm.md) — Use this when the CloudNode cannot reach HomeNode services, especially when Dockhand on the CloudNode cannot talk to HomeNode Docker at `192.168.1.10:2375`.
 - [`Fix Pocket-ID shared data path`](./runbooks/fix-pocket-id-shared-data.md) — Use this to remediate `F-POCKETID-1 / C1`, where Pocket-ID mounts the shared repo `data/` directory instead of a dedicated path.
 - [`Recreate CloudNode Traefik after recreating Gerbil`](./runbooks/recreate-traefik-after-gerbil.md) — Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.

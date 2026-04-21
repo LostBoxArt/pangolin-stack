@@ -222,3 +222,26 @@ artifacts.
 - Updated `AGENTS.md` inventory and volume notes.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-21] maintenance | skill and machine entry points updated
+- Patched `pangolin-stack-wiki-maintenance` skill: replaced all deprecated "VPS/NASUS" terminology with "CloudNode/HomeNode", updated paths from `services-nasus/` / `nasus-review-*.md` / `host-configs/nasus/` to `services-homenode/` / `homenode-review-*.md` / `host-configs/homenode/`.
+- Removed `adguard-home` from `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` active CloudNode service lists since the service was removed on 2026-04-21.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
+## [2026-04-21] incident | CrowdSec container exit caused global 403s
+- **Symptom**: All Cloudflare-fronted sites returned 403. Both home ISP (`89.139.129.135`) and cellular affected.
+- **Initial misdiagnosis**: Assumed Cloudflare IP blocking or WAF challenge.
+- **Actual root cause**: `crowdsec` container (not `crowdsec-web-ui`) had exited ~23 minutes prior. Traefik's `websecure` entrypoint applies `crowdsec@file` middleware to every request by default. With the CrowdSec LAPI unreachable, the plugin returned 403 for all traffic.
+- **Fix**: `docker start crowdsec` — immediate restoration of all sites.
+- **Lesson**: When all sites return 403 simultaneously, check `docker ps -a | grep crowdsec` first. The CrowdSec bouncer plugin fails closed (blocks) when LAPI is unreachable.
+- **Cleanup**: Removed unnecessary `reverse_tunnel` SSH key from `~/.ssh/authorized_keys` and reverted `GatewayPorts` (still needs sudo to complete).
+- **New runbook**: `docs/wiki/runbooks/403-all-sites.md`
+
+## [2026-04-21] incident | HomeNode SSH through Olm tunnel blocked
+- **Symptom**: Termix web SSH to HomeNode (`192.168.0.10`) failed with "Connection lost before handshake". VPS direct SSH worked initially, then also broke.
+- **Initial misdiagnosis**: Asustor `sshd` penalty table blocking Docker bridge IP `172.20.0.2` due to `sshd-session` seccomp crash (SIGSYS/syscall 87).
+- **Actual root cause**: The VPS OpenSSH client (10.0p1-5ubuntu5) had an incompatibility with Asustor's custom `sshd-session` binary that triggered seccomp crashes on certain key exchange paths.
+- **Fix**: `apt upgrade` on the CloudNode updated OpenSSH client to `10.0p1-5ubuntu5.1`. After the update, SSH from VPS to HomeNode through the tunnel worked immediately.
+- **Lesson**: The "penalty table" was a symptom of the real issue (client-induced `sshd-session` crash), not the root cause. Restarting Asustor `sshd` cleared the table temporarily, but the crash reoccurred on every connection attempt from the old client version.
+- **Important**: Asustor `sshd` restart via `SIGHUP` does NOT clear the penalty table — the PID stays the same. A hard restart (`kill -9`) or ADM GUI toggle is required to wipe it.
+- **New runbook**: Added SSH troubleshooting section to `docs/wiki/runbooks/403-all-sites.md` and updated `asustor-ssh-penalty-fix` skill with corrected findings.
+

@@ -31,12 +31,12 @@ remediation steps are collected here. Per-service detail lives in the
 
 ## TL;DR Scoreboard
 
-| Stack | File | Services | Critical | High | Medium | Low |
-|---|---|---|---|---|---|---|
-| core | `stacks/core/docker-compose.yml` | pangolin, gerbil, traefik | 0 | 1 | 3 | 1 |
-| security | `stacks/security/docker-compose.yml` | crowdsec, crowdsec-web-ui, pocket-id | 1 | 2 | 2 | 0 |
-| dns | `stacks/dns/docker-compose.yml` | adguard-home | 0 | 0 | 1 | 1 |
-| observability | `stacks/observability/docker-compose.yml` | traefik-agent, traefik-dashboard, dashdot | 0 | 2 | 2 | 1 |
+| Stack | File | Services | Critical | High | Medium | Low | Status |
+|---|---|---|---|---|---|---|---|
+| core | `stacks/core/docker-compose.yml` | pangolin, gerbil, traefik | 0 | 1 | 3 | 1 | active |
+| security | `stacks/security/docker-compose.yml` | crowdsec, crowdsec-web-ui, pocket-id | 1 | 2 | 2 | 0 | active |
+| dns | `stacks/dns/docker-compose.yml` | adguard-home | 0 | 0 | 1 | 1 | **removed 2026-04-21** |
+| observability | `stacks/observability/docker-compose.yml` | traefik-agent, traefik-dashboard, dashdot | 0 | 2 | 2 | 1 | active |
 | management | `stacks/management/docker-compose.yml` | dockhand | 0 | 0 | 1 | 0 |
 | dashboard | `stacks/dashboard/docker-compose.yml` | homarr, qbit-proxy | 0 | 0 | 0 | 2 |
 | apps | `stacks/apps/docker-compose.yml` | landing, termix | 0 | 0 | 2 | 2 |

@@ -129,7 +129,7 @@ pangolin-stack/
 │   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
 │   ├── management/docker-compose.yml   # dockhand
 │   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
-|   ├── apps/docker-compose.yml         # landing, termix
+│   ├── apps/docker-compose.yml         # landing, termix
 ├── config/                             # service configs (pangolin, crowdsec, traefik)
 ├── config/db/                          # Pangolin database
 ├── config/traefik/rules/               # Traefik dynamic rules

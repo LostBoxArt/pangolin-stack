@@ -148,6 +148,17 @@ artifacts.
 - Completed the truncated `docs/wiki/maintenance-workflow.md` "Additional high-value page families" section.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-21] maintenance | wiki mechanical cleanup and skill drift flagged
+- Removed empty bullet points from `docs/wiki/README.md` (Core section) and `docs/wiki/index.md` (CloudNode Services section).
+- Removed orphan text fragments in `docs/wiki/README.md` that described non-existent `raw/` and `sources/` pages.
+- Removed empty `## Raw Sources` and `## Source Pages` sections from `docs/wiki/index.md` since the directories do not exist.
+- Removed broken links to `./raw/README.md` and `./sources/README.md` from `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt`.
+- Removed three truncated/incomplete sentences about external articles and raw sources from `llms.txt` and `llms-full.txt`.
+- Fixed malformed code block line in `AGENTS.md` (`||` leak in file tree diagram).
+- Updated `last_lint` timestamps in `README.md` and `index.md` to 2026-04-21.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+- Flagged `pangolin-stack-wiki-maintenance` skill for manual update: it still uses deprecated "VPS/NASUS" terminology and references `nasus-review-*.md`, `services-nasus/`, and `host-configs/nasus/` which were renamed to CloudNode/HomeNode on 2026-04-21. Security scan blocked automated skill patching this session.
+
 ## [2026-04-21] service | landing page redesigned and deployed
 - Complete visual redesign of `dennisb.xyz` landing page following Anthropic's
   "frontend-design" skill principles: bold aesthetic direction, distinctive
@@ -186,6 +197,16 @@ artifacts.
 - Replaced dead Fastmail SMTP credentials in `config/pangolin/config.yml` with
   Gmail placeholder values (`smtp.gmail.com`, app-password ready).
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
+## [2026-04-21] service | adguard-home removed
+- Stopped and removed `adguard-home` container (`stacks/dns/docker-compose.yml`).
+- Removed `dns` stack from `startup.sh` phase 2.
+- Marked `docs/wiki/services/adguard-home.md` as `status: removed`, added removal note and config backup path.
+- Removed AdGuard Home from `docs/wiki/README.md`, `docs/wiki/index.md`, `docs/wiki/hosts/cloudnode.md`.
+- Removed DNS-over-HTTPS section and service table entry from `README.md` and `INFRASTRUCTURE.md`.
+- Updated `docs/wiki/compose-review-2026-04-17.md` scoreboard to mark `dns` stack as **removed 2026-04-21**.
+- Config preserved at `./config/adguard-home/` in case restoration is needed.
+- iPhone now uses `1.1.1.1` directly.
 
 ## [2026-04-21] service | linkstack replaced by bespoke landing page
 - Added `docs/wiki/services/landing.md` documenting the new static landing page

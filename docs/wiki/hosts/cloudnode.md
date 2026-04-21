@@ -31,7 +31,6 @@ Primary public edge and control-plane server.
 - [[../services/crowdsec.md]]
 - [[../services/crowdsec-web-ui.md]]
 - [[../services/pocket-id.md]]
-- [[../services/adguard-home.md]]
 - [[../services/traefik-log-dashboard.md]]
 - [[../services/dashdot.md]]
 - [[../services/dockhand.md]]

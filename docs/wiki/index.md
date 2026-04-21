@@ -13,7 +13,7 @@ sources: ["docs/wiki/README.md"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-18
+last_lint: 2026-04-21
 ---
 
 # Wiki Index
@@ -33,10 +33,6 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 ## Reviews
 - [`Compose-File Review — 2026-04-17`](./compose-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `stacks/` against upstream documentation and reference compose files. Findings, severities, and remediation steps are collected there, with per-service detail in `docs/wiki/services/`.
 - [`HomeNode Compose-File Review — 2026-04-17`](./homenode-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `/volume1/docker/` on HomeNode (`192.168.1.10`) against upstream references. Findings, severities, and remediation follow the same conventions as the CloudNode review.
-
-## Raw Sources
-
-## Source Pages
 
 ## Concepts
 - [`Port Matrix`](./concepts/port-matrix.md) — This page is the quickest view of which host or service owns which important port, whether it is public, tunneled, LAN-only, or considered a risk surface.
@@ -60,9 +56,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Recreate CloudNode Traefik after recreating Gerbil`](./runbooks/recreate-traefik-after-gerbil.md) — Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.
 
 ## CloudNode Services
--
--
-- [`adguard-home`](./services/adguard-home.md) — Network-wide DNS filtering exposed as `https://dns.example.com`, with DoH at `/dns-query` and DoT on `dns.example.com:853`.
+- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21**. iPhone now uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
 - [`crowdsec-web-ui`](./services/crowdsec-web-ui.md) — Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image (not shipped by CrowdSec team).
 - [`crowdsec`](./services/crowdsec.md) — IDS/IPS that reads Traefik's access log (and host `auth.log`/`syslog`), classifies suspicious behavior, and pushes decisions to bouncers (Traefik Badger plugin + host firewall).
 - [`dashdot`](./services/dashdot.md) — Lightweight CloudNode system dashboard (CPU, RAM, storage, network). Runs behind Traefik at `dash.example.com`.

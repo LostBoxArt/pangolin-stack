@@ -13,7 +13,7 @@ sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-21
 ---
 # Pangolin Stack — Internal Wiki
 
@@ -51,8 +51,6 @@ Coverage spans **two hosts**:
 - [Glossary](./glossary.md) — compact definitions for recurring homelab terms.
 - [Wiki Log](./log.md) — append-only maintenance log for wiki updates, audits,
   and structural changes.
-  vendor docs, transcripts, and other external inputs.
-  sources, with applicability notes and backlinks into the rest of the wiki.
 - [llms.txt](./llms.txt) — machine-oriented manifest for agents.
 - [llms-full.txt](./llms-full.txt) — compact compiled context file for agents
   that need the wiki map and top operational rules in one read.
@@ -73,8 +71,6 @@ Each page follows the same structure:
 
 - [Index](./index.md) — flat catalog of all current wiki pages.
 - [Glossary](./glossary.md) — recurring homelab terms and shorthand.
-  material that should remain separate from synthesized knowledge.
-  used to keep future semantic health checks traceable.
 - [Hosts](./hosts/cloudnode.md) / [HomeNode host](./hosts/homenode.md) — host-level summaries.
 - [Networks](./networks/pangolin.md) and [traefik_traefik](./networks/traefik-traefik.md) — current network model.
 - [Runbooks](./runbooks/recreate-traefik-after-gerbil.md) and peers — operator procedures grounded in existing wiki facts.
@@ -86,18 +82,12 @@ Each page follows the same structure:
 - [pangolin](./services/pangolin.md)
 - [gerbil](./services/gerbil.md)
 - [traefik](./services/traefik.md)
--
--
 
 ### Security (`stacks/security/docker-compose.yml`)
 
 - [crowdsec](./services/crowdsec.md)
 - [crowdsec-web-ui](./services/crowdsec-web-ui.md)
 - [pocket-id](./services/pocket-id.md)
-
-### DNS (`stacks/dns/docker-compose.yml`)
-
-- [adguard-home](./services/adguard-home.md)
 
 ### Observability (`stacks/observability/docker-compose.yml`)
 

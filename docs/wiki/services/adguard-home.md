@@ -2,7 +2,7 @@
 title: "adguard-home"
 slug: cloudnode-adguard-home
 type: service
-status: active
+status: removed
 tags: ["homelab", "cloudnode", "service", "adguard-home"]
 aliases: ["adguard-home"]
 entities:
@@ -12,10 +12,26 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dns/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-04-21
+last_lint: 2026-04-21
 ---
-# adguard-home
+
+# adguard-home (REMOVED)
+
+**Status:** Removed on 2026-04-21. Container stopped and stack removed from startup.
+
+**Reason:** Only used for iPhone DNS filtering. Caused more issues than it was worth. iPhone now uses `1.1.1.1` directly. Local AdGuard copy remains on the home network if needed.
+
+**Historical endpoints (no longer active):**
+- DoH: `https://dns.dennisb.xyz/dns-query`
+- DoT: `dns.dennisb.xyz:853`
+- WebUI: `https://dns.dennisb.xyz`
+
+**Config backup:** `./config/adguard-home/` still exists if ever needed for restoration.
+
+---
+
+*Below is the original service documentation, preserved for reference.*
 
 Network-wide DNS filtering. Exposed publicly as:
 
@@ -27,10 +43,9 @@ All traffic reaches AdGuard through Traefik — plain DNS (53/udp) is **not**
 exposed, by design.
 
 - **Image**: `adguard/adguardhome:latest` ⚠️
-- **Compose file**: `stacks/dns/docker-compose.yml`
+- **Compose file**: `stacks/dns/docker-compose.yml` (removed from startup)
 - **Config**: `./config/adguard-home/conf/`
 - **Work dir** (filter lists, stats): `./config/adguard-home/work/`
-
 ## Upstream Sources
 
 - Docker wiki: <https://github.com/AdguardTeam/AdGuardHome/wiki/Docker>

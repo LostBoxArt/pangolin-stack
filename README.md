@@ -18,7 +18,6 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Core infrastructure (starts first) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Security & authentication |
-| **dns** | adguard-home | DNS-over-HTTPS \u0026 filtering |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
@@ -181,29 +180,9 @@ sudo systemctl status olm-watchdog.timer  # Watchdog timer status
 | Homarr | https://home.example.com |
 | Dashdot | https://dash.example.com |
 | Dockhand | https://dockhand.example.com |
-| AdGuard Home | https://dns.example.com |
 | LinkStack | https://example.com |
 | Termix | https://termix.example.com |
 | CrowdSec Web UI | http://<cloudnode-ip>:3458 |
-
-## DNS-over-HTTPS (DoH)
-
-AdGuard Home runs independently on the CloudNode with its own blocklists and configuration.
-
-**DoH URL:** `https://dns.example.com/dns-query`  
-**DoT URL:** `dns.example.com:853`
-
-### Device Setup
-
-| Device | Instructions |
-|--------|--------------|
-| **iPhone/iOS** | Visit dns.example.com → Setup Guide → Download iOS profile |
-| **Android 9+** | Settings → Network → Private DNS → `dns.example.com` |
-| **Firefox** | Settings → Privacy → Enable DoH → Custom: `https://dns.example.com/dns-query` |
-| **Chrome** | Settings → Privacy → Use secure DNS → Custom: `https://dns.example.com/dns-query` |
-
-### Configuration
-Manage blocklists and upstream DNS at `https://dns.example.com`
 
 ## Troubleshooting
 

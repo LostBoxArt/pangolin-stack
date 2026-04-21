@@ -86,7 +86,6 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 |-------|---------|----------|
 | `core` | Infrastructure (starts first) | pangolin, gerbil, traefik |
 | `security` | Protection & auth | crowdsec, crowdsec-web-ui, pocket-id |
-| `dns` | DNS-over-HTTPS & filtering | adguard-home |
 | `observability` | Monitoring & logs | traefik-agent, traefik-dashboard, dashdot |
 | `management` | Container orchestration | dockhand |
 | `dashboard` | User dashboards | homarr, qbit-proxy |
@@ -118,24 +117,6 @@ Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Ger
 docker compose -f stacks/core/docker-compose.yml --env-file .env up -d --force-recreate traefik
 ```
 
-
-## AdGuard Home
-
-The CloudNode runs its own independent AdGuard Home instance with DNS-over-HTTPS (DoH) and DNS-over-TLS (DoT) support.
-
-### Access
-- **Web UI**: https://dns.example.com
-- **DoH Endpoint**: `https://dns.example.com/dns-query`
-- **DoT Endpoint**: `dns.example.com:853`
-
-### Management
-```bash
-# Access web UI to configure blocklists and upstream DNS
-# https://dns.example.com
-
-# Check query logs
-docker logs adguard-home --tail 50
-```
 
 ## Olm Tunnel Configuration
 

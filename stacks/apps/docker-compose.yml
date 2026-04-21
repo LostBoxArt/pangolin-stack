@@ -15,7 +15,7 @@ services:
       - pangolin
     restart: unless-stopped
     volumes:
-      - /opt/homelab/sites/example-landing:/usr/share/nginx/html:ro
+      - ../../sites/dennisb-landing:/usr/share/nginx/html:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.linkstack.rule=Host(`example.com`)"

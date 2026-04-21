@@ -9,7 +9,7 @@ entities:
   primary: cloudnode-landing
   mentions: []
 related: ["./README.md", "./system-overview.md", "./linkstack.md"]
-sources: ["stacks/apps/docker-compose.yml", "sites/example-landing/"]
+sources: ["stacks/apps/docker-compose.yml", "sites/dennisb-landing/"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-21
@@ -24,7 +24,8 @@ previous LinkStack container with a single HTML+CSS page served by nginx.
 - **Image**: `nginx:alpine`
 - **Compose file**: `stacks/apps/docker-compose.yml`
 - **Internal port**: `80` (Traefik-fronted)
-- **Data**: bind-mounted site directory `sites/example-landing/` → `/usr/share/nginx/html`
+- **Data**: bind-mounted site directory `sites/dennisb-landing/` (gitignored; contains
+  personal info) → `/usr/share/nginx/html`
 - **Container name**: `landing`
 
 ## Upstream Sources
@@ -41,7 +42,7 @@ None — this is a bespoke static page built in-repo.
       - pangolin
     restart: unless-stopped
     volumes:
-      - /opt/homelab/sites/example-landing:/usr/share/nginx/html:ro
+      - ../../sites/dennisb-landing:/usr/share/nginx/html:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.linkstack.rule=Host(`example.com`)"
@@ -58,7 +59,7 @@ Pangolin SQLite `targets` table row for this resource was updated from
 
 ## Site Files
 
-Located under `sites/example-landing/`:
+Located under `sites/dennisb-landing/` (gitignored):
 
 - `index.html` — profile card markup
 - `style.css` — all styles (glassmorphism, animations, responsive)
@@ -83,7 +84,7 @@ Located under `sites/example-landing/`:
 
 - The site is served read-only (`:ro` bind mount). No container state to
   preserve.
-- To update: edit files in `sites/example-landing/`, bump the `?v=N`
+- To update: edit files in `sites/dennisb-landing/`, bump the `?v=N`
   cache-buster in `index.html`, and reload nginx inside the container:
   `docker exec landing nginx -s reload`.
 - The old `linkstack_linkstack_data` external Docker volume still exists

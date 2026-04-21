@@ -25,7 +25,10 @@ config from it.
 - **Compose file**: `stacks/core/docker-compose.yml`
 - **Internal port**: `3001/tcp` (fronted by Traefik at `pangolin.example.com`)
 - **Data**: `./config/` (bound into container at `/app/config`, includes
-  `db/` with SQLite)
+  `db/` with SQLite and `pangolin/config.yml`). Pangolin expects the main
+  config at `/app/config/config.yml`; we keep the actual file at
+  `config/pangolin/config.yml` and create a symlink at `config/config.yml`
+  so the container finds it.
 
 ## Upstream Sources
 
@@ -98,6 +101,13 @@ explicitly sets both a limit and a reservation.
 lot of wake-ups. Upstream uses `10s` which is more than responsive enough for
 orchestration (`depends_on: service_healthy` still only waits seconds).
 
+### F-PANGOLIN-3 — config file path mismatch (`low`)
+Pangolin expects its config at `/app/config/config.yml` inside the container.
+We organize config under `config/pangolin/config.yml` for clarity. If the
+symlink `config/config.yml → pangolin/config.yml` is missing, Pangolin crashes
+on startup with "No configuration file found." This happened during a
+`git-filter-repo` purge that removed the symlink.
+
 ## Remediation
 
 ### Fix F-PANGOLIN-1
@@ -114,6 +124,25 @@ orchestration (`depends_on: service_healthy` still only waits seconds).
 ```
 
 ### Fix F-PANGOLIN-2
+
+```yaml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+```
+
+### Fix F-PANGOLIN-3
+
+Ensure the symlink exists in the working tree:
+
+```bash
+ln -s pangolin/config.yml config/config.yml
+```
+
+Or adjust the compose volume to mount `config/pangolin` directly to
+`/app/config` if no other files are needed from `config/`.
 
 ```yaml
     healthcheck:

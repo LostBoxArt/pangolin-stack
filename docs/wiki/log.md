@@ -148,6 +148,29 @@ artifacts.
 - Completed the truncated `docs/wiki/maintenance-workflow.md` "Additional high-value page families" section.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-21] maintenance | repo public-ready cleanup and live config fixes
+- Ran `git-filter-repo` to purge `config/config.yml` (secrets), `config/db/db.sqlite.fresh`
+  (binary DB), and `config/traefik/rules/resource-overrides.yml.back` (basic-auth hash)
+  from all history.
+- Replaced all real addresses/domains/names with generic examples across history
+  (`dennisb.xyz` → `example.com`, `192.168.0.x` → `192.168.1.x`, `NASUS` → `HomeNode`,
+  `VPS` → `CloudNode`, etc.).
+- Removed `sites/dennisb-landing/` from git history and added to `.gitignore`.
+- Fixed `.gitignore` paths: `config/config.yml`, `config/pangolin/config.yml`, backup
+  patterns, and SQLite fresh files.
+- Restored `config/config.yml` symlink (`→ pangolin/config.yml`) after `git-filter-repo`
+  deleted it; documented the symlink requirement in `docs/wiki/services/pangolin.md`
+  as finding `F-PANGOLIN-3`.
+- Restored `sites/dennisb-landing/` from `/tmp/github-check-2` backup after the
+  directory was lost during cleanup.
+- Fixed `stacks/apps/docker-compose.yml` landing volume from hardcoded
+  `/opt/homelab/sites/example-landing` to relative `../../sites/dennisb-landing`.
+- Updated `docs/wiki/services/landing.md` to reflect the actual `dennisb-landing`
+  path and gitignored status.
+- Replaced dead Fastmail SMTP credentials in `config/pangolin/config.yml` with
+  Gmail placeholder values (`smtp.gmail.com`, app-password ready).
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
 ## [2026-04-21] service | linkstack replaced by bespoke landing page
 - Added `docs/wiki/services/landing.md` documenting the new static landing page
   at `example.com` (nginx:alpine, `sites/example-landing/`).

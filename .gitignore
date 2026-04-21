@@ -10,7 +10,7 @@
 .env.*.local
 
 # Pangolin config (contains secrets)
-config/pangolin/config.yml
+config/config.yml
 
 # Traefik dynamic config (contains CrowdSec API key)
 config/traefik/rules/dynamic_config.yml
@@ -58,6 +58,8 @@ backups/
 # =============================================================================
 # Traefik config backups
 config/traefik/*.bak.*
+config/traefik/rules/*.back
+config/traefik/rules/*.bak
 
 # CrowdSec hub (auto-downloaded)
 config/crowdsec/hub/
@@ -97,5 +99,6 @@ config/traefik/rules/resource-overrides.yml
 # Traefik static config (contains email)
 config/traefik/traefik_config.yml
 config/db/db.sqlite
+config/db/*.sqlite.fresh
 config/adguard-home/conf/AdGuardHome.yaml
 pass.secret

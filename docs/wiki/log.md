@@ -148,6 +148,22 @@ artifacts.
 - Completed the truncated `docs/wiki/maintenance-workflow.md` "Additional high-value page families" section.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-21] service | landing page redesigned and deployed
+- Complete visual redesign of `dennisb.xyz` landing page following Anthropic's
+  "frontend-design" skill principles: bold aesthetic direction, distinctive
+  typography, intentional spatial composition.
+- Key changes: full-page layout replacing centered card, Cormorant Garamond
+  serif + Outfit sans-serif fonts, warm industrial palette (near-black with
+  copper accents), structural grid lines, film-grain noise overlay, large
+  avatar with rotating amber ring and pulsing glow, staggered entrance
+  animations, 3+2 centered link grid, corner bracket framing.
+- All 5 links preserved (Email, LinkedIn, GitHub, X, Steam) with icons.
+- Bio, focus tags, and "Built by me. Hosted at home." footer retained.
+- Responsive single-column layout for mobile.
+- Respects `prefers-reduced-motion`.
+- Deployed to live nginx container at `sites/dennisb-landing/`.
+- Updated `docs/wiki/services/landing.md` to reflect new design.
+
 ## [2026-04-21] maintenance | repo public-ready cleanup and live config fixes
 - Ran `git-filter-repo` to purge `config/config.yml` (secrets), `config/db/db.sqlite.fresh`
   (binary DB), and `config/traefik/rules/resource-overrides.yml.back` (basic-auth hash)

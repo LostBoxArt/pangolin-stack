@@ -61,32 +61,42 @@ Pangolin SQLite `targets` table row for this resource was updated from
 
 Located under `sites/dennisb-landing/` (gitignored):
 
-- `index.html` — profile card markup
-- `style.css` — all styles (glassmorphism, animations, responsive)
+- `index.html` — full-page markup (hero, body blocks, footer)
+- `style.css` — all styles (grid, typography, animations, responsive)
 - `avatar.jpg` — profile photo
 
 ## Design Features
 
-- **Rotating amber border** — thin conic-gradient border that slowly rotates
-  around the card (10s cycle, soft opacity)
-- **Mouse-tracking spotlight** — radial amber glow follows cursor inside the
-  card on desktop; disabled on touch devices
-- **Mesh gradient background** — three large soft blobs (amber, purple, pink)
-  that drift at different speeds
-- **Text shimmer** — slow warm highlight sweeps across "Admin B." every 6s
-- **Enhanced glassmorphism** — increased backdrop blur, inner top-edge
-  highlight, soft inner glow
-- **Staggered fade-up entrance animations** on all card elements
-- **3+2 social link grid** — fixed-width pill buttons: Email, LinkedIn,
-  GitHub on top row; X, Steam on bottom row
+- **Full-page layout** — content spans the viewport, not a centered card.
+  Asymmetric hero with large serif typography left, large photo right.
+- **Structural grid lines** — faint vertical and horizontal guide lines at
+  key proportions (8.33%, 25%, 50%, 75%, 91.66%) for an architectural feel.
+- **Film-grain noise overlay** — subtle SVG noise texture at 3% opacity for
+  depth and atmosphere.
+- **Editorial typography** — Cormorant Garamond serif for the name, Outfit
+  sans-serif for body text. No Inter, no Roboto.
+- **Warm industrial palette** — near-black `#0c0c0c` background with copper
+  `#c4956a` accents. Not the default dark-mode blue-purple.
+- **Rotating amber border** — conic-gradient ring around the avatar (10s loop).
+- **Pulsing glow behind avatar** — soft radial gradient that breathes.
+- **Staggered entrance animations** — content blocks fade up in sequence on load.
+- **3+2 centered link grid** — Email, LinkedIn, GitHub top row; X, Steam
+  centered below.
+- **Corner brackets** — minimal L-shaped framing elements top-left and
+  bottom-right.
+- **Responsive** — single-column stack on mobile with photo moved above name.
+- **Respects `prefers-reduced-motion`** — disables all animations for users
+  who request it.
 
 ## Operational Notes
 
 - The site is served read-only (`:ro` bind mount). No container state to
   preserve.
-- To update: edit files in `sites/dennisb-landing/`, bump the `?v=N`
-  cache-buster in `index.html`, and reload nginx inside the container:
+- To update: edit files in `sites/dennisb-landing/` and reload nginx:
   `docker exec landing nginx -s reload`.
+- Design follows the "frontend-design" Anthropic skill principles:
+  bold aesthetic direction, distinctive typography, intentional spatial
+  composition, and avoiding generic "AI slop" aesthetics.
 - The old `linkstack_linkstack_data` external Docker volume still exists
   on the host as a safety precaution; it can be removed once confirmed
   unnecessary.

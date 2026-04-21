@@ -102,3 +102,6 @@ config/db/db.sqlite
 config/db/*.sqlite.fresh
 config/adguard-home/conf/AdGuardHome.yaml
 pass.secret
+
+# Real landing page (contains personal info)
+sites/example-landing/

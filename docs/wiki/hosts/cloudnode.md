@@ -13,7 +13,7 @@ sources: ["AGENTS.md", "docs/wiki/system-overview.md", "docs/wiki/compose-review
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-21
 ---
 # CloudNode Host
 
@@ -28,6 +28,8 @@ Primary public edge and control-plane server.
 - [[../services/pangolin.md]]
 - [[../services/gerbil.md]]
 - [[../services/traefik.md]]
+- [[../services/badger.md]]
+- [[../services/olm.md]]
 - [[../services/crowdsec.md]]
 - [[../services/crowdsec-web-ui.md]]
 - [[../services/pocket-id.md]]
@@ -37,8 +39,11 @@ Primary public edge and control-plane server.
 - [[../services/homarr.md]]
 - [[../services/qbit-proxy.md]]
 - [[../services/landing.md]]
-- [[../services/linkstack.md]] (archived)
 - [[../services/termix.md]]
+
+## Archived services
+- [[../services/linkstack.md]] — archived on 2026-04-21 after `landing`
+  replaced it at the apex domain.
 
 ## Networks
 - Docker external network: [[../networks/pangolin.md]]

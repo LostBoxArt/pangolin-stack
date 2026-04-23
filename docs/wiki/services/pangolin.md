@@ -13,7 +13,7 @@ sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-21
 ---
 # pangolin
 

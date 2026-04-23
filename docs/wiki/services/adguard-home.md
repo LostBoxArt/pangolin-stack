@@ -13,7 +13,7 @@ sources: ["stacks/dns/docker-compose.yml"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-21
-last_lint: 2026-04-21
+last_lint: 2026-04-22
 ---
 
 # adguard-home (REMOVED)
@@ -23,9 +23,9 @@ last_lint: 2026-04-21
 **Reason:** Only used for iPhone DNS filtering. Caused more issues than it was worth. iPhone now uses `1.1.1.1` directly. Local AdGuard copy remains on the home network if needed.
 
 **Historical endpoints (no longer active):**
-- DoH: `https://dns.dennisb.xyz/dns-query`
-- DoT: `dns.dennisb.xyz:853`
-- WebUI: `https://dns.dennisb.xyz`
+- DoH: `https://dns.example.com/dns-query`
+- DoT: `dns.example.com:853`
+- WebUI: `https://dns.example.com`
 
 **Config backup:** `./config/adguard-home/` still exists if ever needed for restoration.
 

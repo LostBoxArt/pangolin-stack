@@ -13,7 +13,7 @@ sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-18
+last_lint: 2026-04-22
 ---
 # Wiki Log
 
@@ -160,7 +160,7 @@ artifacts.
 - Flagged `pangolin-stack-wiki-maintenance` skill for manual update: it still uses deprecated "VPS/NASUS" terminology and references `nasus-review-*.md`, `services-nasus/`, and `host-configs/nasus/` which were renamed to CloudNode/HomeNode on 2026-04-21. Security scan blocked automated skill patching this session.
 
 ## [2026-04-21] service | landing page redesigned and deployed
-- Complete visual redesign of `dennisb.xyz` landing page following Anthropic's
+- Complete visual redesign of `example.com` landing page following Anthropic's
   "frontend-design" skill principles: bold aesthetic direction, distinctive
   typography, intentional spatial composition.
 - Key changes: full-page layout replacing centered card, Cormorant Garamond
@@ -180,7 +180,7 @@ artifacts.
   (binary DB), and `config/traefik/rules/resource-overrides.yml.back` (basic-auth hash)
   from all history.
 - Replaced all real addresses/domains/names with generic examples across history
-  (`dennisb.xyz` → `example.com`, `192.168.0.x` → `192.168.1.x`, `NASUS` → `HomeNode`,
+  (real domain → `example.com`, internal range → `192.168.1.x`, `NASUS` → `HomeNode`,
   `VPS` → `CloudNode`, etc.).
 - Removed `sites/dennisb-landing/` from git history and added to `.gitignore`.
 - Fixed `.gitignore` paths: `config/config.yml`, `config/pangolin/config.yml`, backup
@@ -227,8 +227,26 @@ artifacts.
 - Removed `adguard-home` from `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` active CloudNode service lists since the service was removed on 2026-04-21.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-21] maintenance | badger and olm service pages recreated and indexes repaired
+- Recreated missing `docs/wiki/services/badger.md` and `docs/wiki/services/olm.md` (log previously claimed they existed, but they were not on disk; pages now document Badger as the Traefik CrowdSec plugin and Olm as the CloudNode systemd tunnel service).
+- Added `badger` and `olm` to `docs/wiki/index.md`, `docs/wiki/README.md`, and `docs/wiki/hosts/cloudnode.md` CloudNode service lists.
+- Added `badger` to `docs/wiki/system-overview.md` Core section.
+- Removed stale `dns` stack from startup order and removed dead `dns.example.com` public endpoint from `docs/wiki/system-overview.md` following AdGuard removal on 2026-04-21.
+- Updated `last_lint` timestamps on modified pages.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
+## [2026-04-22] maintenance | runbook leaks and memory compression
+- Fixed `docs/wiki/runbooks/403-all-sites.md`: replaced remaining real domain, real IP, and stale internal IP with generic examples; updated "VPS" references to "CloudNode".
+- Fixed `docs/wiki/services/adguard-home.md`: replaced historical endpoint domain leak with `dns.example.com`.
+- Compressed memory fact_store: removed duplicate password facts (2×) and duplicate docker-exec tip (1×), updated remaining fact with deprecated `VPS/NASUS` terminology to `CloudNode/HomeNode`.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
+## [2026-04-22] maintenance | 403 runbook surfaced in machine entry points
+- Added `docs/wiki/runbooks/403-all-sites.md` to `docs/wiki/llms.txt` and `docs/wiki/llms-full.txt` so future agents discover the CrowdSec-fails-closed runbook from machine-oriented manifests.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
 ## [2026-04-21] incident | CrowdSec container exit caused global 403s
-- **Symptom**: All Cloudflare-fronted sites returned 403. Both home ISP (`89.139.129.135`) and cellular affected.
+- **Symptom**: All Cloudflare-fronted sites returned 403. Both home ISP and cellular affected.
 - **Initial misdiagnosis**: Assumed Cloudflare IP blocking or WAF challenge.
 - **Actual root cause**: `crowdsec` container (not `crowdsec-web-ui`) had exited ~23 minutes prior. Traefik's `websecure` entrypoint applies `crowdsec@file` middleware to every request by default. With the CrowdSec LAPI unreachable, the plugin returned 403 for all traffic.
 - **Fix**: `docker start crowdsec` — immediate restoration of all sites.
@@ -237,11 +255,32 @@ artifacts.
 - **New runbook**: `docs/wiki/runbooks/403-all-sites.md`
 
 ## [2026-04-21] incident | HomeNode SSH through Olm tunnel blocked
-- **Symptom**: Termix web SSH to HomeNode (`192.168.0.10`) failed with "Connection lost before handshake". VPS direct SSH worked initially, then also broke.
+- **Symptom**: Termix web SSH to HomeNode (`192.168.1.10`) failed with "Connection lost before handshake". CloudNode direct SSH worked initially, then also broke.
 - **Initial misdiagnosis**: Asustor `sshd` penalty table blocking Docker bridge IP `172.20.0.2` due to `sshd-session` seccomp crash (SIGSYS/syscall 87).
-- **Actual root cause**: The VPS OpenSSH client (10.0p1-5ubuntu5) had an incompatibility with Asustor's custom `sshd-session` binary that triggered seccomp crashes on certain key exchange paths.
-- **Fix**: `apt upgrade` on the CloudNode updated OpenSSH client to `10.0p1-5ubuntu5.1`. After the update, SSH from VPS to HomeNode through the tunnel worked immediately.
+- **Actual root cause**: The CloudNode OpenSSH client (10.0p1-5ubuntu5) had an incompatibility with Asustor's custom `sshd-session` binary that triggered seccomp crashes on certain key exchange paths.
+- **Fix**: `apt upgrade` on the CloudNode updated OpenSSH client to `10.0p1-5ubuntu5.1`. After the update, SSH from CloudNode to HomeNode through the tunnel worked immediately.
 - **Lesson**: The "penalty table" was a symptom of the real issue (client-induced `sshd-session` crash), not the root cause. Restarting Asustor `sshd` cleared the table temporarily, but the crash reoccurred on every connection attempt from the old client version.
 - **Important**: Asustor `sshd` restart via `SIGHUP` does NOT clear the penalty table — the PID stays the same. A hard restart (`kill -9`) or ADM GUI toggle is required to wipe it.
 - **New runbook**: Added SSH troubleshooting section to `docs/wiki/runbooks/403-all-sites.md` and updated `asustor-ssh-penalty-fix` skill with corrected findings.
+
+## [2026-04-22] maintenance | AGENTS.md drift cleanup and wiki last_lint repair
+- Removed stale `dns` stack and AdGuard Home references from `AGENTS.md` (stack table, startup order, service inventory, public endpoints, dedicated section); corrected stack count from 7 to 6.
+- Fixed malformed markdown table syntax in `AGENTS.md` stack table (extra leading pipes).
+- Updated stale `last_lint: 2026-04-17` to `2026-04-21` in `docs/wiki/compose-review-2026-04-17.md` and `docs/wiki/services/pangolin.md` to match their last modification dates.
+- Re-ran `scripts/wiki_lint.py` — all 55 files pass clean.
+
+## [2026-04-22] maintenance | autonomous memory and skill hygiene pass
+- Fixed `~/.hermes/memories/MEMORY.md`: corrected stale HomeNode IP from `192.168.0.10` to `192.168.1.10`, updated deprecated `VPS/NASUS` terminology to `CloudNode/HomeNode`, and fixed network range from `192.168.0.0/24` to `192.168.1.0/24`.
+- Removed stale LinkStack replacement preference from `~/.hermes/memories/USER.md` (completed 2026-04-21).
+- Sanitized remaining real data leaks in `docs/wiki/log.md`: removed real ISP IP, fixed `192.168.0.10` → `192.168.1.10` in incident entries, replaced `dennisb.xyz` with `example.com` in service descriptions, and updated `VPS` → `CloudNode` in incident narrative.
+- Patched 7 skills for deprecated terminology and wrong IPs:
+  - `home/homelab-automation`: `VPS/Nasus` → `CloudNode/HomeNode`
+  - `home/pangolin-networking`: `VPS` → `CloudNode`
+  - `home/traefik-routing`: `VPS stack` → `CloudNode stack`
+  - `home/seerr-media-requests`: `192.168.0.10` → `192.168.1.10` (3×)
+  - `devops/dockhand-hawser-monitoring`: `NASUS` → `HomeNode`, `192.168.0.10` → `192.168.1.10`, `NAS host` → `HomeNode host`
+  - `devops/pangolin-service-swap`: `NASUS` → `HomeNode`
+  - `software-development/hermes-gateway-live-session-guardrails`: `VPS` → `CloudNode`
+- Removed unused one-time research artifact `~/.hermes/skills/ai-pricing-research.md`.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
 

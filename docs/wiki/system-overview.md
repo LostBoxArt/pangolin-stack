@@ -13,7 +13,7 @@ sources: ["AGENTS.md", "docs/wiki/compose-review-2026-04-17.md", "docs/wiki/home
 confidence: medium
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-21
 ---
 # System Overview
 
@@ -57,15 +57,13 @@ Control and tunnel flow:
 - `pangolin` — control plane
 - `gerbil` — relay and edge port owner
 - `olm` — WireGuard endpoint for LAN reachability
+- `badger` — Traefik CrowdSec bouncer plugin
 - `traefik` — reverse proxy
 
 ### Security
 - `crowdsec`
 - `crowdsec-web-ui`
 - `pocket-id`
-
-### DNS
-- ~~`adguard-home`~~ — **Removed 2026-04-21**. iPhone uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
 
 ### Observability
 - `traefik-log-dashboard`
@@ -81,6 +79,10 @@ Control and tunnel flow:
 ### Apps
 - `landing`
 - `termix`
+
+### Historical note
+- `adguard-home` was removed from the CloudNode on 2026-04-21 and is not part
+  of the active stack layout.
 
 ## HomeNode Service Layout
 
@@ -116,7 +118,7 @@ There is no stack separation like on the CloudNode.
 ## Startup Order
 
 1. `core`
-2. `security`, `management`, `dns`
+2. `security`, `management`
 3. `observability`, `dashboard`, `apps`
 
 All non-core stacks use the external `pangolin` Docker network.
@@ -126,7 +128,6 @@ All non-core stacks use the external `pangolin` Docker network.
 - `https://pangolin.example.com`
 - `https://crowdsec.example.com`
 - `https://auth.example.com`
-- `https://dns.example.com`
 - `https://dockhand.example.com`
 - `https://home.example.com`
 - `https://dash.example.com`

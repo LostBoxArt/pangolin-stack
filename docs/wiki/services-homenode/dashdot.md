@@ -24,7 +24,9 @@ dashdot (which lives at [services/dashdot](../services/dashdot.md)).
 - **Compose file**: `/volume1/docker/config/dashdot/docker-compose.yml`
 - **Tracked copy**: **not tracked** (finding NM1)
 - **Port (internal)**: `3001`
-- **Router**: `dash.example.com`
+- **Router**: `dash.example.com` ⚠️ **conflict** — CloudNode dashdot also uses
+  this hostname. Only one will resolve depending on which Traefik answers.
+  See Operational Notes below.
 - **Privileged**: `true` ⚠️
 - **Volume**: `/volume1/docker/config/dashdot:/mnt/host:ro` ⚠️ **wrong mount**
 
@@ -158,9 +160,9 @@ Validation steps after applying:
 
 ## Operational Notes
 
-- Two dashdots now: `dash.example.com` is HomeNode and is currently broken
-  per F-N-DASHDOT-1. CloudNode dashdot is at `dashdot.example.com` (or similar,
-  per CloudNode compose).
-- If you really just want a HomeNode dashboard and CloudNode dashboard to be
-  differentiated, consider naming the router `dash-nas.example.com` to
-  avoid confusion with CloudNode `dash.example.com`.
+- `dash.example.com` is claimed by **both** CloudNode dashdot (router name
+  `dashdot`, see `stacks/observability/docker-compose.yml`) and HomeNode
+  dashdot (router name `dash`). This is a hostname collision — whichever
+  Traefik answers first wins.
+- The HomeNode dashdot should use a separate hostname such as
+  `dash-nas.example.com` to avoid overlap with the CloudNode router.

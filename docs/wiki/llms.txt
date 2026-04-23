@@ -102,7 +102,7 @@ related homelab services as documented in `/opt/homelab`.
 - [HomeNode Host](./hosts/homenode.md)
 - [pangolin network](./networks/pangolin.md)
 - [traefik_traefik network](./networks/traefik-traefik.md)
-- [Runbooks](./runbooks/recreate-traefik-after-gerbil.md), [Pocket-ID data fix](./runbooks/fix-pocket-id-shared-data.md), [Olm reachability](./runbooks/check-homenode-reachability-via-olm.md)
+- [Runbooks](./runbooks/recreate-traefik-after-gerbil.md), [Pocket-ID data fix](./runbooks/fix-pocket-id-shared-data.md), [Olm reachability](./runbooks/check-homenode-reachability-via-olm.md), [All sites return 403](./runbooks/403-all-sites.md)
 
 ## Lint Surface
 

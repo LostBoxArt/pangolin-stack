@@ -13,7 +13,7 @@ sources: ["incident 2026-04-21"]
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-21
-last_lint: 2026-04-21
+last_lint: 2026-04-22
 ---
 
 # All Sites Return 403
@@ -40,16 +40,16 @@ docker start crowdsec
 bouncer plugin fails closed — if it cannot reach the CrowdSec LAPI on
 `crowdsec:8080`, it returns 403 for every request.
 
-This has happened before (2026-04-21) when CrowdSec exited after a VPS
+This has happened before (2026-04-21) when CrowdSec exited after a CloudNode
 reboot or resource pressure. The `crowdsec-web-ui` container may still be
 running, which is misleading.
 
 ### 2. Verify origin health directly (bypass Cloudflare)
 
 ```bash
-# Test the origin directly via the VPS public IP
-curl -sI -H "Host: dennisb.xyz" --resolve dennisb.xyz:443:51.195.100.11 \
-  https://dennisb.xyz
+# Test the origin directly via the CloudNode public IP
+curl -sI -H "Host: example.com" --resolve example.com:443:203.0.113.1 \
+  https://example.com
 ```
 
 - If this returns **200** but Cloudflare returns 403 → Cloudflare is
@@ -101,19 +101,19 @@ add your IP to the Allowlist (Security → WAF → Tools).
 ## HomeNode SSH Tunnel Issues (separate from 403s)
 
 If Termix or other SSH-through-tunnel connections fail with "Connection lost
-before handshake" while direct VPS SSH works:
+before handshake" while direct CloudNode SSH works:
 
 ### Diagnosis
 
 ```bash
 # From CloudNode, test through tunnel
-ssh -vvv -o ConnectTimeout=5 jesus@192.168.0.10 echo test 2>&1 | \
+ssh -vvv -o ConnectTimeout=5 jesus@192.168.1.10 echo test 2>&1 | \
   grep -E "kex_exchange|banner|Connection closed"
 ```
 
 - `kex_exchange_identification: banner line 0: Not allowed at this time`
   → Asustor penalty table is blocking the source IP.
-- Check if the VPS OpenSSH client was recently updated:
+- Check if the CloudNode OpenSSH client was recently updated:
   ```bash
   ssh -V  # e.g., OpenSSH_10.0p2 Ubuntu-5ubuntu5.1
   ```

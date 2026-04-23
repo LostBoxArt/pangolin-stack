@@ -17,7 +17,6 @@ last_lint: 2026-04-21
 ---
 
 # linkstack
-n
 > **ARCHIVED** — Replaced by [landing](./landing.md) on 2026-04-21.
 > LinkStack was overkill (PHP + SQLite for 5 buttons). The new landing page
 > is a single static HTML+CSS file served by nginx.

@@ -26,16 +26,16 @@ This page is the quickest view of which host or service owns which important por
 |---|---|---|---|---|
 | 80/tcp | Gerbil namespace with CloudNode Traefik | public edge | HTTP entrypoint | CloudNode Traefik shares Gerbil namespace |
 | 443/tcp | Gerbil namespace with CloudNode Traefik | public edge | HTTPS entrypoint | primary public ingress |
+| 443/udp | Gerbil namespace with CloudNode Traefik | public edge | HTTP/3 QUIC entrypoint | CloudNode Traefik HTTP/3 via Gerbil namespace |
 | 51820/udp | Gerbil | public edge | WireGuard relay | documented in `AGENTS.md` |
 | 21820/udp | Gerbil | public edge | additional WireGuard-related relay port | documented in `AGENTS.md` |
 | 3001/tcp | Pangolin | internal, fronted by Traefik | control plane UI/API | exposed at `pangolin.example.com` |
+| 3001/tcp | Dashdot | internal, fronted by Traefik | system dashboard | CloudNode dashdot exposed at `dash.example.com` |
 | 3458/tcp | CrowdSec Web UI | host-published | admin UI | explicitly documented as host-published |
 | 3000/tcp | Dockhand | internal, fronted by Traefik | container management | exposed at `dockhand.example.com` |
 | 7575/tcp | Homarr | internal, fronted by Traefik | dashboard UI | exposed at `home.example.com` |
 | 8080/tcp | Termix | internal, fronted by Traefik | web terminal | exposed at `termix.example.com` |
 | 1411/tcp | Pocket-ID | internal, fronted by Traefik | identity provider | passkey/OIDC |
-| 53/tcp+udp | AdGuard Home | host-published | DNS | DNS service |
-| 853/tcp | AdGuard Home | host-published | DNS-over-TLS | public DNS endpoint |
 
 ## HomeNode edge and app ports
 

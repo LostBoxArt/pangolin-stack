@@ -13,7 +13,7 @@ sources: ["stacks/core/docker-compose.yml", "stacks/security/docker-compose.yml"
 confidence: high
 audience_level: operator
 last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_lint: 2026-04-21
 ---
 # Compose-File Review — 2026-04-17
 
@@ -65,7 +65,7 @@ remediation steps are collected here. Per-service detail lives in the
 
 ## High Findings
 
-### H2. CrowdSec Traefik log mount is read-write; upstream is `:ro`
+### H1. CrowdSec Traefik log mount is read-write; upstream is `:ro`
 - **Service**: [crowdsec](./services/crowdsec.md)
 - **File**: `stacks/security/docker-compose.yml`
 - **Upstream** (`fosrl/pangolin/install/config/crowdsec/docker-compose.yml`):
@@ -74,7 +74,7 @@ remediation steps are collected here. Per-service detail lives in the
   access log. A rogue parser bug could truncate/rotate logs unexpectedly.
 - **Remediation**: add `:ro` suffix.
 
-### H3. Traefik-log-dashboard uses legacy env-var scheme
+### H2. Traefik-log-dashboard uses legacy env-var scheme
 - **Service**: [traefik-log-dashboard](./services/traefik-log-dashboard.md)
 - **File**: `stacks/observability/docker-compose.yml`
 - **Upstream** (`hhftechnology/traefik-log-dashboard/docker-compose.yml`):
@@ -85,7 +85,7 @@ remediation steps are collected here. Per-service detail lives in the
 - **Remediation**: rewrite the dashboard's `environment:` block, see
   service page for the exact diff.
 
-### H4. Dashboard state has no persistent volume
+### H3. Dashboard state has no persistent volume
 - **Service**: [traefik-log-dashboard](./services/traefik-log-dashboard.md)
 - **File**: `stacks/observability/docker-compose.yml`
 - **Upstream**: declares a named volume `dashboard-data:/data`.
@@ -125,7 +125,7 @@ Without it, all source IPs show "Unknown" in the UI. See
 release shipped as `latest` could corrupt state. Pin to a known tag. See
 [dockhand](./services/dockhand.md).
 
-### M7. LinkStack runs as root in container
+### M7. LinkStack runs as root in container 📜 **historical**
 Upstream compose sets `user: apache:apache`. Ours doesn't. See
 [linkstack](./services/linkstack.md) (archived — replaced by [landing](./services/landing.md) on 2026-04-21).
 
@@ -134,13 +134,14 @@ Upstream ships with `guacamole/guacd` for RDP/VNC support. If you only ever
 SSH through Termix this is fine; if you ever want RDP/VNC it will fail. See
 [termix](./services/termix.md).
 
-### M9. AdGuard Home has no `TZ`
-Timestamps in logs will be UTC. See [adguard-home](./services/adguard-home.md).
+### M9. AdGuard Home has no `TZ` 📜 **historical**
+Timestamps in logs will be UTC. See [adguard-home](./services/adguard-home.md)
+(removed 2026-04-21).
 
 ### M10. Most service images use `:latest`
-Specifically `traefik`, `adguardhome`, `dockhand`, `homarr`, `landing`,
-`termix`, `dashdot`, `crowdsec`, `traefik-log-dashboard*`. Drift risk per
-`AGENTS.md` policy. See each service page.
+Specifically `traefik`, `dockhand`, `homarr`, `termix`, `dashdot`, `crowdsec`,
+`traefik-log-dashboard*`. (`landing` uses `nginx:alpine`; `adguardhome` was
+removed 2026-04-21.) Drift risk per `AGENTS.md` policy. See each service page.
 
 ### M11. CrowdSec env has a redundant `ACQUIRE_FILES`
 Our `acquis.yaml` already defines acquisition. The env var duplicates this.
@@ -165,15 +166,14 @@ Low-risk cruft. See [crowdsec](./services/crowdsec.md).
 
 ## Remediation Plan (suggested order)
 
-1. **C1 / H3** — fix Pocket-ID volume path (critical data-layout bug).
-2. **H1** — pin Traefik to `v3.6`.
-3. **H2** — make CrowdSec Traefik log mount read-only.
-4. **M1, M2** — memory limits + QUIC port on core.
-5. **H4, H5, M5** — observability dashboard refresh.
-6. **M3, M4, M11, L1** — CrowdSec hardening sweep.
-7. **M10** — global pin pass on all `:latest` tags.
-8. **M7, M8, M9** — app-level hardening.
-9. **L2–L5** — healthcheck additions.
+1. **C1** — fix Pocket-ID volume path (critical data-layout bug).
+2. **H1** — make CrowdSec Traefik log mount read-only.
+3. **M1, M2** — memory limits + QUIC port on core.
+4. **H3, M5** — observability dashboard refresh.
+5. **M3, M4, M11, L1** — CrowdSec hardening sweep.
+6. **M10** — global pin pass on all `:latest` tags.
+7. **M8** — Termix guacd sidecar (if RDP/VNC ever needed).
+8. **L2–L5** — healthcheck additions.
 
 Each step should be a separate commit so any breakage is bisectable.
 

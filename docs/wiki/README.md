@@ -82,6 +82,8 @@ Each page follows the same structure:
 - [pangolin](./services/pangolin.md)
 - [gerbil](./services/gerbil.md)
 - [traefik](./services/traefik.md)
+- [badger](./services/badger.md)
+- [olm](./services/olm.md)
 
 ### Security (`stacks/security/docker-compose.yml`)
 

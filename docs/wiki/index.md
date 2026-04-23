@@ -56,8 +56,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Fix Pocket-ID shared data path`](./runbooks/fix-pocket-id-shared-data.md) — Use this to remediate `F-POCKETID-1 / C1`, where Pocket-ID mounts the shared repo `data/` directory instead of a dedicated path.
 - [`Recreate CloudNode Traefik after recreating Gerbil`](./runbooks/recreate-traefik-after-gerbil.md) — Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.
 
-## CloudNode Services
-- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21**. iPhone now uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
+## CloudNode Services (Active)
 - [`crowdsec-web-ui`](./services/crowdsec-web-ui.md) — Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image (not shipped by CrowdSec team).
 - [`crowdsec`](./services/crowdsec.md) — IDS/IPS that reads Traefik's access log (and host `auth.log`/`syslog`), classifies suspicious behavior, and pushes decisions to bouncers (Traefik Badger plugin + host firewall).
 - [`dashdot`](./services/dashdot.md) — Lightweight CloudNode system dashboard (CPU, RAM, storage, network). Runs behind Traefik at `dash.example.com`.
@@ -65,13 +64,20 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`gerbil`](./services/gerbil.md) — Fossorial Gerbil — WireGuard relay between the CloudNode and remote sites. Also owns the public HTTP/HTTPS ports (80/443); Traefik shares its network namespace via `network_mode: service:gerbil`.
 - [`homarr`](./services/homarr.md) — Personal landing / dashboard page at `home.example.com`. Embeds widgets for media services, torrents, system status, etc.
 - [`landing`](./services/landing.md) — Custom-built static landing page at the apex `example.com`. Replaced LinkStack with a single HTML+CSS page served by nginx.
-- [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
 - [`pangolin`](./services/pangolin.md) — Fossorial Pangolin — control plane, dashboard, API, and database for the whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read config from it.
 - [`pocket-id`](./services/pocket-id.md) — OIDC / passkey-first identity provider. Used as the SSO gateway behind Traefik for admin UIs (`auth.example.com`).
 - [`qbit-proxy`](./services/qbit-proxy.md) — Local reverse-proxy sidecar for Homarr's qBittorrent widget. Built from in-repo Dockerfile.
 - [`termix`](./services/termix.md) — Web-based SSH terminal / tunneling / file editor at `termix.example.com`.
 - [`traefik-log-dashboard (agent + UI)`](./services/traefik-log-dashboard.md) — Two services, one codebase: the **agent** tails Traefik's JSON access/error logs and exposes a parsed stream; the **dashboard** renders that stream in a React SPA with geolocation, status-code breakdowns, and service metrics.
 - [`traefik`](./services/traefik.md) — Edge reverse-proxy and TLS terminator for everything exposed behind `*.example.com`. Shares Gerbil's network namespace.
+- [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.4.0`). Not a container; runs inside Traefik.
+- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.4.4`), not a container.
+
+## CloudNode Services (Archived)
+- [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
+
+## CloudNode Services (Removed)
+- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21**. iPhone now uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
 
 ## HomeNode Services
 - [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.

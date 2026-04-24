@@ -235,6 +235,34 @@ artifacts.
 - Updated `last_lint` timestamps on modified pages.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-24] service | landing page redesigned as operations console
+- Complete visual redesign of `example.com` landing page (commit `4172993`).
+- Shifted from dark editorial aesthetic to an **operations console** concept
+  that frames Dennis as an infrastructure/operator profile.
+- Hero copy rewritten: research compute at work, homelab tinkering at home,
+  Linux boxes, private tunnels, local models, agents, dashboards, automations.
+- New identity section: "Cloud / Lab / Home" eyebrow, Playfair Display name,
+  position paragraph, primary action buttons (Email, GitHub, LinkedIn).
+- New ops panel: infrastructure-map style portrait frame with Cloud/HPC/Home
+  node labels, telemetry rows for Base, Role, and Stack.
+- Systems section reorganized into six numbered cards:
+  01 Operating Principle, 02 Day Work, 03 Night Work, 04 Focus, 05 Elsewhere,
+  06 Current Focus.
+- Current Focus card explicitly calls out AI hobbies: local models,
+  tool-using agents, coding assistants, and agent workflows.
+- Typography: IBM Plex Mono (labels/telemetry), Outfit (body), Playfair
+  Display (name). Old Cormorant Garamond + helix canvas removed.
+- Palette: near-black `#0d0f0d` with warm gold `#c9a96e` accents and a
+  green status dot. Old copper accents, rotating amber ring, pulsing glow,
+  film-grain overlay, and aurora orbs removed.
+- Cache buster bumped to `style.css?v=9`.
+- `logo.png` optimized from ~2.1 MB to ~119 KB.
+- `sites/dennisb-landing/` removed from `.gitignore`; all site files and
+  assets now tracked in git (`index.html`, `style.css`, `avatar.jpg`,
+  `logo.png`, `DESIGN.md`).
+- Updated `docs/wiki/services/landing.md` to reflect the new design.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
 ## [2026-04-22] maintenance | runbook leaks and memory compression
 - Fixed `docs/wiki/runbooks/403-all-sites.md`: replaced remaining real domain, real IP, and stale internal IP with generic examples; updated "VPS" references to "CloudNode".
 - Fixed `docs/wiki/services/adguard-home.md`: replaced historical endpoint domain leak with `dns.example.com`.

@@ -63,7 +63,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`dockhand`](./services/dockhand.md) — Modern replacement for Portainer — container + compose-stack management, both for the CloudNode (local docker.sock) and HomeNode (remote Hawser agent over TCP). Fronted at `dockhand.example.com`.
 - [`gerbil`](./services/gerbil.md) — Fossorial Gerbil — WireGuard relay between the CloudNode and remote sites. Also owns the public HTTP/HTTPS ports (80/443); Traefik shares its network namespace via `network_mode: service:gerbil`.
 - [`homarr`](./services/homarr.md) — Personal landing / dashboard page at `home.example.com`. Embeds widgets for media services, torrents, system status, etc.
-- [`landing`](./services/landing.md) — Custom-built static landing page at the apex `example.com`. Replaced LinkStack with a single HTML+CSS page served by nginx.
+- [`landing`](./services/landing.md) — Custom-built static landing page at the apex `example.com`. Operations console concept with infrastructure-map portrait, telemetry rows, and numbered systems cards. Replaced LinkStack on 2026-04-21; redesigned as operations console on 2026-04-24.
 - [`pangolin`](./services/pangolin.md) — Fossorial Pangolin — control plane, dashboard, API, and database for the whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read config from it.
 - [`pocket-id`](./services/pocket-id.md) — OIDC / passkey-first identity provider. Used as the SSO gateway behind Traefik for admin UIs (`auth.example.com`).
 - [`qbit-proxy`](./services/qbit-proxy.md) — Local reverse-proxy sidecar for Homarr's qBittorrent widget. Built from in-repo Dockerfile.

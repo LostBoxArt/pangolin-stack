@@ -331,11 +331,20 @@ h1 span:last-child {
   aspect-ratio: 1;
   border-radius: 28px;
   padding: 7px;
-  background:
-    conic-gradient(from 215deg, var(--accent), transparent 18%, transparent 76%, var(--accent-hot)),
-    var(--bg);
+  background: var(--bg);
   box-shadow: 0 24px 70px var(--shadow);
   transform: rotate(-2deg);
+}
+
+.portrait::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -7px;
+  border-radius: 35px;
+  background: conic-gradient(from 215deg, var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
+  animation: ring-spin 10s linear infinite;
+  pointer-events: none;
 }
 
 .portrait img {
@@ -782,6 +791,10 @@ h1 span:last-child {
 @keyframes pulse-route {
   0%, 100% { opacity: 0.28; }
   50% { opacity: 0.75; }
+}
+
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

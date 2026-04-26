@@ -61,42 +61,50 @@ Pangolin SQLite `targets` table row for this resource was updated from
 
 Located under `sites/dennisb-landing/` (all tracked in git):
 
-- `index.html` — full-page markup (topbar, hero, ops panel, systems cards, footer)
-- `style.css` — all styles (console layout, typography, responsive, reduced-motion)
+- `index.html` — full-page markup (topbar, hero, ops panel, field notes, footer)
+- `style.css` — all styles (console layout, typography, portrait ring, note rows, responsive, reduced-motion)
 - `avatar.jpg` — profile photo
-- `logo.png` — favicon / mark (optimized to ~119 KB)
-- `DESIGN.md` — design system reference (colors, typography, spacing tokens)
+- `logo.png` — favicon / mark
+- `DESIGN.md` — design system reference (colors, typography, spacing tokens, component specs)
 
 ## Design Features
 
-- **Operations console concept** — presents the page as an infrastructure
-  operator profile rather than a traditional portfolio.
+- **Field notes concept** — the body content is presented as journal-style
+  numbered entries (Work, Home, AI/agents, Signals) rather than cards or a
+  traditional portfolio grid.
 - **Three-tone identity** — "Cloud / Lab / Home" eyebrow breadcrumb mapping
   work, research, and personal stacks.
 - **Mixed typography** — Playfair Display serif for the name, Outfit
-  sans-serif for body, IBM Plex Mono for labels and telemetry.
+  sans-serif for body, IBM Plex Mono for labels, tags, and telemetry.
 - **Dark technical palette** — near-black `#0d0f0d` background with warm gold
-  `#c9a96e` accents and a green status dot.
+  (`#d5a15f`) accents and a green status dot (`#9ccf92`).
 - **Infrastructure-map portrait** — avatar framed inside a panel with
   route lines and node labels (Cloud, HPC, Home) suggesting a network topology.
+- **Rotating gold ring** — a conic-gradient ring on a `::before` pseudo-element
+  sweeps gold arcs around the portrait border (10s loop). Uses CSS `@property`
+  for GPU-friendly angle animation that doesn't rotate the square element.
 - **Telemetry rows** — Base, Role, and Stack data displayed as definition-list
   pairs below the portrait.
-- **Systems cards** — six numbered cards (01-06) covering Operating Principle,
-  Day Work, Night Work, Focus tags, Elsewhere links, and Current Focus.
-- **AI hobbies surfaced explicitly** — "local models, tool-using agents,
-  coding assistants, agent workflows" called out in the Current Focus card.
+- **Note rows** — four numbered field notes with a two-column layout:
+  numbered index + title on the left, body text + metadata tags on the right.
+  Each row has a gold left border accent and subtle gold gradient background.
+  Covers: Work (Linux/storage), Home (tunnels/dashboards), AI/agents (local
+  models/tool use), and Signals (focus tags).
+- **Focus tags as pill labels** — monospace, uppercase, gold-bordered pill
+  labels in the Signals note.
 - **Primary action buttons** — Email, GitHub, LinkedIn with inline SVG icons.
-- **Secondary links** — X and Steam in a dedicated Elsewhere card.
+- **Secondary links** — X and Steam moved to the footer, split layout with
+  the status tagline.
 - **Responsive** — single-column stack on mobile with ops panel collapsing
-  below the identity section.
-- **Respects `prefers-reduced-motion`** — disables entrance animations for
-  users who request it.
+  below the identity section. Note rows collapse to single-column.
+- **Respects `prefers-reduced-motion`** — disables all animations for users
+  who request it.
 
 ## Operational Notes
 
 - The site is served read-only (`:ro` bind mount). No container state to
   preserve.
-- Cache buster is currently `style.css?v=9`.
+- Cache buster is currently `style.css?v=12`.
 - To update: edit files in `sites/dennisb-landing/`, commit, push, then reload
   nginx on the live host:
   `docker exec landing nginx -s reload`.
@@ -126,7 +134,7 @@ Verify:
 
 ```bash
 curl -I https://dennisb.xyz
-curl -I https://dennisb.xyz/style.css?v=9
+curl -I https://dennisb.xyz/style.css?v=12
 curl -I https://dennisb.xyz/avatar.jpg
 curl -I https://dennisb.xyz/logo.png
 ```
@@ -136,5 +144,7 @@ curl -I https://dennisb.xyz/logo.png
 LinkStack was replaced on 2026-04-21. See the archived
 [linkstack.md](./linkstack.md) page for historical reference.
 
-The page received a full visual redesign on 2026-04-24 (commit `4172993`)
-from a dark editorial aesthetic into the current operations console concept.
+The landing page received two major redesigns:
+- **2026-04-24** (commit `4172993`) — operations console concept with systems cards
+- **2026-04-26** (commit `deb6eb9`) — field notes redesign with journal-style entries,
+  rotating portrait ring, footer secondary links

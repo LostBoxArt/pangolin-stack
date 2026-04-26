@@ -1,220 +1,183 @@
 ---
 version: alpha
 name: Dennis B.
-description: Personal landing page for Dennis B., an infrastructure engineer and homelab operator. Dark editorial aesthetic with warm gold accents on a deep charcoal foundation.
+description: Personal landing page for Dennis B., an infrastructure engineer and homelab operator. Dark technical aesthetic with warm gold accents on a deep charcoal foundation. Field-notes layout with journal-style entries.
 colors:
-  background: "#121212"
-  text-primary: "#f0ece6"
-  text-secondary: "#c4bdb4"
-  text-muted: "#8a827a"
-  accent: "#d4a574"
-  accent-dim: "#a07850"
-  accent-glow: "rgba(212, 165, 116, 0.15)"
-  grid-line: "rgba(212, 165, 116, 0.08)"
-  grid-strong: "rgba(212, 165, 116, 0.16)"
-  border: "rgba(212, 165, 116, 0.12)"
-  vignette: "rgba(0, 0, 0, 0.35)"
-  orb-1: "rgba(212, 165, 116, 0.10)"
-  orb-2: "rgba(180, 130, 90, 0.08)"
-  orb-3: "rgba(220, 180, 130, 0.06)"
-  on-accent: "#121212"
+  background: "#0d0f0d"
+  text-primary: "#f3eee5"
+  text-secondary: "#cfc5b7"
+  text-muted: "#897e70"
+  accent: "#d5a15f"
+  accent-hot: "#f4cb88"
+  accent-dim: "#765333"
+  green: "#9ccf92"
+  grid-line: "rgba(213, 161, 95, 0.075)"
+  grid-strong: "rgba(213, 161, 95, 0.17)"
+  border: "rgba(213, 161, 95, 0.17)"
+  vignette: "rgba(0, 0, 0, 0.5)"
+  panel: "rgba(19, 18, 14, 0.68)"
+  on-accent: "#0d0f0d"
 typography:
   display:
     fontFamily: "Playfair Display, Georgia, serif"
-    fontSize: "clamp(4.5rem, 11vw, 11rem)"
-    fontWeight: 300
-    lineHeight: 0.9
-    letterSpacing: "-0.02em"
+    fontSize: "clamp(6rem, 15vw, 13.4rem)"
+    fontWeight: 600
+    lineHeight: 0.78
   body:
     fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "1.125rem"
+    fontSize: "1rem"
     fontWeight: 300
-    lineHeight: 1.75
-    letterSpacing: "0"
+    lineHeight: 1.7
   label-caps:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 500
-    lineHeight: 1.2
-    letterSpacing: "0.2em"
-    fontFeature: "c2sc"
-  index:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.9rem"
-    fontWeight: 400
-    lineHeight: 1.4
-    letterSpacing: "0.15em"
-  role:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 300
-    lineHeight: 1.4
-    letterSpacing: "0.02em"
-  location:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.975rem"
-    fontWeight: 300
-    lineHeight: 1.4
-    letterSpacing: "0.1em"
-    fontFeature: "c2sc"
-  tag:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.825rem"
-    fontWeight: 500
-    lineHeight: 1.2
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "0.72rem"
+    fontWeight: 700
+    letterSpacing: "0.13em"
+    textTransform: uppercase
+  note-meta:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "0.68rem"
+    fontWeight: 700
     letterSpacing: "0.08em"
-    fontFeature: "c2sc"
-  link:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.975rem"
-    fontWeight: 400
-    lineHeight: 1.2
-    letterSpacing: "0"
-  footer:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 300
-    lineHeight: 1.4
-    letterSpacing: "0.1em"
-    fontFeature: "c2sc"
+    textTransform: uppercase
+  tag:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "0.68rem"
+    fontWeight: 700
+    letterSpacing: "0.08em"
+    textTransform: uppercase
 rounded:
-  pill: "100px"
-  circle: "50%"
-  dot: "50%"
+  portrait: 28px
+  portrait-inner: 22px
+  pill: 999px
+  button: 10px
 spacing:
-  content-x: "8.333vw"
-  content-y: "4rem"
-  content-y-bottom: "3rem"
-  hero-gap: "4rem"
-  body-gap: "6rem"
-  block-gap: "2.5rem"
-  tag-gap: "0.625rem"
-  link-gap: "0.625rem"
+  content-x: "calc(100% - 4rem)"
+  content-max: 1240px
+  hero-gap: "clamp(2.5rem, 6vw, 5.5rem)"
 easing:
   default: "cubic-bezier(0.22, 1, 0.36, 1)"
 components:
-  focus-tag:
-    backgroundColor: "rgba(212, 165, 116, 0.03)"
-    textColor: "{colors.accent-dim}"
-    borderColor: "{colors.border}"
-    rounded: "{rounded.pill}"
-    padding: "0.5rem 1rem"
-    border: "1px solid {colors.border}"
-  focus-tag-hover:
-    backgroundColor: "rgba(212, 165, 116, 0.08)"
-    textColor: "{colors.accent}"
-    borderColor: "{colors.accent}"
-    transform: "translateY(-2px)"
-    boxShadow: "0 4px 16px rgba(212, 165, 116, 0.08)"
-  social-link:
-    backgroundColor: "rgba(212, 165, 116, 0.02)"
-    textColor: "{colors.text-secondary}"
-    borderColor: "{colors.border}"
-    rounded: "{rounded.pill}"
-    padding: "0.7rem 0.6rem"
-    border: "1px solid {colors.border}"
-  social-link-hover:
-    backgroundColor: "rgba(212, 165, 116, 0.06)"
-    textColor: "{colors.accent}"
-    borderColor: "{colors.accent}"
-    transform: "translateY(-2px)"
-    boxShadow: "0 6px 20px rgba(212, 165, 116, 0.10)"
-  avatar:
-    borderColor: "rgba(212, 165, 116, 0.25)"
-    border: "2px solid rgba(212, 165, 116, 0.25)"
-    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)"
-    rounded: "{rounded.circle}"
+  portrait-ring:
+    type: pseudo-element
+    background: conic-gradient(from 215deg, accent, transparent 18%, transparent 76%, accent-hot)
+    animation: ring-spin 10s linear infinite
+    border-radius: 35px
+    inset: -7px
+  tag-pill:
+    borderColor: "rgba(213, 161, 95, 0.27)"
+    textColor: accent-hot
+    backgroundColor: "rgba(213, 161, 95, 0.045)"
+    rounded: pill
+    padding: "0.44rem 0.72rem"
+  note-row:
+    borderLeft: "1px solid accent-dim"
+    borderTop: "1px solid line-soft"
+    background: "linear-gradient(90deg, rgba(213, 161, 95, 0.04), transparent 32%)"
+    padding: "1.05rem 1.15rem 1.05rem 1.35rem"
 ---
 
 ## Overview
 
-A dark editorial portfolio page for an infrastructure engineer. The aesthetic blends technical precision with warm human touches — structured grid systems, serif/sans-serif contrast, and restrained gold accents against a near-black canvas. The goal is to feel like a premium technical document that happens to be alive: subtle motion, depth layers, and interactive feedback without noise.
+A dark editorial portfolio page for an infrastructure engineer. The aesthetic blends technical precision with warm human touches — structured grid systems, monospace labels, serif/sans-serif contrast, and restrained gold accents against a near-black canvas.
 
-The personality is calm, capable, and quietly confident. No glassmorphism, no gradients as decoration, no flat minimalism. Depth comes from actual layered elements (noise, vignette, aurora orbs) rather than drop shadows alone.
+The personality is calm, capable, and quietly confident. No glassmorphism, no decorative gradients, no flat minimalism. Depth comes from actual layered elements (noise, vignette, subtle radial highlights) rather than drop shadows alone.
+
+The body content is presented as **field notes** — journal-style entries (Work, Home, AI/agents, Signals) that read like personal observations rather than a resume or portfolio grid.
 
 ## Colors
 
 The palette is intentionally small. One warm accent against a dark neutral foundation.
 
-- **Background (#121212):** Deep charcoal, not pure black. Provides warmth and prevents the harsh contrast of #000.
-- **Text Primary (#f0ece6):** Warm off-white for body copy and headlines. Softer than pure white.
-- **Text Secondary (#c4bdb4):** Muted warm gray for supporting text and descriptions.
-- **Text Muted (#8a827a):** Dimmer gray for metadata, indices, and inactive states.
-- **Accent (#d4a574):** Warm muted gold — the single emotional color. Used sparingly for the name initial, labels, interactive borders, and ambient glows.
-- **Accent Dim (#a07850):** A darker, more subdued gold for secondary accents (pipes, cursors, footer dots).
-- **Grid Lines (rgba 8-16%):** Very faint gold-tinted lines that structure the space without dominating it.
+- **Background (#0d0f0d):** Deep charcoal, not pure black. Provides warmth and prevents harsh contrast.
+- **Text Primary (#f3eee5):** Warm off-white for headlines and key copy.
+- **Text Secondary (#cfc5b7):** Muted warm gray for body text and descriptions.
+- **Text Muted (#897e70):** Dimmer gray for metadata, indices, and inactive states.
+- **Accent (#d5a15f):** Warm muted gold — the single emotional color. Used sparingly for the name initial, note borders, interactive states, and the rotating portrait ring.
+- **Accent Hot (#f4cb88):** Brighter gold for hover/focus states and the bright side of the portrait ring.
+- **Green (#9ccf92):** Status dot indicator — the only non-gold color, used minimally.
 
 ## Typography
 
-Two typefaces create hierarchy through contrast:
+Three typefaces create hierarchy through contrast:
 
-- **Playfair Display (serif)** for the display name. Large, light weight, tight leading. The serif adds gravitas and editorial texture.
-- **Outfit (sans-serif)** for everything else. Clean, geometric, readable at small sizes. Used for body, labels, tags, and links.
+- **Playfair Display (serif)** for the display name. Large, tight leading, weight 600. The serif adds editorial gravitas.
+- **Outfit (sans-serif)** for body copy, headings, and buttons. Clean, geometric, readable at all sizes.
+- **IBM Plex Mono (monospace)** for labels, tags, telemetry, and note metadata. Caps with wide tracking gives everything a technical, indexed feel.
 
-Label text uses small caps (`font-feature-settings: c2sc`) with wide tracking (`0.2em`). This gives section headers a technical, indexed feel.
-
-The display name uses a shimmer gradient animation that sweeps a lighter gold (`#e8c9a0`) across the text. This is the one allowed moment of flash — everything else stays static or subtly reactive.
+The display name "B." is colored with the accent gold for a subtle visual anchor.
 
 ## Layout
 
-The page uses a **12-column mental grid** expressed through faint vertical lines at 8.333%, 25%, 50%, 75%, and 91.666%. Horizontal lines at 33.333% and 66.666% divide the vertical space. Grid intersection points are marked with tiny gold dots.
+The page uses a two-column hero split at desktop:
 
-Content sits in a single centered column with generous side padding (`8.333vw`). The layout is two-column at desktop:
-- **Hero:** 1.2fr left (identity) + auto right (avatar)
-- **Body:** 1fr + 1fr (about/focus left, homelab/links right)
-- **Footer:** Full width, left-aligned with a status dot
+- **Left (identity):** Name, eyebrow label (Cloud / Lab / Home), position/tagline text, primary action buttons (Email, GitHub, LinkedIn).
+- **Right (ops-panel):** Portrait framed with route lines and node labels (Cloud, HPC, Home) suggesting a network topology diagram. Telemetry rows below (Base, Role, Stack).
 
-The avatar breaks the grid slightly — it sits in the upper right, creating asymmetry and visual interest.
+Below the hero, a full-width **field notes** section replaces the traditional card grid:
+- **Header:** "Field notes" label + "Not a resume. Just the stuff I keep coming back to."
+- **Four note rows** with numbered indexes, two-column layout (index+title left, body right):
+  - 01 Work — Linux, storage, shared services, reliability
+  - 02 Home — reverse proxies, tunnels, dashboards, media
+  - 03 AI/agents — local models, tool use, coding assistants
+  - 04 Signals — focus tags as pill-shaped labels
 
-## Elevation & Depth
+Footer is split: status dot + "Built by me. Hosted at home." on the left, secondary links (X, Steam) on the right.
 
-Depth is achieved through layered atmospheric effects, not shadows:
+## Depth Layers
 
-1. **Aurora Orbs (z-index 0):** Three large blurred circles in warm gold tones, slowly drifting. They provide ambient color and prevent the background from feeling dead.
-2. **Grid Lines (z-index 0):** Faint structural lines and intersection dots.
-3. **Noise Overlay (z-index 1):** 3% opacity SVG fractal noise. Adds film grain texture that makes digital flatness disappear.
-4. **Spotlight (z-index 1):** Mouse-tracking radial gradient with warm gold at very low opacity (7%). Follows the cursor on desktop.
-5. **Vignette (z-index 1):** Radial darkening at the edges. Draws the eye inward.
-6. **Helix Canvas (z-index 3):** A subtle animated DNA helix rendered in Canvas 2D. Gold dots on sine waves, depth-based opacity. Positioned behind the content but in front of the grid.
-7. **Content Layer (z-index 2):** All text and interactive elements. Sits above everything except the helix.
+1. **Grid overlay** — fixed-position, faint gold-tinted structural lines with a radial mask that fades toward the edges.
+2. **Noise texture** — 3.5% opacity SVG fractal noise overlay for film-grain texture.
+3. **Radial lighting** — two radial gradients (warm gold at 78%/18% and warm brown at 16%/78%) creating ambient depth.
+4. **Vignette** — not explicit, achieved via the gradient background composition.
 
-Corner brackets (top-left and bottom-right) in faint gold reinforce the technical drafting aesthetic.
+## Motion
 
-## Shapes
-
-- **Pill shapes (border-radius: 100px):** Used for focus tags and social link buttons. Creates a soft, button-like feel without harsh corners.
-- **Circles:** Avatar image, pulse dots, status indicators, aurora orbs.
-- **Lines:** Section label underlines (24px wide, 1px tall, gold at 40% opacity), grid lines, borders.
-- **Organic:** The helix is the only non-geometric element — a flowing sine wave that softens the rigid structure.
+- **Portrait ring** — a conic-gradient ring on a `::before` pseudo-element sweeps gold arcs around the portrait border (10s linear loop). Uses CSS `@property --ring-angle` for GPU-friendly angle animation.
+- **Route lines** — three subtle pulse animations on the portrait-map route lines (5s staggered).
+- **Button hover** — lift 2px with border brightening and background shift.
+- **All animations** respect `prefers-reduced-motion` and disable cleanly.
 
 ## Components
 
+### Portrait Ring
+The rotating gold border around the avatar photo. Implemented as a `::before` pseudo-element with:
+- Conic gradient (gold at 215deg → transparent at 18% → transparent at 76% → gold at 100%)
+- `animation: ring-spin 10s linear infinite` animating the `--ring-angle` custom property
+- `inset: -7px` and `border-radius: 35px` to sit outside the portrait padding
+- `z-index: -1` so it sits behind the image but above the portrait background
+
+### Note Rows
+Journal-style entries with:
+- Left accent border (1px solid var(--accent-dim))
+- Top hairline (1px solid var(--line-soft))
+- Subtle gold gradient background (4% opacity at left edge, fades to transparent)
+- Two-column grid: narrow label column + wide body column
+- Numbered index in monospace + h2 title stacked vertically in the label column
+- Body text + metadata tags in the body column
+
 ### Focus Tags
-Small pill labels for skills/interests. Default state has a faint gold border and near-transparent background. On hover, the border brightens, the tag lifts 2px, and a soft shadow appears. The transition uses the custom easing curve.
+Pill-shaped labels for skills/interests in the Signals note. Monospace, uppercase, gold border, dark background. Tight spacing in a flex-wrap row.
 
-### Social Links
-Icon + text buttons arranged in a centered 3+2 grid. Same pill shape as tags but larger. Hover adds a radial gradient highlight from the top center, creating a subtle "lit from above" effect.
-
-### Avatar
-Circular photo with a thin gold border and deep drop shadow. Two ambient effects surround it:
-- **Rotating ring:** A conic gradient that slowly spins, creating a halo of gold light.
-- **Pulsing glow:** A radial gradient that breathes in and out, suggesting active presence.
+### Action Buttons
+Email, GitHub, and LinkedIn buttons in the hero. Gold-accented primary for Email, standard for the rest. Inline SVG icons, lift on hover.
 
 ### Footer
-Left-aligned with a small pulsing gold dot as a status indicator. The text is tiny, uppercase, tracked wide — almost like a hardware serial number.
+Split layout: status indicator + tagline left, X and Steam links right. Monospace, muted, small.
 
 ## Do's and Don'ts
 
 **Do:**
-- Keep the color palette small. The only "color" is gold; everything else is a shade of gray.
-- Use the serif font only for the display name. Everywhere else stays sans-serif.
-- Let the grid be visible but quiet. It should feel structural, not decorative.
-- Animate on interaction (hover, mouse move) rather than on load. Avoid scroll-triggered animations.
-- Respect `prefers-reduced-motion`. All animations should disable cleanly.
+- Keep the color palette small. Gold is the only color; everything else is a shade of gray or green (status dot).
+- Use Playfair Display only for the display name. Everything else stays sans or mono.
+- Let the grid be visible but quiet — structural, not decorative.
+- Animate on interaction (hover, portrait ring) rather than scroll.
+- Respect `prefers-reduced-motion`.
+- Keep copy concise and personal — field notes, not resume bullet points.
 
 **Don't:**
-- Add more colors. No blue links, no green status indicators, no red alerts.
-- Use glassmorphism or backdrop blur. The depth comes from actual layered elements.
-- Make the grid dominant. If the lines compete with the content, they're too bright.
-- Add scroll-triggered reveal animations or typing effects. The page should feel still until interacted with.
-- Use pure black (#000) or pure white (#fff). The warmth of the off-shades is intentional.
+- Add more colors. No blue links, no green indicators beyond the status dot.
+- Use glassmorphism or backdrop blur. Depth comes from actual layered elements.
+- Make the grid dominant. If lines compete with content, they're too bright.
+- Add scroll-triggered reveals or typing effects. The page should feel still until interacted with.
+- Use pure black (#000) or pure white (#fff).

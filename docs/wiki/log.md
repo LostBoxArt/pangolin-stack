@@ -157,7 +157,19 @@ artifacts.
 - Fixed malformed code block line in `AGENTS.md` (`||` leak in file tree diagram).
 - Updated `last_lint` timestamps in `README.md` and `index.md` to 2026-04-21.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
-- Flagged `pangolin-stack-wiki-maintenance` skill for manual update: it still uses deprecated "VPS/NASUS" terminology and references `nasus-review-*.md`, `services-nasus/`, and `host-configs/nasus/` which were renamed to CloudNode/HomeNode on 2026-04-21. Security scan blocked automated skill patching this session.
+
+## [2026-04-26] design | landing page field-notes redesign
+- Delivered the field-notes redesign (branch `codex/landing-field-notes-redesign`,
+  commit `deb6eb9`): replaced the operations console systems card grid with
+  journal-style numbered note rows (01 Work, 02 Home, 03 AI/agents, 04 Signals).
+- Restored rotating gold ring around the portrait using `@property --ring-angle`
+  for GPU-friendly conic-gradient animation (commit `b47661c`).
+- Moved secondary links (X, Steam) from a card into the footer.
+- Switched focus tags into a pill-layout section within the Signals note.
+- Updated `docs/wiki/services/landing.md` and `sites/dennisb-landing/DESIGN.md`
+  to reflect the current design.
+- Cache buster bumped to `style.css?v=12`.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean. Flagged `pangolin-stack-wiki-maintenance` skill for manual update: it still uses deprecated "VPS/NASUS" terminology and references `nasus-review-*.md`, `services-nasus/`, and `host-configs/nasus/` which were renamed to CloudNode/HomeNode on 2026-04-21. Security scan blocked automated skill patching this session.
 
 ## [2026-04-21] service | landing page redesigned and deployed
 - Complete visual redesign of `example.com` landing page following Anthropic's

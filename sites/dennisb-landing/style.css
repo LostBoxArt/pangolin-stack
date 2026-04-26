@@ -19,6 +19,12 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@property --ring-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -342,7 +348,7 @@ h1 span:last-child {
   z-index: -1;
   inset: -7px;
   border-radius: 35px;
-  background: conic-gradient(from 215deg, var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
+  background: conic-gradient(from calc(215deg + var(--ring-angle)), var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
   animation: ring-spin 10s linear infinite;
   pointer-events: none;
 }
@@ -794,7 +800,7 @@ h1 span:last-child {
 }
 
 @keyframes ring-spin {
-  to { transform: rotate(360deg); }
+  to { --ring-angle: 360deg; }
 }
 
 @media (prefers-reduced-motion: reduce) {

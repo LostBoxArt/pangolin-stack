@@ -397,22 +397,19 @@ h1 span:last-child {
   z-index: 3;
   width: min(72%, 285px);
   aspect-ratio: 1;
-  border-radius: 28px;
-  padding: 7px;
-  background: var(--bg);
+  border-radius: 22px;
   box-shadow: 0 24px 70px var(--shadow);
   transform: rotate(-2deg);
 }
 
-/* Spinning gold ring — cross-browser: rotate the entire pseudo-element */
+/* Spinning gold ring — gradient angle driven by JS, works cross-browser */
 .portrait::before {
   content: "";
   position: absolute;
   z-index: -1;
-  inset: -7px;
-  border-radius: 35px;
-  background: conic-gradient(from 215deg, var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
-  animation: ring-spin 10s linear infinite;
+  inset: -4px;
+  border-radius: 26px;
+  background: conic-gradient(from calc(215deg + var(--ring-angle, 0deg)), var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
   pointer-events: none;
 }
 
@@ -780,7 +777,11 @@ h1 span:last-child {
 
   .portrait {
     width: 156px;
-    border-radius: 22px;
+    border-radius: 17px;
+  }
+
+  .portrait::before {
+    border-radius: 21px;
   }
 
   .portrait img {

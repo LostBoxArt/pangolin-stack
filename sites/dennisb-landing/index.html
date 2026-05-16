@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=15">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
 <body>
@@ -160,5 +160,23 @@
       </nav>
     </footer>
   </main>
+  <script>
+  /* Portrait ring — animate gradient angle via JS (works cross-browser, no @property needed) */
+  (function() {
+    var el = document.querySelector('.portrait');
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var angle = 0;
+    var speed = 0.6; /* degrees per frame at 60fps = 36°/s = 10s per revolution */
+    var last = performance.now();
+    function step(now) {
+      var dt = Math.min(now - last, 100); /* cap at 100ms to avoid jumps when tab is backgrounded */
+      angle = (angle + speed * (dt / 16.667)) % 360;
+      el.style.setProperty('--ring-angle', angle + 'deg');
+      last = now;
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+  </script>
 </body>
 </html>

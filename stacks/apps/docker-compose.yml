@@ -8,6 +8,29 @@ networks:
     external: true
 
 services:
+  hermes-webui:
+    image: ghcr.io/nesquena/hermes-webui:latest
+    container_name: hermes-webui
+    pid: "host"
+    networks:
+      - pangolin
+    restart: unless-stopped
+    ports:
+      - "9119:8787"
+    volumes:
+      - /home/jesus/.hermes:/home/hermeswebui/.hermes
+      - /home/jesus/.hermes/agent:/home/hermeswebui/.hermes/hermes-agent
+    environment:
+      - HERMES_HOME=/home/hermeswebui/.hermes
+      - HERMES_WEBUI_HOST=0.0.0.0
+      - HERMES_WEBUI_PORT=8787
+      - HERMES_WEBUI_STATE_DIR=/home/hermeswebui/.hermes/webui
+      - WANTED_UID=1001
+      - WANTED_GID=1001
+      - HERMES_SKIP_CHMOD=1
+      - HERMES_WEBUI_DEFAULT_WORKSPACE=/home/hermeswebui/.hermes
+      - WIKI_PATH=/home/hermeswebui/.hermes/wiki
+
   landing:
     image: nginx:alpine
     container_name: landing
@@ -16,6 +39,7 @@ services:
     restart: unless-stopped
     volumes:
       - ../../sites/dennisb-landing:/usr/share/nginx/html:ro
+      - ../../sites/dennisb-landing/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.linkstack.rule=Host(`example.com`)"

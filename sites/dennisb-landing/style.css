@@ -1,31 +1,48 @@
+/* ── Design tokens ── */
 :root {
+  /* Canvas */
   --bg: #0d0f0d;
-  --bg-2: #12130f;
+  --bg-elevated: #131512;
+  --bg-surface: #181a16;
+  /* Text */
   --text: #f3eee5;
   --text-soft: #cfc5b7;
-  --muted: #897e70;
+  --text-muted: #897e70;
+  --text-on-accent: #0d0f0d;
+  /* Accent (warm gold) */
   --accent: #d5a15f;
+  --accent-hover: #e0b472;
   --accent-hot: #f4cb88;
-  --accent-low: #765333;
+  --accent-press: #b88642;
+  --accent-dim: #765333;
+  --accent-subtle: rgba(213, 161, 95, 0.075);
+  /* Borders */
+  --border: rgba(213, 161, 95, 0.18);
+  --border-soft: rgba(213, 161, 95, 0.085);
+  --border-accent: rgba(213, 161, 95, 0.44);
+  --border-focus: rgba(244, 203, 136, 0.54);
+  /* Semantic */
   --green: #9ccf92;
-  --line: rgba(213, 161, 95, 0.17);
-  --line-soft: rgba(213, 161, 95, 0.075);
-  --panel: rgba(19, 18, 14, 0.68);
-  --panel-strong: rgba(213, 161, 95, 0.075);
+  --green-glow: rgba(156, 207, 146, 0.55);
+  --focus-ring: #f4cb88;
+  /* Overlays */
   --shadow: rgba(0, 0, 0, 0.5);
+  --panel: rgba(19, 18, 14, 0.68);
+  /* Typefaces */
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --serif: "Playfair Display", Georgia, serif;
+  /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-micro: 150ms;
+  --dur-standard: 220ms;
+  --dur-slow: 400ms;
 }
 
-@property --ring-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-* {
+/* ── Reset ── */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -49,27 +66,6 @@ body {
   overflow-x: hidden;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--line-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-  background-size: 8.333vw 33.333vh;
-  mask-image: radial-gradient(ellipse 92% 78% at 50% 42%, black 12%, transparent 90%);
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
 a {
   color: inherit;
 }
@@ -79,6 +75,32 @@ svg {
   display: block;
 }
 
+/* ── Depth layer 1: Structural grid ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(var(--border-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+  background-size: 8.333vw 33.333vh;
+  mask-image: radial-gradient(ellipse 92% 78% at 50% 42%, black 12%, transparent 90%);
+}
+
+/* ── Depth layer 2: Film grain ── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Content container ── */
 .console {
   position: relative;
   z-index: 1;
@@ -88,6 +110,7 @@ svg {
   padding: 1.4rem 0 2rem;
 }
 
+/* ── Topbar ── */
 .topbar {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -102,7 +125,7 @@ svg {
   width: 42px;
   height: 42px;
   place-items: center;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 10px;
   background: rgba(243, 238, 229, 0.035);
   overflow: hidden;
@@ -116,26 +139,37 @@ svg {
   border-radius: 50%;
 }
 
+/* ── Shared mono-caps voice ── */
 .topbar-status,
-.footer,
-.footer-links,
+.nav a,
 .eyebrow,
 .card-index,
 .telemetry dt,
 .node,
-.nav a {
+.footer,
+.footer-links,
+.footer-links a {
   font-family: var(--mono);
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
+.note-index,
+.note-meta,
+.focus-list li {
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Topbar status ── */
 .topbar-status {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .status-light {
@@ -143,20 +177,21 @@ svg {
   height: 7px;
   border-radius: 50%;
   background: var(--green);
-  box-shadow: 0 0 18px rgba(156, 207, 146, 0.55);
+  box-shadow: 0 0 18px var(--green-glow);
 }
 
+/* ── Navigation ── */
 .nav {
   display: flex;
   gap: clamp(0.9rem, 3vw, 2rem);
 }
 
 .nav a {
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
-  transition: color 0.2s var(--ease);
+  transition: color var(--dur-micro) var(--ease);
 }
 
 .nav a:hover,
@@ -164,6 +199,7 @@ svg {
   color: var(--accent-hot);
 }
 
+/* ── Hero ── */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.75fr);
@@ -173,10 +209,12 @@ svg {
   padding: 1rem 0 4rem;
 }
 
+/* ── Identity column ── */
 .identity {
   position: relative;
 }
 
+/* Horizontal structural line behind identity */
 .identity::before {
   content: "";
   position: absolute;
@@ -184,17 +222,18 @@ svg {
   height: 1px;
   left: -8.333vw;
   top: 45%;
-  background: var(--line);
+  background: var(--border);
   z-index: -1;
 }
 
 .eyebrow {
   margin: 0 0 1.2rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 700;
 }
 
+/* ── Display name ── */
 h1 {
   margin: 0;
   font-family: var(--serif);
@@ -212,15 +251,18 @@ h1 span:last-child {
   color: var(--accent);
 }
 
+/* ── Body lead (position text) ── */
 .position {
   max-width: 730px;
   margin: 1.4rem 0 0;
   color: var(--text-soft);
   font-size: clamp(1.2rem, 2.1vw, 1.62rem);
   font-weight: 300;
+  letter-spacing: -0.01em;
   line-height: 1.55;
 }
 
+/* ── Buttons ── */
 .primary-actions {
   display: flex;
   flex-wrap: wrap;
@@ -234,35 +276,41 @@ h1 span:last-child {
   align-items: center;
   justify-content: center;
   gap: 0.62rem;
-  border: 1px solid var(--line);
+  padding: 0 1.1rem;
+  border: 1px solid var(--border);
   border-radius: 10px;
   background: rgba(13, 15, 13, 0.7);
   color: var(--text-soft);
+  font-size: 1rem;
   font-weight: 600;
+  letter-spacing: 0;
   text-decoration: none;
   transition:
-    transform 0.22s var(--ease),
-    border-color 0.22s var(--ease),
-    color 0.22s var(--ease),
-    background 0.22s var(--ease);
-}
-
-.button {
-  padding: 0 1.1rem;
+    transform var(--dur-standard) var(--ease),
+    border-color var(--dur-standard) var(--ease),
+    color var(--dur-standard) var(--ease),
+    background var(--dur-standard) var(--ease);
 }
 
 .button svg {
   width: 18px;
   height: 18px;
   fill: currentColor;
+  flex-shrink: 0;
 }
 
 .button:hover,
 .button:focus-visible {
   color: var(--accent-hot);
-  border-color: rgba(244, 203, 136, 0.54);
-  background: var(--panel-strong);
+  border-color: var(--border-focus);
+  background: var(--accent-subtle);
   transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
+  background: rgba(213, 161, 95, 0.12);
+  transition: transform 50ms var(--ease), background 50ms var(--ease);
 }
 
 .button-primary {
@@ -273,16 +321,26 @@ h1 span:last-child {
     rgba(13, 15, 13, 0.78);
 }
 
+.button-primary:hover,
+.button-primary:focus-visible {
+  border-color: var(--accent-hot);
+  background:
+    linear-gradient(180deg, rgba(213, 161, 95, 0.35), rgba(213, 161, 95, 0.14)),
+    rgba(13, 15, 13, 0.85);
+}
+
+/* ── Ops panel ── */
 .ops-panel {
   position: relative;
   padding: 1.25rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   background:
     linear-gradient(145deg, rgba(243, 238, 229, 0.05), transparent 38%),
-    rgba(13, 15, 13, 0.42);
+    var(--panel);
   box-shadow: 0 26px 80px var(--shadow);
 }
 
+/* Gold corner brackets */
 .ops-panel::before,
 .ops-panel::after {
   content: "";
@@ -306,6 +364,7 @@ h1 span:last-child {
   border-bottom: 1px solid var(--accent);
 }
 
+/* ── Portrait map ── */
 .portrait-map {
   position: relative;
   min-height: 390px;
@@ -314,14 +373,16 @@ h1 span:last-child {
   overflow: hidden;
 }
 
+/* Diamond frame (rotated square) */
 .portrait-map::before {
   content: "";
   position: absolute;
   inset: 6%;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   transform: rotate(45deg);
 }
 
+/* Dashed ring */
 .portrait-map::after {
   content: "";
   position: absolute;
@@ -330,6 +391,7 @@ h1 span:last-child {
   border-radius: 50%;
 }
 
+/* ── Portrait with spinning ring ── */
 .portrait {
   position: relative;
   z-index: 3;
@@ -342,13 +404,14 @@ h1 span:last-child {
   transform: rotate(-2deg);
 }
 
+/* Spinning gold ring — cross-browser: rotate the entire pseudo-element */
 .portrait::before {
-  content: '';
+  content: "";
   position: absolute;
   z-index: -1;
   inset: -7px;
   border-radius: 35px;
-  background: conic-gradient(from calc(215deg + var(--ring-angle)), var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
+  background: conic-gradient(from 215deg, var(--accent), transparent 18%, transparent 76%, var(--accent-hot));
   animation: ring-spin 10s linear infinite;
   pointer-events: none;
 }
@@ -360,11 +423,12 @@ h1 span:last-child {
   object-fit: cover;
 }
 
+/* ── Route lines ── */
 .route {
   position: absolute;
   z-index: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(213, 161, 95, 0.44), transparent);
+  background: linear-gradient(90deg, transparent, var(--border-accent), transparent);
   transform-origin: center;
 }
 
@@ -383,6 +447,7 @@ h1 span:last-child {
   transform: rotate(90deg);
 }
 
+/* ── Node labels ── */
 .node {
   position: absolute;
   z-index: 4;
@@ -395,24 +460,14 @@ h1 span:last-child {
   font-weight: 700;
 }
 
-.node-cloud {
-  top: 11%;
-  right: 12%;
-}
+.node-cloud { top: 11%; right: 12%; }
+.node-lab   { left: 8%; top: 48%; }
+.node-home  { right: 16%; bottom: 12%; }
 
-.node-lab {
-  left: 8%;
-  top: 48%;
-}
-
-.node-home {
-  right: 16%;
-  bottom: 12%;
-}
-
+/* ── Telemetry ── */
 .telemetry {
   margin: 1rem 0 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--border);
 }
 
 .telemetry div {
@@ -420,7 +475,7 @@ h1 span:last-child {
   grid-template-columns: 5rem 1fr;
   gap: 1rem;
   padding: 0.8rem 0;
-  border-bottom: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .telemetry dt,
@@ -429,7 +484,7 @@ h1 span:last-child {
 }
 
 .telemetry dt {
-  color: var(--accent-low);
+  color: var(--accent-dim);
   font-size: 0.65rem;
   font-weight: 700;
 }
@@ -437,14 +492,17 @@ h1 span:last-child {
 .telemetry dd {
   color: var(--text-soft);
   font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
+/* ── Field notes ── */
 .field-notes {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.8rem;
   padding: 1.25rem 0 2.75rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--border);
 }
 
 .notes-heading {
@@ -455,26 +513,24 @@ h1 span:last-child {
   padding: 1.3rem 0 0.45rem;
 }
 
-.card-index,
-.note-index {
+.card-index {
   margin: 0;
-  color: var(--muted);
-  font-family: var(--mono);
+  color: var(--text-muted);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
 }
 
 .notes-heading p:last-child {
   max-width: 34rem;
   margin: 0;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.95rem;
   font-weight: 300;
+  letter-spacing: 0;
   line-height: 1.6;
 }
 
+/* ── Note rows ── */
 .note-row {
   display: grid;
   grid-template-columns: minmax(12rem, 0.34fr) minmax(0, 1fr);
@@ -482,13 +538,14 @@ h1 span:last-child {
   position: relative;
   margin-bottom: 0.9rem;
   padding: 1.05rem 1.15rem 1.05rem 1.35rem;
-  border-left: 1px solid var(--accent-low);
-  border-top: 1px solid var(--line-soft);
+  border-left: 1px solid var(--accent-dim);
+  border-top: 1px solid var(--border-soft);
   background:
     linear-gradient(90deg, rgba(213, 161, 95, 0.04), transparent 32%),
     rgba(13, 15, 13, 0.1);
 }
 
+/* Gold corner hairline marks */
 .note-row::before,
 .note-row::after {
   content: "";
@@ -499,12 +556,20 @@ h1 span:last-child {
   background: var(--accent);
 }
 
-.note-row::before {
-  top: -1px;
+.note-row::before { top: -1px; }
+.note-row::after  { bottom: -1px; }
+
+.note-head {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
 }
 
-.note-row::after {
-  bottom: -1px;
+.note-index {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 
 .note-row h2 {
@@ -512,13 +577,8 @@ h1 span:last-child {
   color: var(--text);
   font-size: clamp(1.25rem, 2vw, 1.7rem);
   font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1.08;
-}
-
-.note-head {
-  display: grid;
-  gap: 0.55rem;
-  align-content: start;
 }
 
 .note-body {
@@ -533,19 +593,18 @@ h1 span:last-child {
   color: var(--text-soft);
   font-size: 1.08rem;
   font-weight: 300;
+  letter-spacing: 0;
   line-height: 1.7;
 }
 
 .note-body .note-meta {
-  color: var(--accent-low);
-  font-family: var(--mono);
+  color: var(--accent-dim);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
   line-height: 1.5;
-  text-transform: uppercase;
 }
 
+/* ── Focus tags (Signals section) ── */
 .focus-list {
   display: flex;
   flex-wrap: wrap;
@@ -561,21 +620,19 @@ h1 span:last-child {
   padding: 0.44rem 0.72rem;
   color: var(--accent-hot);
   background: rgba(213, 161, 95, 0.045);
-  font-family: var(--mono);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
+/* ── Footer ── */
 .footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 0.65rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--border);
   padding-top: 1.1rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.68rem;
   font-weight: 700;
 }
@@ -593,11 +650,11 @@ h1 span:last-child {
 }
 
 .footer-links a {
-  color: var(--muted);
+  color: var(--text-muted);
   text-decoration: none;
   transition:
-    color 0.2s var(--ease),
-    opacity 0.2s var(--ease);
+    color var(--dur-micro) var(--ease),
+    opacity var(--dur-micro) var(--ease);
 }
 
 .footer-links a:hover,
@@ -605,11 +662,23 @@ h1 span:last-child {
   color: var(--accent-hot);
 }
 
+/* ── Focus ring (global) ── */
 :focus-visible {
-  outline: 2px solid var(--accent-hot);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 4px;
 }
 
+/* ── Animation keyframes ── */
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-route {
+  0%, 100% { opacity: 0.28; }
+  50%      { opacity: 0.75; }
+}
+
+/* ── Responsive: Tablet (620px – 980px) ── */
 @media (max-width: 980px) {
   .console {
     width: min(100% - 3rem, 760px);
@@ -653,7 +722,7 @@ h1 span:last-child {
   .notes-heading {
     position: static;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--border);
   }
 
   .notes-heading p:last-child {
@@ -664,9 +733,9 @@ h1 span:last-child {
     grid-column: 1;
     grid-template-columns: minmax(10rem, 0.34fr) minmax(0, 1fr);
   }
-
 }
 
+/* ── Responsive: Mobile (≤619px) ── */
 @media (max-width: 620px) {
   .console {
     width: calc(100% - 2rem);
@@ -733,6 +802,7 @@ h1 span:last-child {
 
   .position {
     font-size: 1.05rem;
+    letter-spacing: 0;
   }
 
   .primary-actions {
@@ -778,6 +848,7 @@ h1 span:last-child {
   }
 }
 
+/* ── Motion ── */
 @media (prefers-reduced-motion: no-preference) {
   .route-a,
   .route-b,
@@ -785,22 +856,8 @@ h1 span:last-child {
     animation: pulse-route 5s var(--ease) infinite;
   }
 
-  .route-b {
-    animation-delay: 1s;
-  }
-
-  .route-c {
-    animation-delay: 2s;
-  }
-}
-
-@keyframes pulse-route {
-  0%, 100% { opacity: 0.28; }
-  50% { opacity: 0.75; }
-}
-
-@keyframes ring-spin {
-  to { --ring-angle: 360deg; }
+  .route-b { animation-delay: 1s; }
+  .route-c { animation-delay: 2s; }
 }
 
 @media (prefers-reduced-motion: reduce) {

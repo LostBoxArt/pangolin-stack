@@ -17,8 +17,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ../../data/positions:/data
-      - ../../config/traefik/logs:/logs:ro
+      - /home/jesus/pangolin-stack/data/positions:/data
+      - /home/jesus/pangolin-stack/config/traefik/logs:/logs:ro
     environment:
       - TRAEFIK_LOG_DASHBOARD_ACCESS_PATH=/logs/access.log
       - TRAEFIK_LOG_DASHBOARD_ERROR_PATH=/logs/traefik.log

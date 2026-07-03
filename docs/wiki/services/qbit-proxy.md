@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-05-09
+last_lint: 2026-05-09
 ---
 # qbit-proxy
 
@@ -78,6 +78,13 @@ more reliable with a healthcheck attached.
 ### F-QBP-2 — workaround may become obsolete
 Homarr upstream has an open issue for this. When that lands, this service
 can be removed along with the `extra_hosts` line in Homarr's compose.
+
+### F-QBP-3 — Host header must match HomeNode Traefik route (resolved 2026-05-09)
+The proxy sets `Host: <TARGET_HOST>` on forwarded requests. If this doesn't
+match a Traefik router rule on HomeNode, qBittorrent returns 404. Always
+verify `TARGET_HOST` matches the actual Traefik route on HomeNode (e.g.
+`torrent.example.com` in sanitized docs, `torrent.dennisb.xyz` in real
+config).
 
 ## Remediation
 

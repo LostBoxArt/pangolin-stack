@@ -1,8 +1,8 @@
 const http = require('http');
 const https = require('https');
 
-const TARGET_HOST = process.env.TARGET_HOST || 'torrent.example.com';
-const TARGET_IP = process.env.TARGET_IP || '192.168.1.10';
+const TARGET_HOST = process.env.TARGET_HOST || 'torrent.dennisb.xyz';
+const TARGET_IP = process.env.TARGET_IP || '192.168.0.10';
 const LISTEN_PORT = process.env.LISTEN_PORT || 8081;
 
 console.log(`qBit Proxy listening on http://0.0.0.0:${LISTEN_PORT} -> https://${TARGET_HOST} (${TARGET_IP})`);

@@ -12,20 +12,21 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-05-09
+last_lint: 2026-05-09
 ---
 # homarr
 
 Personal landing / dashboard page at `home.example.com`. Embeds widgets for
 media services, torrents, system status, etc.
 
-- **Image**: `ghcr.io/homarr-labs/homarr:latest` ⚠️
+- **Image**: `ghcr.io/homarr-labs/homarr:v1.61.1-beta.1` (pinned beta — saves ~70% memory vs `latest`) ⚠️
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
 - **Port**: `7575` (published on host, also Traefik-fronted)
 - **Data**: `/opt/homarr/appdata:/appdata` (host bind, **not** inside repo)
 - **Socket**: `/var/run/docker.sock` (for Docker integration widgets)
 - **TZ**: `Asia/Jerusalem`
+- **Env symlink**: `stacks/dashboard/.env` → `../../.env` (required — compose auto-load picks up `HOMARR_SECRET_KEY`)
 
 ## Upstream Sources
 
@@ -54,7 +55,7 @@ services:
 ```22:46:stacks/dashboard/docker-compose.yml
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
+    image: ghcr.io/homarr-labs/homarr:v1.61.1-beta.1
     networks:
       - pangolin
     restart: unless-stopped
@@ -87,16 +88,21 @@ services:
 | `depends_on: qbit-proxy` | n/a | added | intentional — qBittorrent widget needs the proxy sidecar |
 | `extra_hosts` | n/a | added | intentional — resolves `torrent.example.com` to HomeNode directly |
 | Port publish | `7575:7575` | same | ✓ |
-| `:latest` tag | yes | yes | drift risk |
+| `:latest` tag | yes | no — pinned to `v1.61.1-beta.1` | intentional (memory savings, control over schema migrations) |
 | DB env | default (`better-sqlite3` + `/appdata/db/db.sqlite`) | default | ✓ |
 
 ## Findings
 
-### F-HOMARR-1 — `:latest` image tag (`medium` / M10 scope)
-Homarr ships a lot of schema migrations. A jump from, say, 1.58 to 1.60
-triggered on an unattended pull will auto-migrate the SQLite DB *forward*.
-If you later want to roll back, the old image won't understand the new
-schema.
+### F-HOMARR-1 — `:latest` image tag → resolved: pinned to `v1.61.1-beta.1` (✓)
+Update 2026-05-09: Switched from `:latest` (main branch) to `v1.61.1-beta.1` (beta branch).
+The beta merges 3 Node processes into 1 (#5600) plus idle-memory reduction (#5637),
+cutting memory from ~595 MiB to ~181 MiB. Tag is intentionally a beta release, not `:latest`.
+
+### F-HOMARR-1b — beta pin requires manual bump vigilance (`low`)
+The beta branch diverges from main (2 ahead, 96 behind as of 2026-05-09). Check
+[releases](https://github.com/homarr-labs/homarr/releases) periodically for stable
+releases that merge the memory work. When a stable release includes #5600, switch
+back to a stable tag.
 
 ### F-HOMARR-2 — no healthcheck (`low` / L3)
 Homarr exposes a health endpoint; adding a check helps the UI to signal
@@ -109,16 +115,17 @@ depth.
 
 ## Remediation
 
-### Fix F-HOMARR-1
+### Fix F-HOMARR-1 (resolved)
 
-Pin a release:
+Pinned to `v1.61.1-beta.1`:
 
 ```yaml
-    image: ghcr.io/homarr-labs/homarr:1.59.1
+    image: ghcr.io/homarr-labs/homarr:v1.61.1-beta.1
 ```
 
-Keep an eye on <https://homarr.dev/blog> for breaking-change notices before
-bumping.
+When a stable release includes the memory optimizations (PRs #5600, #5637), pin
+that stable tag instead. Check releases at
+<https://github.com/homarr-labs/homarr/releases>.
 
 ### Fix F-HOMARR-2
 
@@ -139,9 +146,16 @@ moved from `/api/healthcheck` to `/api/health` around 1.x.)
 - **qBittorrent widget quirk** (Homarr v0.15+ with qBittorrent v5.1.4+):
   the secure-cookie flag breaks the widget. We work around it with the
   `qbit-proxy` sidecar — see [qbit-proxy](./qbit-proxy.md).
+- **qbit-proxy Host header**: The proxy sends `Host: torrent.example.com` to
+  HomeNode's Traefik. If the Traefik route on HomeNode doesn't match (e.g.
+  expects `torrent.dennisb.xyz`), the integration returns 404. The `TARGET_HOST`
+  env var in `qbit-proxy` must match the Traefik route.
 - `SECRET_ENCRYPTION_KEY` is single-source-of-truth for encrypted
   credentials in Homarr's DB. **Do not rotate without exporting secrets
   first** — all saved service credentials become unreadable.
 - Host bind path `/opt/homarr/appdata` is excluded from `backup.sh` by
   default; confirm your backup policy includes it if you want dashboard
   customization backed up.
+- **Env file**: `stacks/dashboard/.env` is a symlink to `../../.env`.
+  Compose only auto-loads `.env` from the compose file's directory — the
+  symlink ensures `HOMARR_SECRET_KEY` resolves without `--env-file`.

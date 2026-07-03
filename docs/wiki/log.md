@@ -12,13 +12,27 @@ related: ["./README.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-22
+last_ingested: 2026-05-09
+last_lint: 2026-05-09
 ---
 # Wiki Log
 
 Append-only record of structural wiki changes, maintenance passes, and review
 artifacts.
+
+## [2026-04-17] bootstrap | initial service audit
+
+## [2026-05-09] homarr | memory-optimized beta + qbit-proxy fix
+- **Homarr**: Pinned from `:latest` (main branch, ~595 MiB) to `v1.61.1-beta.1`
+  (~181 MiB). Beta tag merges 3 Node processes into 1 (#5600) plus idle-memory
+  reduction (#5637). Updated `services/homarr.md` — version, findings,
+  remediation, operational notes. Added `.env` symlink:
+  `stacks/dashboard/.env` → `../../.env` to fix compose env resolution.
+- **qbit-proxy**: Fixed `TARGET_IP` from `192.168.1.10` (unreachable subnet) to
+  `192.168.0.10` (routed through OLM tunnel). Fixed `TARGET_HOST` to match
+  HomeNode's Traefik route. Updated `qbit-proxy/index.js` defaults to match.
+  Added F-QBP-3 to `services/qbit-proxy.md`.
+- Updated `services/homarr.md` and `services/qbit-proxy.md`.
 
 ## [2026-04-17] bootstrap | initial service audit
 - Added the first dated compose review at

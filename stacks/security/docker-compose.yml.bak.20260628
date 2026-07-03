@@ -52,7 +52,7 @@ services:
 
   crowdsec-web-ui:
     # Pin a known-good release; the moving latest tag pulled a broken image on 2026-03-30.
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.7.2
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.6.6
     container_name: crowdsec-web-ui
     networks:
       - pangolin
@@ -82,7 +82,6 @@ services:
       - TRUST_PROXY=${POCKET_ID_TRUST_PROXY}
       - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
       - MAXMIND_ACCOUNT_ID=${MAXMIND_ACCOUNT_ID}
-      - ALLOW_DOWNGRADE=true
     volumes:
       - /home/jesus/pangolin-stack/data:/app/data
     labels:

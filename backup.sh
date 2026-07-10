@@ -37,7 +37,7 @@ set -e
 
 # Configuration
 BACKUP_DIR="/opt/homelab/backups"
-STACK_DIR="/opt/homelab"
+STACK_DIR="/home/jesus/pangolin-stack"
 LOG_FILE="${BACKUP_DIR}/backup.log"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 RETAIN_DAYS=${RETAIN_DAYS:-7}  # Default retention: 7 days

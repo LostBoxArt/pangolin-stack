@@ -20,7 +20,15 @@ last_lint: 2026-05-09
 Append-only record of structural wiki changes, maintenance passes, and review
 artifacts.
 
-## [2026-04-17] bootstrap | initial service audit
+## [2026-07-18] incident + runbook | tunnel down, all HomeNode sites unreachable
+- **Symptom**: All HomeNode-backed `*.example.com` sites returned 502/timeout. Pangolin showed site `homelab` as `online=0`. Watchdog false-alarmed on all 7 HomeNode SSH services.
+- **Root cause**: Docker's embedded DNS proxy (127.0.0.11) died inside the `dockerd` process on HomeNode. Newt could not resolve `pangolin.example.com` to fetch its auth token, so the tunnel dropped and could not reconnect. The DNS proxy death is a runtime failure of dockerd's internal DNS forwarder, not a config issue.
+- **Contributing factor**: Home ISP NAT rebinding (endpoint port changing every 2-10 min) caused the initial WebSocket disconnect. Newt could not reconnect due to the DNS proxy being dead.
+- **Secondary issue**: The Asustor GUI Docker restart (used to restart dockerd) clobbered `/usr/local/bin/docker` — replaced the wrapper script with a plain symlink, breaking non-interactive docker access for the `jesus` user. The sudoers rule survived; the wrapper was restored manually.
+- **Fix**: Restarted `dockerd` (via Asustor GUI and via CLI). All 16 containers came back via `restart: unless-stopped`. Restored the Docker wrapper script. Tunnel reconnected; all sites recovered.
+- **New runbook**: `docs/wiki/runbooks/tunnel-down-all-homenode-down.md` — comprehensive troubleshooting guide covering Docker DNS proxy death, newt reconnection failures, NAT rebinding churn, Docker wrapper clobbering, SSH penalty table blocks, container-level diagnosis, and a decision flowchart.
+- **Updated**: `docs/wiki/index.md` — added the new runbook to the Runbooks section.
+- **Lessons**: (1) Search session history before re-deriving a fix. (2) Do not restart CloudNode Traefik during debugging. (3) Do not tinker with DNS config when the real issue is a dead dockerd DNS proxy. (4) Verify the Docker wrapper after any Asustor GUI Docker restart. (5) Avoid rapid SSH retry loops (triggers penalty table). (6) Pangolin `online=1` does not guarantee the data path works.
 
 ## [2026-05-09] homarr | memory-optimized beta + qbit-proxy fix
 - **Homarr**: Pinned from `:latest` (main branch, ~595 MiB) to `v1.61.1-beta.1`

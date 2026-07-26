@@ -9,10 +9,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=17">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
 <body>
+  <!-- Background orbs for subtle parallax drift -->
+  <div class="bg-orb bg-orb--top" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--bottom" aria-hidden="true"></div>
+
   <main class="console" id="top">
     <header class="topbar" aria-label="Site header">
       <a class="mark" href="#top" aria-label="Dennis B. home">
@@ -20,7 +24,7 @@
       </a>
       <div class="topbar-status" aria-label="Current status">
         <span class="status-light" aria-hidden="true"></span>
-        <span>Operator online</span>
+        <span id="status-text">Operator online</span>
       </div>
       <nav class="nav" aria-label="Primary links">
         <a href="mailto:Dennisline@gmail.com">Email</a>
@@ -55,7 +59,7 @@
         </div>
       </div>
 
-      <aside class="ops-panel" aria-label="Infrastructure profile">
+      <aside class="ops-panel reveal" aria-label="Infrastructure profile">
         <div class="portrait-map">
           <div class="route route-a" aria-hidden="true"></div>
           <div class="route route-b" aria-hidden="true"></div>
@@ -84,13 +88,20 @@
       </aside>
     </section>
 
+    <!-- Scroll-down indicator -->
+    <div class="scroll-indicator" aria-hidden="true">
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+    </div>
+
     <section class="field-notes" aria-label="Field notes">
-      <div class="notes-heading">
+      <div class="notes-heading reveal">
         <p class="card-index">Field notes</p>
         <p>Not a resume. Just the stuff I keep coming back to.</p>
       </div>
 
-      <article class="note-row">
+      <article class="note-row reveal" data-reveal-delay="0">
         <div class="note-head">
           <p class="note-index">01</p>
           <h2>Work</h2>
@@ -103,7 +114,7 @@
         </div>
       </article>
 
-      <article class="note-row">
+      <article class="note-row reveal" data-reveal-delay="100">
         <div class="note-head">
           <p class="note-index">02</p>
           <h2>Home</h2>
@@ -116,7 +127,7 @@
         </div>
       </article>
 
-      <article class="note-row">
+      <article class="note-row reveal" data-reveal-delay="200">
         <div class="note-head">
           <p class="note-index">03</p>
           <h2>AI / agents</h2>
@@ -129,7 +140,7 @@
         </div>
       </article>
 
-      <div class="note-row note-links">
+      <div class="note-row note-links reveal" data-reveal-delay="300">
         <div class="note-head">
           <p class="note-index">04</p>
           <h2>Signals</h2>
@@ -149,10 +160,11 @@
       </div>
     </section>
 
-    <footer class="footer">
+    <footer class="footer reveal">
       <div class="footer-status">
         <span class="status-light" aria-hidden="true"></span>
         <span>Built by me. Hosted at home. dennisb.xyz</span>
+        <span id="uptime-ticker"></span>
       </div>
       <nav class="footer-links" aria-label="Secondary links">
         <a href="https://x.com/LostBoxArt" rel="noopener noreferrer">X</a>
@@ -160,22 +172,100 @@
       </nav>
     </footer>
   </main>
+
   <script>
-  /* Portrait ring — animate gradient angle via JS (works cross-browser, no @property needed) */
   (function() {
-    var el = document.querySelector('.portrait');
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var angle = 0;
-    var speed = 0.6; /* degrees per frame at 60fps = 36°/s = 10s per revolution */
-    var last = performance.now();
-    function step(now) {
-      var dt = Math.min(now - last, 100); /* cap at 100ms to avoid jumps when tab is backgrounded */
-      angle = (angle + speed * (dt / 16.667)) % 360;
-      el.style.setProperty('--ring-angle', angle + 'deg');
-      last = now;
-      requestAnimationFrame(step);
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── 1. Portrait ring — animate gradient angle via JS (cross-browser) ── */
+    var portrait = document.querySelector('.portrait');
+    if (portrait && !reducedMotion) {
+      var angle = 0;
+      var speed = 0.6; /* degrees per frame at 60fps = 36°/s = 10s per revolution */
+      var last = performance.now();
+      (function step(now) {
+        var dt = Math.min(now - last, 100); /* cap to avoid jumps on tab background */
+        angle = (angle + speed * (dt / 16.667)) % 360;
+        portrait.style.setProperty('--ring-angle', angle + 'deg');
+        last = now;
+        requestAnimationFrame(step);
+      })(performance.now());
     }
-    requestAnimationFrame(step);
+
+    /* ── 2. Scroll reveal — IntersectionObserver ── */
+    var revealEls = document.querySelectorAll('.reveal');
+    if (revealEls.length && !reducedMotion) {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var delay = parseInt(entry.target.getAttribute('data-reveal-delay')) || 0;
+            setTimeout(function() {
+              entry.target.classList.add('revealed');
+            }, delay);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      revealEls.forEach(function(el) { observer.observe(el); });
+    } else if (revealEls.length) {
+      /* Reduced motion: show everything immediately */
+      revealEls.forEach(function(el) { el.classList.add('revealed'); });
+    }
+
+    /* ── 3. Parallax — subtle orb drift on scroll ── */
+    var orbTop = document.querySelector('.bg-orb--top');
+    var orbBottom = document.querySelector('.bg-orb--bottom');
+    if (orbTop && orbBottom && !reducedMotion) {
+      window.addEventListener('scroll', function() {
+        var y = window.scrollY;
+        orbTop.style.transform = 'translateY(' + (y * 0.025) + 'px)';
+        orbBottom.style.transform = 'translateY(' + (y * -0.018) + 'px)';
+      }, { passive: true });
+    }
+
+    /* ── 4. Typing effect — "Operator online" ── */
+    var statusEl = document.getElementById('status-text');
+    if (statusEl && !reducedMotion) {
+      var fullText = statusEl.textContent;
+      var charIndex = 0;
+      statusEl.textContent = '';
+      statusEl.classList.add('typing');
+
+      function typeNext() {
+        if (charIndex < fullText.length) {
+          statusEl.textContent = fullText.slice(0, charIndex + 1);
+          charIndex++;
+          var delay = 60 + Math.random() * 70; /* 60–130ms per character */
+          setTimeout(typeNext, delay);
+        } else {
+          statusEl.classList.remove('typing');
+          statusEl.classList.add('typing-done');
+        }
+      }
+
+      setTimeout(typeNext, 450); /* small initial pause */
+    }
+
+    /* ── 5. Uptime ticker — counts up from configurable start date ── */
+    var ticker = document.getElementById('uptime-ticker');
+    if (ticker) {
+      /* Change this date to match when the site/homelab went online */
+      var START_DATE = new Date('2025-03-15T00:00:00');
+
+      function updateUptime() {
+        var diff = Date.now() - START_DATE.getTime();
+        var days = Math.floor(diff / 86400000);
+        var hours = Math.floor((diff % 86400000) / 3600000);
+        ticker.textContent = 'uptime: ' + days + 'd ' + hours + 'h';
+      }
+
+      updateUptime();
+      setInterval(updateUptime, 60000); /* refresh every minute */
+    }
   })();
   </script>
 </body>

@@ -22,7 +22,7 @@ services:
         - -f
         - http://localhost:3001/api/v1/
       timeout: 3s
-    image: fosrl/pangolin:1.21.0
+    image: fosrl/pangolin:1.20.0
     restart: unless-stopped
     volumes:
       - /home/jesus/pangolin-stack/config:/app/config
@@ -42,7 +42,7 @@ services:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: fosrl/gerbil:1.4.3
+    image: fosrl/gerbil:1.4.2
     ports:
       - 51820:51820/udp
       - 21820:21820/udp

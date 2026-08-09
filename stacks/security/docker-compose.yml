@@ -52,7 +52,7 @@ services:
 
   crowdsec-web-ui:
     # Pin a known-good release; the moving latest tag pulled a broken image on 2026-03-30.
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.7.25
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.8.1
     container_name: crowdsec-web-ui
     networks:
       - pangolin
@@ -71,7 +71,7 @@ services:
       - /home/jesus/pangolin-stack/config/crowdsec-web-ui:/app/config
 
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.12.0
+    image: ghcr.io/pocket-id/pocket-id:v2.13.0
     container_name: pocket-id
     networks:
       - pangolin

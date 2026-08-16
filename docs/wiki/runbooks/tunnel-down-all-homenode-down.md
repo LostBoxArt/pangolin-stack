@@ -117,17 +117,20 @@ If you see repeated `Peer <key> removed` / `Peer <key> added` cycles every
 is unstable. See **NAT rebinding churn** below.
 
 ```bash
-# Test the tunnel data path directly from CloudNode
-curl -sk -o /dev/null -w "HTTP %{http_code} time=%{time_total}s\n" \
-  --max-time 10 -H "Host: plex.example.com" \
-  https://<tunnel-ip>:443/
+# Test from CloudNode's Gerbil/Traefik network namespace.
+# A host-side curl may follow the public ens3 route instead of wg0.
+docker exec traefik wget -S -O /dev/null --no-check-certificate \
+  --timeout=10 -H "Host: plex.example.com" \
+  https://<tunnel-ip>:443/ 2>&1
 ```
 
-- Timeout (HTTP 000) → Gerbil is not forwarding to HomeNode. Check Gerbil
-  peer state and HomeNode newt.
+- Timeout (HTTP 000) from the Traefik/Gerbil namespace → Gerbil is not
+  forwarding to HomeNode. Check Gerbil peer state and HomeNode newt.
 - 502 → Gerbil forwarded but HomeNode Traefik/backend is down. Check
   HomeNode Traefik and the target container.
 - 200/302/401 → tunnel works; the issue is a specific route or container.
+- A timeout from the CloudNode host namespace alone is inconclusive if
+  `ip route get <tunnel-ip>` selects the public `ens3` gateway.
 
 ### 3. Check HomeNode Traefik and containers
 

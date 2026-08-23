@@ -71,7 +71,7 @@ services:
       - /home/jesus/pangolin-stack/config/crowdsec-web-ui:/app/config
 
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.14.0
+    image: ghcr.io/pocket-id/pocket-id:v2.13.0
     container_name: pocket-id
     networks:
       - pangolin

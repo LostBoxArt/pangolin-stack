@@ -52,7 +52,7 @@ services:
 
   crowdsec-web-ui:
     # Pin a known-good release; the moving latest tag pulled a broken image on 2026-03-30.
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.8.1
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.8.3
     container_name: crowdsec-web-ui
     networks:
       - pangolin

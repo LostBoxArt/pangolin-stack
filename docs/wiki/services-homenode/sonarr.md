@@ -97,6 +97,10 @@ Pick the current tag from <https://github.com/linuxserver/docker-sonarr/pkgs/con
   stores its library under `/data/tv`; `/downloads` remains mounted as a
   compatibility alias for existing torrent paths. No host-side media move was
   performed.
+- **Download safety**: every configured indexer has `failDownloads=[0,1]`, which
+  enables Sonarr's `Executables` and `Potentially Dangerous` checks. Arr rejects
+  these when processing completed downloads; qBittorrent may still receive
+  bytes before the completed contents can be inspected.
 - API key is persisted in `/config/config.xml` — needed by qBit cross-seed
   scripts and Prowlarr sync.
 - Sonarr v4 has a different DB schema than v3; downgrades require restoring

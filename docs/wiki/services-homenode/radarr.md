@@ -80,3 +80,7 @@ Pin the image from
   paths.
 - Hardlinks now pass the real cross-container test through the shared `/data`
   namespace; no media files were moved.
+- **Download safety**: every configured indexer has `failDownloads=[0,1]`, which
+  enables Radarr's `Executables` and `Potentially Dangerous` checks. Arr rejects
+  these when processing completed downloads; qBittorrent may still receive
+  bytes before the completed contents can be inspected.

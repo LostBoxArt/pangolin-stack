@@ -19,9 +19,9 @@ last_lint: 2026-09-05
 
 ## Scope
 
-Read-only live audit plus interruption-free configuration and documentation
-work. No media files, application databases, torrent paths, containers, or
-images were changed.
+Read-only live audit plus controlled media-path migration and documentation
+work. Plex was deliberately excluded: no Plex files, configuration, container,
+or image were changed.
 
 ## Completed without interruption
 
@@ -32,8 +32,14 @@ images were changed.
 - Added verified Compose definitions to Git for Recyclarr, Profilarr, Cleanuparr,
   and Seerr. Seerr is pinned to the current stable `v3.4.1` and uses the
   preserved `jellyseerr` data directory.
-- Corrected hardlink documentation: a real in-container link test returned
-  `Cross-device link` because the current bind mounts are separate.
+- Added `/data` mounts to qBittorrent, Sonarr, Radarr, and Bazarr while retaining
+  legacy aliases. Updated qBittorrent defaults and all 59 Sonarr / 40 Radarr
+  library paths through their APIs with file movement disabled.
+- Plex was not stopped, recreated, or reconfigured; it remained `running/healthy`
+  throughout. qBittorrent retained all 128 torrents.
+- The cross-container hardlink canary passed with matching device/inode values.
+  No safe unimported real-import canary was available, so no real media item was
+  altered.
 - Documented the Recyclarr/Profilarr ownership boundary: one setting must have
   one writer, with Recyclarr as the preferred declarative owner.
 
@@ -47,10 +53,11 @@ content-by-content decision, not a bulk replacement.
 
 ## Deferred maintenance-window work
 
-- Add the common `/data` mount and migrate stored paths through supported APIs.
-- Verify a completed-torrent canary, a real hardlink import, and seeding state.
-- Remove legacy path aliases only after observation.
+- Observe imports, seeding, paths, and service health for 24–48 hours before
+  removing the legacy `/tv`, `/movies`, and `/downloads` aliases.
+- Run a genuine new-download import canary when one is available; the current
+  completed torrents were already imported or could not be matched safely.
 - Recreate containers to apply image pinning or healthcheck changes.
 - Decide whether to move Prowlarr off `develop` after compatibility testing.
-- Reconstruct the missing authoritative Seerr Compose definition; it was not
-  guessed or invented during this audit.
+- Review whether Bazarr's stored paths should move from legacy aliases to `/data`
+  after the observation period.

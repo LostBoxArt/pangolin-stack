@@ -192,6 +192,15 @@ normally passes it to `crowdsec` as a runtime flag that runs validation
 *then* continues. Double-check against the current image's ENTRYPOINT
 before committing (Pangolin's upstream uses it without issue).
 
+## Dynamic home-IP whitelist
+
+The home WAN address is dynamic, so it must not be kept as a hard-coded
+CrowdSec exception. A host cron job runs a lock-protected updater every five
+minutes. It queries the home WAN address from the home server, validates it,
+atomically updates `config/crowdsec/postoverflows/s01-whitelist/home_dynamic_whitelist.yaml`,
+validates CrowdSec configuration, reloads CrowdSec, and clears any decision
+for the current address. The updater rolls back if validation fails.
+
 ## Operational Notes
 
 - **Blocklist import**: use `scripts/blocklist-import.sh` on the host — the

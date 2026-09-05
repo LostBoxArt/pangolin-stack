@@ -29,6 +29,7 @@ outbound swarm traffic exits on the ISP IP.
 - **Volumes**:
   - `/volume1/docker/config/qbittorrent:/config`
   - `/volume1/media/downloads:/downloads`
+  - `/volume1/media:/data`
 
 ## Upstream Sources
 
@@ -129,9 +130,11 @@ Not a compose change. Runbook:
 
 ## Operational Notes
 
-- `/downloads` is shared with Sonarr + Radarr, but the separate bind mounts
-  currently fail hardlink creation with `Cross-device link`. A future shared
-  `/data` mount is required for hardlink imports.
+- `/downloads` remains mounted for existing torrent paths. The default and
+  temporary download paths now use `/data/downloads`; existing torrents were
+  not moved and all 128 torrents remained present after the change.
+- The shared `/data` namespace now passes the real cross-container hardlink
+  test. No media files were physically moved.
 - **Homarr widget from the CloudNode** uses the `qbit-proxy` sidecar on the CloudNode
   (see CloudNode [qbit-proxy](../services/qbit-proxy.md)) because of the
   `Secure` cookie issue introduced in qBit 5.1.4. Do NOT point Homarr

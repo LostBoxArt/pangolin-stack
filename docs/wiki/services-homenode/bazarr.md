@@ -28,6 +28,7 @@ Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
   - `/volume1/docker/config/bazarr:/config`
   - `/volume1/media/movies:/movies`
   - `/volume1/media/tv:/tv`
+  - `/volume1/media:/data`
 
 ## Upstream Sources
 
@@ -64,9 +65,10 @@ services:
 - **`:latest` image** (`medium` / NM2).
 - **Healthcheck**: `/system/status` is the canonical endpoint for Bazarr
   (not `/ping`, unlike Sonarr/Radarr). Correct.
-- **Volumes match Sonarr/Radarr**: Bazarr sees `/movies` and `/tv` at the
-  same paths those apps use, which is what Bazarr's
-  "path mappings" config expects. No extra path mapping needed in the UI.
+- **Volumes match Sonarr/Radarr**: Bazarr retains `/movies` and `/tv` as
+  compatibility aliases and also has `/data` available. Its stored paths remain
+  on the legacy aliases intentionally until the observation period is complete;
+  no subtitle files or library paths were moved.
 
 ## Remediation
 

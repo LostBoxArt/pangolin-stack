@@ -29,6 +29,7 @@ Movie manager. LinuxServer.io image. Twin of [sonarr](./sonarr.md), with
   - `/volume1/docker/config/radarr:/config`
   - `/volume1/media/movies:/movies`
   - `/volume1/media/downloads:/downloads`
+  - `/volume1/media:/data`
 
 ## Upstream Sources
 
@@ -74,5 +75,8 @@ Pin the image from
 - **Quality profiles** should be managed centrally via
   [profilarr](./profilarr.md) or [recyclarr](./recyclarr.md), not edited
   by hand in Radarr's UI — your changes will get overwritten on next sync.
-- Root folder: `/movies` inside the container = `/volume1/media/movies` on
-  the host.
+- Root folder: `/data/movies` inside the container = `/volume1/media/movies`
+  on the host. The old `/movies` alias remains mounted for rollback and legacy
+  paths.
+- Hardlinks now pass the real cross-container test through the shared `/data`
+  namespace; no media files were moved.

@@ -28,6 +28,7 @@ TV series manager. LinuxServer.io image.
   - `/volume1/docker/config/sonarr:/config`
   - `/volume1/media/tv:/tv`
   - `/volume1/media/downloads:/downloads`
+  - `/volume1/media:/data`
 - **Env**: `PUID=1000`, `PGID=1000`, `TZ=Asia/Jerusalem`
 
 ## Upstream Sources
@@ -75,11 +76,10 @@ read all four as a group. Common items:
   LSIO images rebuild against upstream Sonarr releases; `:latest` follows
   the default channel. Pinning keeps your upgrade cadence intentional.
 - **Healthcheck is good**: `/ping` is the canonical endpoint.
-- **Current hardlink state is not correct**: the live container sees `/tv` and
-  `/downloads` as separate bind mounts. A real test on 2026-09-05 returned
-  `Cross-device link`, so imports are currently copies rather than hardlinks.
-  The proposed fix is a maintenance-window migration to one `/data` mount;
-  no host-side media move is required.
+- **Current hardlink state is repaired**: the live container now has the shared
+  `/data` mount, all 59 series use `/data/tv`, and the real cross-container
+  hardlink canary passes. Legacy `/tv` and `/downloads` aliases remain mounted
+  for existing paths and rollback; no host-side media move was required.
 
 ## Remediation
 
@@ -93,10 +93,10 @@ Pick the current tag from <https://github.com/linuxserver/docker-sonarr/pkgs/con
 
 ## Operational Notes
 
-- **Hardlinks**: currently unavailable inside the container despite the host
-  directories sharing `/volume1/media/`; the separate bind mounts produce
-  `Cross-device link`. Do not claim hardlink imports until the shared `/data`
-  migration and a genuine import verify matching device/inode values.
+- **Hardlinks**: verified working after the shared `/data` migration. Sonarr
+  stores its library under `/data/tv`; `/downloads` remains mounted as a
+  compatibility alias for existing torrent paths. No host-side media move was
+  performed.
 - API key is persisted in `/config/config.xml` — needed by qBit cross-seed
   scripts and Prowlarr sync.
 - Sonarr v4 has a different DB schema than v3; downgrades require restoring

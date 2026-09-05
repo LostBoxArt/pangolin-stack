@@ -11,6 +11,7 @@ services:
       - /volume1/docker/config/bazarr:/config
       - /volume1/media/movies:/movies
       - /volume1/media/tv:/tv
+      - /volume1/media:/data
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:6767/system/status >/dev/null || exit 1"]
       interval: 30s

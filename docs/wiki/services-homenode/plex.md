@@ -124,10 +124,12 @@ every linked device needs to re-pair.
   Settings → Transcoder → "Use hardware acceleration when available" is
   checked; look for `hwaccel qsv` in the transcode logs when playing an
   HDR → SDR conversion.
-- **Library path in container**: `/media/movies`, `/media/tv` etc. match
-  the subdirs under `/volume1/media/` on the host. Must match whatever
-  Radarr / Sonarr use for hardlinks; the live 2026-09-05 test currently fails
-  because the *arr containers use separate media/download bind mounts.
+- **Library path in container**: `/media/movies`, `/media/tv` etc. remain
+  unchanged and continue to map to `/volume1/media/` on the host. Plex was not
+  stopped or recreated during the shared `/data` migration; its existing
+  `/media` mount is still valid because the physical layout did not change.
+  Sonarr/Radarr hardlinks now pass through their shared `/data` namespace,
+  while Plex sees the resulting files normally.
 - **Remote access via Pangolin**: `plex.example.com` → CloudNode Traefik → Olm
   tunnel → HomeNode Traefik → Plex. Two hops of reverse proxy, but works.
   Plex mobile apps that don't accept the cert chain fall back to Plex

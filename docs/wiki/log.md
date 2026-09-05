@@ -348,3 +348,8 @@ artifacts.
 - Removed unused one-time research artifact `~/.hermes/skills/ai-pricing-research.md`.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-09-05] maintenance | Seerr deployment recovery
+- Restored a reproducible Compose definition for Seerr from verified live runtime state.
+- Preserved the existing `jellyseerr` data directory and added a pinned `v3.4.1` image.
+- Verified the backup, healthcheck, internal route, and unchanged application data after recreation.
+

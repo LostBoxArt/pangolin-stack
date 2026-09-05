@@ -29,8 +29,9 @@ images were changed.
   application notification tests returned HTTP 200.
 - Extended the existing twice-daily service watchdog to include Profilarr,
   Recyclarr, Cleanuparr, and Qui. A real run completed with exit code 0.
-- Added verified Compose definitions to Git for Recyclarr, Profilarr, and
-  Cleanuparr. They were not deployed.
+- Added verified Compose definitions to Git for Recyclarr, Profilarr, Cleanuparr,
+  and Seerr. Seerr is pinned to the current stable `v3.4.1` and uses the
+  preserved `jellyseerr` data directory.
 - Corrected hardlink documentation: a real in-container link test returned
   `Cross-device link` because the current bind mounts are separate.
 - Documented the Recyclarr/Profilarr ownership boundary: one setting must have

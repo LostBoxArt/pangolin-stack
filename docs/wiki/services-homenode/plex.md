@@ -126,7 +126,8 @@ every linked device needs to re-pair.
   HDR → SDR conversion.
 - **Library path in container**: `/media/movies`, `/media/tv` etc. match
   the subdirs under `/volume1/media/` on the host. Must match whatever
-  Radarr / Sonarr use for hardlinks to work (they do).
+  Radarr / Sonarr use for hardlinks; the live 2026-09-05 test currently fails
+  because the *arr containers use separate media/download bind mounts.
 - **Remote access via Pangolin**: `plex.example.com` → CloudNode Traefik → Olm
   tunnel → HomeNode Traefik → Plex. Two hops of reverse proxy, but works.
   Plex mobile apps that don't accept the cert chain fall back to Plex

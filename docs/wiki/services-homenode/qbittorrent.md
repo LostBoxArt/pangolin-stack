@@ -129,7 +129,9 @@ Not a compose change. Runbook:
 
 ## Operational Notes
 
-- `/downloads` shared with Sonarr + Radarr for hardlink imports.
+- `/downloads` is shared with Sonarr + Radarr, but the separate bind mounts
+  currently fail hardlink creation with `Cross-device link`. A future shared
+  `/data` mount is required for hardlink imports.
 - **Homarr widget from the CloudNode** uses the `qbit-proxy` sidecar on the CloudNode
   (see CloudNode [qbit-proxy](../services/qbit-proxy.md)) because of the
   `Secure` cookie issue introduced in qBit 5.1.4. Do NOT point Homarr

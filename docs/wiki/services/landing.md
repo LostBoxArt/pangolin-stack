@@ -133,10 +133,10 @@ docker compose -f stacks/apps/docker-compose.yml --env-file .env up -d landing
 Verify:
 
 ```bash
-curl -I https://dennisb.xyz
-curl -I https://dennisb.xyz/style.css?v=12
-curl -I https://dennisb.xyz/avatar.jpg
-curl -I https://dennisb.xyz/logo.png
+curl -I https://example.com
+curl -I https://example.com/style.css?v=12
+curl -I https://example.com/avatar.jpg
+curl -I https://example.com/logo.png
 ```
 
 ## Migration from LinkStack

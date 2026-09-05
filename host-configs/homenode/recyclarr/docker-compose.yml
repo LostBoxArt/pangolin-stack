@@ -1,0 +1,17 @@
+services:
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:8.7.1
+    container_name: recyclarr
+    user: 1000:1000
+    restart: unless-stopped
+    networks:
+      - traefik_traefik
+    volumes:
+      - /volume1/docker/config/recyclarr:/config
+    environment:
+      - TZ=Asia/Jerusalem
+      - CRON_SCHEDULE=@daily
+      - RECYCLARR_CREATE_CONFIG=true
+
+networks:
+  traefik_traefik:

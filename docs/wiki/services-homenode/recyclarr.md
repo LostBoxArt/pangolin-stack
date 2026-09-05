@@ -21,9 +21,9 @@ CLI + cron job that applies TRaSH-Guides recommended quality profiles and
 custom formats to Sonarr / Radarr. Runs on a schedule, not a long-lived
 server.
 
-- **Image**: `ghcr.io/recyclarr/recyclarr:latest` ⚠️
+- **Image**: `ghcr.io/recyclarr/recyclarr:8.7.1`
 - **Compose file**: `/volume1/docker/config/recyclarr/docker-compose.yml`
-- **Tracked copy**: **not tracked** (finding NM1)
+- **Tracked copy**: `host-configs/homenode/recyclarr/docker-compose.yml` ✓
 - **Runtime**: cron `@daily` inside the container
 - **User**: `1000:1000`
 - **Volume**: `/volume1/docker/config/recyclarr:/config`

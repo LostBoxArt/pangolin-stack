@@ -23,7 +23,7 @@ spec.
 
 - **Image**: `santiagosayshey/profilarr:latest` ⚠️
 - **Compose file**: `/volume1/docker/config/profilarr/docker-compose.yml`
-- **Tracked copy**: **not tracked** (finding NM1)
+- **Tracked copy**: `host-configs/homenode/profilarr/docker-compose.yml` ✓
 - **Port (internal)**: `6868`
 - **Router**: `profilarr.example.com`
 - **Volume**: `/volume1/docker/config/profilarr:/config`
@@ -88,6 +88,12 @@ Profilarr serves a web UI on 6868. Simple probe:
 
 Profilarr and [recyclarr](./recyclarr.md) solve overlapping problems.
 Both can push quality profiles / custom formats into Sonarr + Radarr.
+
+**Current live audit (2026-09-05):** Recyclarr's daily sync completes
+successfully. Profilarr is running a repository-sync task every two minutes;
+no profile push was observed in the recent logs. Keep Recyclarr as the
+incumbent owner unless an explicit ownership matrix proves Profilarr is
+restricted to non-overlapping settings. One setting must have one writer.
 
 Rough split that's worked in the wild:
 

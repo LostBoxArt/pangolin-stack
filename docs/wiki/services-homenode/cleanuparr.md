@@ -22,7 +22,7 @@ redundant downloads so they stop taking up disk and swarm slots.
 
 - **Image**: `ghcr.io/cleanuparr/cleanuparr:latest` ⚠️
 - **Compose file**: `/volume1/docker/config/cleanuparr/docker-compose.yml`
-- **Tracked copy**: **not tracked** (finding NM1)
+- **Tracked copy**: `host-configs/homenode/cleanuparr/docker-compose.yml` ✓
 - **Port (internal)**: `11011`
 - **Router**: `cleanuparr.example.com`
 - **Volume**: `/volume1/docker/config/cleanuparr:/config`

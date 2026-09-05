@@ -1,0 +1,24 @@
+services:
+  profilarr:
+    image: santiagosayshey/profilarr:latest
+    container_name: profilarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - TZ=Asia/Jerusalem
+    volumes:
+      - /volume1/docker/config/profilarr:/config
+    networks:
+      - traefik_traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.profilarr.rule=Host(`profilarr.example.com`)"
+      - "traefik.http.routers.profilarr.entrypoints=websecure"
+      - "traefik.http.routers.profilarr.tls.certresolver=cloudflare"
+      - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
+
+networks:
+  traefik_traefik:
+    external: true

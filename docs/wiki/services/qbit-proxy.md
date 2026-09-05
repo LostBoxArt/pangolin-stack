@@ -83,8 +83,8 @@ can be removed along with the `extra_hosts` line in Homarr's compose.
 The proxy sets `Host: <TARGET_HOST>` on forwarded requests. If this doesn't
 match a Traefik router rule on HomeNode, qBittorrent returns 404. Always
 verify `TARGET_HOST` matches the actual Traefik route on HomeNode (e.g.
-`torrent.example.com` in sanitized docs, `torrent.dennisb.xyz` in real
-config).
+`torrent.example.com` in sanitized docs and the corresponding real
+configuration value on HomeNode.
 
 ## Remediation
 

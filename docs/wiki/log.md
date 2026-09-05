@@ -37,7 +37,7 @@ artifacts.
   remediation, operational notes. Added `.env` symlink:
   `stacks/dashboard/.env` → `../../.env` to fix compose env resolution.
 - **qbit-proxy**: Fixed `TARGET_IP` from `192.168.1.10` (unreachable subnet) to
-  `192.168.0.10` (routed through OLM tunnel). Fixed `TARGET_HOST` to match
+  `<homenode-lan-ip>` (routed through the tunnel). Fixed `TARGET_HOST` to match
   HomeNode's Traefik route. Updated `qbit-proxy/index.js` defaults to match.
   Added F-QBP-3 to `services/qbit-proxy.md`.
 - Updated `services/homarr.md` and `services/qbit-proxy.md`.
@@ -332,15 +332,17 @@ artifacts.
 - Re-ran `scripts/wiki_lint.py` — all 55 files pass clean.
 
 ## [2026-04-22] maintenance | autonomous memory and skill hygiene pass
-- Fixed `~/.hermes/memories/MEMORY.md`: corrected stale HomeNode IP from `192.168.0.10` to `192.168.1.10`, updated deprecated `VPS/NASUS` terminology to `CloudNode/HomeNode`, and fixed network range from `192.168.0.0/24` to `192.168.1.0/24`.
+- Fixed `~/.hermes/memories/MEMORY.md`: corrected the stale HomeNode address, updated deprecated `VPS/NASUS` terminology to `CloudNode/HomeNode`, and fixed the documented network range.
 - Removed stale LinkStack replacement preference from `~/.hermes/memories/USER.md` (completed 2026-04-21).
-- Sanitized remaining real data leaks in `docs/wiki/log.md`: removed real ISP IP, fixed `192.168.0.10` → `192.168.1.10` in incident entries, replaced `dennisb.xyz` with `example.com` in service descriptions, and updated `VPS` → `CloudNode` in incident narrative.
+- Sanitized remaining real data leaks in `docs/wiki/log.md`: removed real ISP and
+  LAN addresses, replaced real domains with `example.com` in service descriptions,
+  and updated `VPS` → `CloudNode` in incident narrative.
 - Patched 7 skills for deprecated terminology and wrong IPs:
   - `home/homelab-automation`: `VPS/Nasus` → `CloudNode/HomeNode`
   - `home/pangolin-networking`: `VPS` → `CloudNode`
   - `home/traefik-routing`: `VPS stack` → `CloudNode stack`
-  - `home/seerr-media-requests`: `192.168.0.10` → `192.168.1.10` (3×)
-  - `devops/dockhand-hawser-monitoring`: `NASUS` → `HomeNode`, `192.168.0.10` → `192.168.1.10`, `NAS host` → `HomeNode host`
+  - `home/seerr-media-requests`: `<homenode-lan-ip>` in place of the private LAN address (3×)
+  - `devops/dockhand-hawser-monitoring`: `NASUS` → `HomeNode`, private LAN address → `<homenode-lan-ip>`, `NAS host` → `HomeNode host`
   - `devops/pangolin-service-swap`: `NASUS` → `HomeNode`
   - `software-development/hermes-gateway-live-session-guardrails`: `VPS` → `CloudNode`
 - Removed unused one-time research artifact `~/.hermes/skills/ai-pricing-research.md`.

@@ -148,7 +148,7 @@ moved from `/api/healthcheck` to `/api/health` around 1.x.)
   `qbit-proxy` sidecar — see [qbit-proxy](./qbit-proxy.md).
 - **qbit-proxy Host header**: The proxy sends `Host: torrent.example.com` to
   HomeNode's Traefik. If the Traefik route on HomeNode doesn't match (e.g.
-  expects `torrent.dennisb.xyz`), the integration returns 404. The `TARGET_HOST`
+  expects the same host in its route), the integration returns 404. The `TARGET_HOST`
   env var in `qbit-proxy` must match the Traefik route.
 - `SECRET_ENCRYPTION_KEY` is single-source-of-truth for encrypted
   credentials in Homarr's DB. **Do not rotate without exporting secrets

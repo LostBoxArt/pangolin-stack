@@ -75,10 +75,11 @@ read all four as a group. Common items:
   LSIO images rebuild against upstream Sonarr releases; `:latest` follows
   the default channel. Pinning keeps your upgrade cadence intentional.
 - **Healthcheck is good**: `/ping` is the canonical endpoint.
-- **Media paths are correct**: `/tv` for library, `/downloads` for inbox.
-  Matches qBit's `/volume1/media/downloads` bind so the downloaded file's
-  path inside qBit == the path Sonarr sees (critical for hardlinks /
-  atomic moves).
+- **Current hardlink state is not correct**: the live container sees `/tv` and
+  `/downloads` as separate bind mounts. A real test on 2026-09-05 returned
+  `Cross-device link`, so imports are currently copies rather than hardlinks.
+  The proposed fix is a maintenance-window migration to one `/data` mount;
+  no host-side media move is required.
 
 ## Remediation
 
@@ -92,10 +93,10 @@ Pick the current tag from <https://github.com/linuxserver/docker-sonarr/pkgs/con
 
 ## Operational Notes
 
-- **Hardlinks**: both `/tv` (library) and `/downloads` (inbox) live on
-  `/volume1/media/` on the host, same filesystem → Sonarr uses hardlinks
-  for imports (zero-copy, zero-seed-loss). Verify with `ls -li` showing
-  matching inode counts after a test import.
+- **Hardlinks**: currently unavailable inside the container despite the host
+  directories sharing `/volume1/media/`; the separate bind mounts produce
+  `Cross-device link`. Do not claim hardlink imports until the shared `/data`
+  migration and a genuine import verify matching device/inode values.
 - API key is persisted in `/config/config.xml` — needed by qBit cross-seed
   scripts and Prowlarr sync.
 - Sonarr v4 has a different DB schema than v3; downgrades require restoring

@@ -353,3 +353,7 @@ artifacts.
 - Preserved the existing `jellyseerr` data directory and added a pinned `v3.4.1` image.
 - Verified the backup, healthcheck, internal route, and unchanged application data after recreation.
 
+## [2026-09-05] maintenance | Arr download safety
+- Enabled Sonarr and Radarr `failDownloads=[0,1]` on all seven configured indexers in each app through their supported APIs.
+- Verified the settings by read-back, confirmed no active qBittorrent torrent has an executable content path, and documented that Arr detects these files after download inspection rather than preventing qBittorrent from receiving initial bytes.
+

@@ -363,3 +363,8 @@ artifacts.
 - Dark Matter and Mayday remain visible in Plex. Their earlier imports were copies rather than hardlinks because they used the legacy aliases; the next normal request is the clean Radarr hardlink canary.
 - Full verification passed: all seven relevant containers healthy with restart count 0; qBittorrent 134 torrents / 133 complete / 0 active downloads; zero dangerous-extension files in Arr download directories.
 
+## [2026-09-06] maintenance | Safe obsolete-data cleanup
+- Removed only the older duplicate migration backup `20260905T105403Z` (203.3 MB) after verifying the retained `20260905T105556Z` backup with its SHA-256 manifest.
+- Kept all media, qBittorrent torrents, the active `vuetorrent` WebUI assets, and two qBittorrent-tracked `.parts` files. Kept legacy aliases because existing torrent records still reference `/downloads`.
+- Post-cleanup migration verification passed with no service restart; NAS free space is 7.3 TB.
+

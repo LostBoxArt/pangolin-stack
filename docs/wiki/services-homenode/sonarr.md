@@ -77,7 +77,7 @@ read all four as a group. Common items:
   the default channel. Pinning keeps your upgrade cadence intentional.
 - **Healthcheck is good**: `/ping` is the canonical endpoint.
 - **Current hardlink state is repaired**: the live container now has the shared
-  `/data` mount, all 59 series use `/data/tv`, and the real cross-container
+  `/data` mount, all 61 series use `/data/tv`, and the real cross-container
   hardlink canary passes. Legacy `/tv` and `/downloads` aliases remain mounted
   for existing paths and rollback; no host-side media move was required.
 

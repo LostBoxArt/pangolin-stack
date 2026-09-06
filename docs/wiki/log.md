@@ -357,3 +357,9 @@ artifacts.
 - Enabled Sonarr and Radarr `failDownloads=[0,1]` on all seven configured indexers in each app through their supported APIs.
 - Verified the settings by read-back, confirmed no active qBittorrent torrent has an executable content path, and documented that Arr detects these files after download inspection rather than preventing qBittorrent from receiving initial bytes.
 
+## [2026-09-06] maintenance | Media path follow-up
+- Seerr's live Sonarr/Radarr routing defaults were still `/tv` and `/movies`; changed them through the supported API to `/data/tv` and `/data/movies` and verified by read-back.
+- Corrected the two affected Arr records through their editor APIs with `moveFiles=false` and `deleteFiles=false`; no media was moved and Plex was not restarted.
+- Dark Matter and Mayday remain visible in Plex. Their earlier imports were copies rather than hardlinks because they used the legacy aliases; the next normal request is the clean Radarr hardlink canary.
+- Full verification passed: all seven relevant containers healthy with restart count 0; qBittorrent 134 torrents / 133 complete / 0 active downloads; zero dangerous-extension files in Arr download directories.
+

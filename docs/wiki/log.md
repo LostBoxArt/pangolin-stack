@@ -368,7 +368,14 @@ artifacts.
 - Kept all media, qBittorrent torrents, the active `vuetorrent` WebUI assets, and two qBittorrent-tracked `.parts` files. Kept legacy aliases because existing torrent records still reference `/downloads`.
 - Post-cleanup migration verification passed with no service restart; NAS free space is 7.3 TB.
 
-## [2026-09-07] maintenance | Prowlarr and arr-mcp remediation
+## [2026-09-07] Quality profile policy
+- Researched the current TRaSH Guides and Recyclarr guide-backed templates for conventional media and anime. The anime guidance explicitly supports lower-resolution availability and does not require 4K.
+- Made Recyclarr the effective single writer for quality profiles and custom formats. Profilarr remains running for repository synchronization only.
+- Synced `2160p Quality`, `1080p Quality`, and `Anime 1080p` into Sonarr and Radarr. Anime Sonarr series use the anime profile; ordinary non-4K series use the 1080p profile; existing 2160p assignments were preserved.
+- Updated Seerr's ordinary-TV and anime defaults to the new Sonarr profiles. Radarr remains defaulted to the 2160p profile.
+- Verified an idempotent Recyclarr preview, healthy Arr/Seerr/Plex containers, zero restarts, and Plex identity HTTP 200. No media, torrents, databases, or Plex configuration changed.
+
+## [2026-09-07] Prowlarr and arr-mcp remediation
 - Removed the broken Prowlarr indexers `1337x` (Cloudflare 403/error 1006) and `BitSearch` (missing indexer definition) through Prowlarr's supported API; no torrents, media, or databases were touched.
 - Set Prowlarr allowed hosts to the verified internal and routed hostnames; read-back passed.
 - Verified Prowlarr now has 6 working indexers, and Sonarr/Radarr now have 5 synchronized indexers each.

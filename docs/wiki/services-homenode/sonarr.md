@@ -81,6 +81,26 @@ read all four as a group. Common items:
   hardlink canary passes. Legacy `/tv` and `/downloads` aliases remain mounted
   for existing paths and rollback; no host-side media move was required.
 
+## Quality profiles (live policy — 2026-09-07)
+
+Recyclarr is the single profile/custom-format writer. Profilarr remains
+installed for repository synchronization only; it must not push overlapping
+Arr settings.
+
+- **2160p Quality**: conventional TV where 4K is desired.
+- **1080p Quality**: conventional TV where 1080p is the practical target,
+  with guide-backed upgrades.
+- **Anime 1080p**: anime scoring with 480p/576p/720p/1080p-capable fallbacks;
+  it does not require 4K.
+
+Anime series use `Anime 1080p`; ordinary series previously on broad or old
+720p/1080p profiles use `1080p Quality`; existing 2160p assignments remain.
+Seerr's ordinary-TV and anime defaults are aligned with these profile IDs.
+
+Sources: [TRaSH Sonarr anime profiles](https://trash-guides.info/Sonarr/sonarr-setup-quality-profiles-anime/),
+[TRaSH Sonarr profiles](https://trash-guides.info/Sonarr/sonarr-setup-quality-profiles/),
+[Recyclarr templates](https://recyclarr.dev/guide/guide-configs/).
+
 ## Remediation
 
 ### Pin the image

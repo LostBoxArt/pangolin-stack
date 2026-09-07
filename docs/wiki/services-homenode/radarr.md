@@ -72,9 +72,19 @@ Pin the image from
 
 ## Operational Notes
 
-- **Quality profiles** should be managed centrally via
-  [profilarr](./profilarr.md) or [recyclarr](./recyclarr.md), not edited
-  by hand in Radarr's UI — your changes will get overwritten on next sync.
+- **Quality profiles** are managed centrally by [Recyclarr](./recyclarr.md),
+  not edited by hand in Radarr's UI. Profilarr is retained for repository
+  synchronization only and must not push overlapping settings.
+- Live profiles are `2160p Quality` (default conventional-movie profile),
+  `1080p Quality` (conventional 1080p target), and `Anime 1080p` (anime-aware
+  profile without a 4K requirement). Existing assignments were preserved;
+  previously unassigned movies were assigned to the 2160p default.
+- Future anime movies should be explicitly assigned to `Anime 1080p`; Radarr
+  does not infer that profile from genre automatically.
+
+Sources: [TRaSH Radarr profiles](https://trash-guides.info/Radarr/radarr-setup-quality-profiles/),
+[TRaSH Radarr anime profiles](https://trash-guides.info/Radarr/radarr-setup-quality-profiles-anime/),
+[Recyclarr templates](https://recyclarr.dev/guide/guide-configs/).
 - Root folder: `/data/movies` inside the container = `/volume1/media/movies`
   on the host. The old `/movies` alias remains mounted for rollback and legacy
   paths.

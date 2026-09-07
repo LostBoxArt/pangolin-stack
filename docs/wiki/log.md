@@ -368,3 +368,10 @@ artifacts.
 - Kept all media, qBittorrent torrents, the active `vuetorrent` WebUI assets, and two qBittorrent-tracked `.parts` files. Kept legacy aliases because existing torrent records still reference `/downloads`.
 - Post-cleanup migration verification passed with no service restart; NAS free space is 7.3 TB.
 
+## [2026-09-07] maintenance | Prowlarr and arr-mcp remediation
+- Removed the broken Prowlarr indexers `1337x` (Cloudflare 403/error 1006) and `BitSearch` (missing indexer definition) through Prowlarr's supported API; no torrents, media, or databases were touched.
+- Set Prowlarr allowed hosts to the verified internal and routed hostnames; read-back passed.
+- Verified Prowlarr now has 6 working indexers, and Sonarr/Radarr now have 5 synchronized indexers each.
+- arr-mcp stack health returned zero failures and zero degraded services after remediation; all adapters remain read-only and private.
+- The Radarr natural hardlink canary remains deferred because no post-migration Radarr import has occurred. The stable Prowlarr image is currently older than the running `develop` build, so switching channels was not performed without an authorized maintenance/source-of-truth update.
+

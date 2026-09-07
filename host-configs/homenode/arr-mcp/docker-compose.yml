@@ -1,0 +1,28 @@
+services:
+  arr-mcp:
+    image: ghcr.io/bardesss/arr-mcp:1.21.2
+    container_name: arr-mcp
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Jerusalem
+      - ARR_MCP_VERSION=1.21.2
+    volumes:
+      - /volume1/docker/config/arr-mcp:/config
+    ports:
+      - 127.0.0.1:6060:6060
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:6060/healthz"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    networks:
+      - traefik_traefik
+
+networks:
+  traefik_traefik:
+    external: true

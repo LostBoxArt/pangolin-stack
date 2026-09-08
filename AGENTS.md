@@ -109,7 +109,7 @@ Apps:
 - CloudNode: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
 - HomeNode: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
 - If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`, first check for `192.168.1.0/24 dev olm`. If it is missing, inspect `/usr/local/sbin/hermes-safe-logs olm --since 30m` and restart `olm` with `/usr/local/sbin/hermes-safe-service restart olm`.
-- HomeNode Docker healthchecks currently exist for `sonarr`, `radarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr`, `plex`, `traefik`, `qui`, `seerr`, `hawser`, `newt`, `badger`, `olm`, and `cleanuparr`.
+- HomeNode Docker healthchecks currently exist for `sonarr`, `radarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr`, `plex`, `traefik`, `qui`, `seerr`, `hawser`, `newt`, `badger`, and `olm`.
 - Those compose files are live on HomeNode under `/volume1/docker/config/*/docker-compose.yml` plus `/volume1/docker/traefik/docker-compose.yml`.
 - Source-controlled backup copies live in this repo under `host-configs/homenode/`.
 

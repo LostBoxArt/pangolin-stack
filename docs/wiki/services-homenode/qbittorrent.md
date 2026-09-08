@@ -128,6 +128,13 @@ Not a compose change. Runbook:
    password.
 4. Restart qBit to apply.
 
+## TorrentLeech seeding policy
+
+- TorrentLeech requires either a 1:1 ratio or minimum total seeding time; the official minimum is 10 days for Registered, then 8/7/6/4 days for Power/Super/Extreme/TL God classes.
+- qBittorrent global inactive-seeding cleanup is set to 30 days (`43200` minutes), with the action set to remove the torrent record only, not downloaded content.
+- Sonarr and Radarr use the post-import category `seeding`; Arr will not remove completed torrents in that category.
+- The `seeding` qBittorrent category exists for imported torrents. Existing torrents are not moved automatically.
+
 ## Operational Notes
 
 - `/downloads` remains mounted for existing torrent paths. The default and

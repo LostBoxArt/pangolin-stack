@@ -47,7 +47,7 @@ client, and the edge proxy.
 
 | Tracked in repo | Live on HomeNode but NOT in repo |
 |---|---|
-| FlareSolverr, bazarr, plex, prowlarr, qbittorrent, radarr, sonarr, traefik | **dashdot, hawser, newt, profilarr, qui, recyclarr, seerr** |
+| FlareSolverr, bazarr, plex, prowlarr, qbittorrent, radarr, sonarr, traefik | **dashdot, hawser, newt, profilarr, recyclarr, seerr** |
 
 The 8 tracked files match HomeNode byte-for-byte (no content drift). The problem
 is coverage: changes to any of the 8 missing services are invisible to git
@@ -64,7 +64,7 @@ history. See finding **NM1** below.
 |---|---|---|---|---|---|
 | Edge/Tunnel | traefik, hawser, newt | 1 | 2 | 3 | 0 |
 | *arr suite | sonarr, radarr, bazarr, prowlarr, profilarr, recyclarr | 0 | 1 | 4 | 2 |
-| Torrent | qbittorrent, qui, flaresolverr | 1 | 1 | 3 | 1 |
+| Torrent | qbittorrent, flaresolverr | 1 | 1 | 3 | 1 |
 | Media | plex, seerr | 0 | 1 | 2 | 1 |
 | Observability | dashdot | 0 | 1 | 1 | 0 |
 | **Meta** | repo-sync | 0 | 1 | 0 | 0 |
@@ -165,7 +165,7 @@ history. See finding **NM1** below.
 
 ### NM2. Image-pin policy violations (most services)
 `:latest` on: traefik, hawser, flaresolverr, bazarr, dashdot,
-plex, profilarr, qbittorrent, qui, radarr, recyclarr, seerr, sonarr. Only
+plex, profilarr, qbittorrent, radarr, recyclarr, seerr, sonarr. Only
 `newt` is pinned (`1.11.0`). Same risk profile as CloudNode M10.
 
 ### NM3. Single flat docker network `traefik_traefik`
@@ -174,7 +174,7 @@ Every HomeNode service joins the same external network. qBit, Plex, and Hawser
 by purpose (arr / torrent / media / mgmt) is standard best practice.
 
 ### NM4. Several services have no healthcheck
-- `newt`, `profilarr`, `qui`, `recyclarr` — no healthcheck
+- `newt`, `profilarr`, `recyclarr` — no healthcheck
   blocks. `stackctl`-style dashboards will show "running" regardless of
   whether the service is actually serving.
 
@@ -184,11 +184,6 @@ got renamed to `seerr`, but the **data directory** kept the old name. This
 is a footgun for backup scripts, rename-to-clean-up operators, and anyone
 doing `find /volume1/docker/config -name 'docker-compose.yml'` expecting
 the dir name to match the service name.
-
-### NM6. `qui` router label calls it `flood`
-Router `Host(\`flood.example.com\`)` — legacy name from when Flood was the
-tool. Mentally confusing; consider renaming router and the DNS record to
-`qui.example.com`.
 
 ### NM7. No access logs or CrowdSec on HomeNode Traefik
 CloudNode Traefik writes JSON access logs to `config/traefik/logs/access.log`
@@ -288,7 +283,7 @@ script.
 | profilarr | <https://github.com/santiagosayshey/Profilarr> |
 | recyclarr | <https://recyclarr.dev/wiki/yaml/config-reference/> |
 | qbittorrent | <https://docs.linuxserver.io/images/docker-qbittorrent/> |
-| qui (autobrr) | <https://github.com/autobrr/qui> |
+
 | flaresolverr | <https://github.com/FlareSolverr/FlareSolverr> |
 
 | plex | <https://docs.linuxserver.io/images/docker-plex/> |

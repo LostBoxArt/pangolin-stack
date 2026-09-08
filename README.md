@@ -122,7 +122,7 @@ The repo now keeps source-controlled copies of the current HomeNode host-side co
 - `flaresolverr`
 - `plex`
 - `traefik`
-- `qui`
+
 - `seerr`
 - `hawser`
 

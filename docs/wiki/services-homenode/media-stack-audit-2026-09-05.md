@@ -27,8 +27,8 @@ or image were changed.
 
 - Added Plex notifications to Sonarr and Radarr through their APIs. Both
   application notification tests returned HTTP 200.
-- Extended the existing twice-daily service watchdog to include Profilarr,
-  Recyclarr, and Qui. A real run completed with exit code 0.
+- Extended the existing twice-daily service watchdog to include Profilarr and
+  Recyclarr. A real run completed with exit code 0.
 - Added verified Compose definitions to Git for Recyclarr, Profilarr, and Seerr.
   Seerr is pinned to the current stable `v3.4.1` and uses the
   preserved `jellyseerr` data directory.

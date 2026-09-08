@@ -602,7 +602,7 @@ that specific route or container.
 | `seerr` | Media request front-end | yes |
 | `bazarr` | Subtitle manager | yes |
 | `plex` | Media server | yes |
-| `qui` | autobrr qBit UI | no |
+
 
 | `hawser` | Dockhand remote agent | no |
 | `profilarr` | Profile manager for *arr | no |

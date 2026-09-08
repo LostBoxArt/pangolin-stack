@@ -162,7 +162,7 @@ HomeNode healthchecks are defined in host-side compose files, and the repo now k
 - `flaresolverr`
 - `plex`
 - `traefik`
-- `qui`
+
 - `seerr`
 - `hawser`
 

@@ -104,7 +104,7 @@ There is no stack separation like on the CloudNode.
 
 ### Torrent
 - `qbittorrent`
-- `qui`
+
 - `flaresolverr`
 
 

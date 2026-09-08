@@ -41,7 +41,7 @@ Home server that runs the media, torrent, and *arr workloads.
 - [[../services-homenode/profilarr.md]]
 - [[../services-homenode/recyclarr.md]]
 - [[../services-homenode/qbittorrent.md]]
-- [[../services-homenode/qui.md]]
+
 - [[../services-homenode/flaresolverr.md]]
 
 - [[../services-homenode/plex.md]]

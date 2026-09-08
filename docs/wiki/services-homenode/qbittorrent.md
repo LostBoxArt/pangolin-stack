@@ -146,5 +146,3 @@ Not a compose change. Runbook:
   (see CloudNode [qbit-proxy](../services/qbit-proxy.md)) because of the
   `Secure` cookie issue introduced in qBit 5.1.4. Do NOT point Homarr
   directly at `https://torrent.example.com`.
-- Cross-seed / autobrr: the companion [qui](./qui.md) service provides a
-  nicer torrent-management UI that talks to qBit's API.

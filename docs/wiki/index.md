@@ -92,7 +92,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality definitions, and naming schemes in sync across the *arr apps from a central spec.
 - [`prowlarr`](./services-homenode/prowlarr.md) — Indexer manager for the *arr suite — federates torrent/usenet indexers into one API that Sonarr/Radarr query.
 - [`qbittorrent`](./services-homenode/qbittorrent.md) — Torrent client. LinuxServer.io image. Serves web UI at `torrent.example.com` (Traefik-routed). **Runs with no VPN sidecar** — outbound swarm traffic exits on the ISP IP.
-- [`qui`](./services-homenode/qui.md) — autobrr's "qui" — modern web UI for managing qBittorrent torrents (sort, bulk re-category, cross-seed workflows, etc.).
+
 - [`radarr`](./services-homenode/radarr.md) — Movie manager. LinuxServer.io image. Twin of Sonarr, with `/movies` instead of `/tv`.
 - [`recyclarr`](./services-homenode/recyclarr.md) — CLI + cron job that applies TRaSH-Guides recommended quality profiles and custom formats to Sonarr / Radarr. Runs on a schedule, not a long-lived server.
 - [`seerr`](./services-homenode/seerr.md) — Media request front-end for end users — they ask for a movie / show, it hands the request to Sonarr / Radarr for fulfilment.

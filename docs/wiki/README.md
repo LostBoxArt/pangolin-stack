@@ -136,7 +136,7 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 - [qbittorrent](./services-homenode/qbittorrent.md)
 - [qui](./services-homenode/qui.md)
 - [flaresolverr](./services-homenode/flaresolverr.md)
-- [cleanuparr](./services-homenode/cleanuparr.md)
+
 
 ### Media
 - [plex](./services-homenode/plex.md)

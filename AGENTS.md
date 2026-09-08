@@ -22,8 +22,9 @@ Services are organized into 7 stacks under `stacks/`:
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
 | **apps** | landing, termix | User applications |
+
 | **homenode-core** | olm, gerbil, pangolin | Tunnel, relay, control plane |
-| **homenode-apps** | newt, prowlarr, profilarr, recyclarr, seerr, sonarr, radarr, bazarr, qui, cleanuparr, flaresolverr, plex, qbittorrent, dashdot | Monitoring, storage, auth, torrent, media, DNS, apps |
+| **homenode-apps** | newt, prowlarr, profilarr, recyclarr, seerr, sonarr, radarr, bazarr, qui, flaresolverr, plex, qbittorrent, dashdot | Monitoring, storage, auth, torrent, media, DNS, apps |
 
 ### Startup Order
 1. **core** (creates network, must start first)

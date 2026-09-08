@@ -47,7 +47,7 @@ client, and the edge proxy.
 
 | Tracked in repo | Live on HomeNode but NOT in repo |
 |---|---|
-| FlareSolverr, bazarr, plex, prowlarr, qbittorrent, radarr, sonarr, traefik | **cleanuparr, dashdot, hawser, newt, profilarr, qui, recyclarr, seerr** |
+| FlareSolverr, bazarr, plex, prowlarr, qbittorrent, radarr, sonarr, traefik | **dashdot, hawser, newt, profilarr, qui, recyclarr, seerr** |
 
 The 8 tracked files match HomeNode byte-for-byte (no content drift). The problem
 is coverage: changes to any of the 8 missing services are invisible to git
@@ -64,7 +64,7 @@ history. See finding **NM1** below.
 |---|---|---|---|---|---|
 | Edge/Tunnel | traefik, hawser, newt | 1 | 2 | 3 | 0 |
 | *arr suite | sonarr, radarr, bazarr, prowlarr, profilarr, recyclarr | 0 | 1 | 4 | 2 |
-| Torrent | qbittorrent, qui, flaresolverr, cleanuparr | 1 | 1 | 3 | 1 |
+| Torrent | qbittorrent, qui, flaresolverr | 1 | 1 | 3 | 1 |
 | Media | plex, seerr | 0 | 1 | 2 | 1 |
 | Observability | dashdot | 0 | 1 | 1 | 0 |
 | **Meta** | repo-sync | 0 | 1 | 0 | 0 |
@@ -164,7 +164,7 @@ history. See finding **NM1** below.
 ## Medium Findings
 
 ### NM2. Image-pin policy violations (most services)
-`:latest` on: traefik, hawser, flaresolverr, bazarr, cleanuparr, dashdot,
+`:latest` on: traefik, hawser, flaresolverr, bazarr, dashdot,
 plex, profilarr, qbittorrent, qui, radarr, recyclarr, seerr, sonarr. Only
 `newt` is pinned (`1.11.0`). Same risk profile as CloudNode M10.
 
@@ -174,7 +174,7 @@ Every HomeNode service joins the same external network. qBit, Plex, and Hawser
 by purpose (arr / torrent / media / mgmt) is standard best practice.
 
 ### NM4. Several services have no healthcheck
-- `cleanuparr`, `newt`, `profilarr`, `qui`, `recyclarr` — no healthcheck
+- `newt`, `profilarr`, `qui`, `recyclarr` — no healthcheck
   blocks. `stackctl`-style dashboards will show "running" regardless of
   whether the service is actually serving.
 
@@ -290,7 +290,7 @@ script.
 | qbittorrent | <https://docs.linuxserver.io/images/docker-qbittorrent/> |
 | qui (autobrr) | <https://github.com/autobrr/qui> |
 | flaresolverr | <https://github.com/FlareSolverr/FlareSolverr> |
-| cleanuparr | <https://github.com/Cleanuparr/Cleanuparr> |
+
 | plex | <https://docs.linuxserver.io/images/docker-plex/> |
 | seerr | <https://github.com/seerr-team/seerr> (fork of Jellyseerr) |
 | dashdot | <https://getdashdot.com/docs/installation/docker-compose> |

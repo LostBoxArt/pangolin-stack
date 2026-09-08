@@ -603,7 +603,7 @@ that specific route or container.
 | `bazarr` | Subtitle manager | yes |
 | `plex` | Media server | yes |
 | `qui` | autobrr qBit UI | no |
-| `cleanuparr` | Download cleanup automation | no |
+
 | `hawser` | Dockhand remote agent | no |
 | `profilarr` | Profile manager for *arr | no |
 | `recyclarr` | TRaSH-Guides sync | no |

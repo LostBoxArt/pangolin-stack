@@ -106,7 +106,7 @@ There is no stack separation like on the CloudNode.
 - `qbittorrent`
 - `qui`
 - `flaresolverr`
-- `cleanuparr`
+
 
 ### Media
 - `plex`

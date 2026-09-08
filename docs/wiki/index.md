@@ -83,7 +83,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 ## HomeNode Services
 - [`HomeNode Media Stack Audit — 2026-09-05`](./services-homenode/media-stack-audit-2026-09-05.md) — Live, interruption-free audit of media notifications, monitoring, profiles, hardlink state, and deferred maintenance work.
 - [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
-- [`cleanuparr`](./services-homenode/cleanuparr.md) — Automated cleanup for qBit / Sonarr / Radarr — removes failed / stalled / redundant downloads so they stop taking up disk and swarm slots.
+
 - [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](./services/dashdot.md)).
 - [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr and the *arr apps proxy indexer requests through it when hitting sites protected by Cloudflare's Under-Attack Mode / Turnstile.
 - [`hawser`](./services-homenode/hawser.md) — Dockhand's remote agent. The CloudNode Dockhand connects to this agent over TCP to manage HomeNode containers in the same UI as CloudNode containers.

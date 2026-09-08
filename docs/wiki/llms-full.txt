@@ -63,7 +63,7 @@ related homelab services as documented in `/opt/homelab`.
 - [qbittorrent](./services-homenode/qbittorrent.md)
 - [qui](./services-homenode/qui.md)
 - [flaresolverr](./services-homenode/flaresolverr.md)
-- [cleanuparr](./services-homenode/cleanuparr.md)
+
 - [plex](./services-homenode/plex.md)
 - [seerr](./services-homenode/seerr.md)
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)

@@ -1,0 +1,37 @@
+services:
+  fileflows:
+    image: revenz/fileflows:26.09@sha256:5d7460ec63be60bb33fd50336b064c138e7d005a8fd3d19d47ff259de7df8b82
+    container_name: fileflows
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:19200:5000"
+    environment:
+      - TZ=Asia/Jerusalem
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - ServerUrl=http://127.0.0.1:5000
+      - AgentName=FileFlowsServer
+    volumes:
+      - /volume1/docker/config/fileflows:/app/Data
+      - /volume1/docker/config/fileflows/temp:/temp
+      - /volume1/docker/config/fileflows/common:/app/common
+      - /volume1/docker/config/fileflows/test-library:/test-library
+      - /volume1/media/tv:/media/tv
+      - /volume1/media/movies:/media/movies
+    devices:
+      - /dev/dri:/dev/dri
+
+  dv-watcher:
+    image: docker:cli@sha256:eccaacfeed644c7de222ff047483568cb988dde95476fbaaf10ea2d04921bb66
+    container_name: fileflows-dv-watcher
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /volume1/docker/config/fileflows/automation:/volume1/docker/config/fileflows/automation:rw
+      - /volume1/media/tv:/volume1/media/tv:rw
+      - /volume1/media/movies:/volume1/media/movies:rw
+    pids_limit: 64
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while true; do /volume1/docker/config/fileflows/automation/dv-watcher.sh; sleep 300; done"]

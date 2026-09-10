@@ -18,6 +18,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     networks:
       - traefik_traefik
     labels:

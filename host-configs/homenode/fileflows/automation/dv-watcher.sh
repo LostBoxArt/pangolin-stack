@@ -125,18 +125,18 @@ scan_root() {
         /volume1/media/movies/*) backup="$MOVIES_BACKUP_ROOT/$relative" ;;
         *) continue ;;
       esac
-      if [ ! -e "$backup" ]; then
-        mkdir -p "$(dirname "$backup")"
-        ln "$file" "$backup" || {
-          log "backup-failed file=$cpath"
-          continue
-        }
-        log "backup-created links=$links file=$cpath backup=$backup"
-      fi
-      printf '%s|ELIGIBLE\n' "$key" >> "$CACHE"
       if [ "$DRY_RUN" = '1' ]; then
         log "dry-run eligible profile=$profile compat=$compat file=$cpath"
       else
+        if [ ! -e "$backup" ]; then
+          mkdir -p "$(dirname "$backup")"
+          ln "$file" "$backup" || {
+            log "backup-failed file=$cpath"
+            continue
+          }
+          log "backup-created links=$links file=$cpath backup=$backup"
+        fi
+        printf '%s|ELIGIBLE\n' "$key" >> "$CACHE"
         if submit "$flow_uid" "$cpath"; then
           printf '%s|SUBMITTED\n' "$key" >> "$STATE"
           log "submitted flow=$flow_uid profile=$profile compat=$compat file=$cpath"
@@ -192,6 +192,8 @@ cleanup_backups() {
 }
 
 SUBMITTED_THIS_RUN=0
-cleanup_backups
+if [ "$DRY_RUN" != '1' ]; then
+  cleanup_backups
+fi
 scan_root '/volume1/media/movies' '/media/movies'
 scan_root '/volume1/media/tv' '/media/tv'

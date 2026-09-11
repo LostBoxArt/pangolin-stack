@@ -12,6 +12,7 @@ BACKUP_RETENTION_SECONDS=604800
 TV_BACKUP_ROOT='/volume1/media/tv/.fileflows-original-backups'
 MOVIES_BACKUP_ROOT='/volume1/media/movies/.fileflows-original-backups'
 DRY_RUN="${DRY_RUN:-0}"
+ALLOW_DAYTIME="${ALLOW_DAYTIME:-1}"
 STATE="$BASE/submitted.tsv"
 CACHE="$BASE/probe-cache.tsv"
 LOG="$BASE/watcher.log"
@@ -28,15 +29,17 @@ log() {
   printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >> "$LOG"
 }
 
-# FileFlows carries the NAS timezone (Asia/Jerusalem). Fail closed if its
-# clock cannot be read; conversions are allowed only from 01:00 through 07:59.
-hour=$(docker exec fileflows sh -c 'date +%H' 2>/dev/null || true)
-hour=${hour#0}
-if [ -z "$hour" ]; then
-  exit 0
-fi
-if [ "$hour" -lt 1 ] || [ "$hour" -ge 8 ]; then
-  exit 0
+# Processing is allowed at any time by default. Set ALLOW_DAYTIME=0 to
+# retain the overnight-only 01:00 through 07:59 gate.
+if [ "$ALLOW_DAYTIME" != '1' ]; then
+  hour=$(docker exec fileflows sh -c 'date +%H' 2>/dev/null || true)
+  hour=${hour#0}
+  if [ -z "$hour" ]; then
+    exit 0
+  fi
+  if [ "$hour" -lt 1 ] || [ "$hour" -ge 8 ]; then
+    exit 0
+  fi
 fi
 
 if [ "$DRY_RUN" != '1' ]; then
@@ -136,6 +139,14 @@ scan_root() {
           }
           log "backup-created links=$links file=$cpath backup=$backup"
         fi
+        retention_meta="$backup.retention"
+        if [ ! -e "$retention_meta" ]; then
+          if ! printf '%s\n' "$(date '+%s')" > "$retention_meta"; then
+            log "retention-metadata-failed file=$cpath backup=$backup"
+            continue
+          fi
+          chmod 600 "$retention_meta" 2>/dev/null || true
+        fi
         printf '%s|ELIGIBLE\n' "$key" >> "$CACHE"
         if submit "$flow_uid" "$cpath"; then
           printf '%s|SUBMITTED\n' "$key" >> "$STATE"
@@ -161,9 +172,15 @@ cleanup_one_backup_root() {
   container_root="$3"
   [ -d "$backup_root" ] || return 0
   now=$(date '+%s')
-  find "$backup_root" -type f -print 2>/dev/null | while IFS= read -r backup; do
-    backup_mtime=$(stat_mtime "$backup") || continue
-    age=$((now - backup_mtime))
+  find "$backup_root" -type f ! -name '*.retention' -print 2>/dev/null | while IFS= read -r backup; do
+    retention_meta="$backup.retention"
+    [ -r "$retention_meta" ] || continue
+    created=$(cat "$retention_meta" 2>/dev/null || true)
+    case "$created" in
+      ''|*[!0-9]*) continue ;;
+    esac
+    [ "$created" -le "$now" ] || continue
+    age=$((now - created))
     [ "$age" -ge "$BACKUP_RETENTION_SECONDS" ] || continue
     case "$backup" in
       "$backup_root"/*) relative=${backup#"$backup_root"/} ;;
@@ -181,7 +198,7 @@ cleanup_one_backup_root() {
     case "$probe" in
       *dv_profile=*|*DOVI*|*dovi*) continue ;;
     esac
-    rm -f "$backup"
+    rm -f "$backup" "$retention_meta"
     log "rollback-expired age=$age file=$cpath backup=$backup"
   done
 }

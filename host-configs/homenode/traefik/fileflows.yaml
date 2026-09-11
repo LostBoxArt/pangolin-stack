@@ -1,0 +1,16 @@
+http:
+  routers:
+    fileflows:
+      rule: "Host(`fileflows.dennisb.xyz`)"
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: cloudflare
+      service: fileflows-service
+
+  services:
+    fileflows-service:
+      loadBalancer:
+        servers:
+          - url: "http://fileflows:5000"
+        passHostHeader: true

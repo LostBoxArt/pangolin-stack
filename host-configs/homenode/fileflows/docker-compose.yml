@@ -5,6 +5,9 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:19200:5000"
+    networks:
+      - default
+      - traefik_traefik
     environment:
       - TZ=Asia/Jerusalem
       - PUID=1000
@@ -35,3 +38,7 @@ services:
     pids_limit: 64
     entrypoint: ["/bin/sh", "-c"]
     command: ["while true; do /volume1/docker/config/fileflows/automation/dv-watcher.sh; sleep 300; done"]
+
+networks:
+  traefik_traefik:
+    external: true

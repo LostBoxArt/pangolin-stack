@@ -9,6 +9,8 @@ FILEFLOWS_URL='http://127.0.0.1:19200/api/library-file/manually-add'
 STABLE_SECONDS=600
 MAX_SUBMISSIONS=1
 BACKUP_RETENTION_SECONDS=604800
+TV_BACKUP_ROOT='/volume1/media/tv/.fileflows-original-backups'
+MOVIES_BACKUP_ROOT='/volume1/media/movies/.fileflows-original-backups'
 DRY_RUN="${DRY_RUN:-0}"
 STATE="$BASE/submitted.tsv"
 CACHE="$BASE/probe-cache.tsv"
@@ -77,7 +79,7 @@ submit() {
 scan_root() {
   host_root="$1"
   container_root="$2"
-  find "$host_root" -type f \( -iname '*.mkv' -o -iname '*.mp4' -o -iname '*.m4v' \) -print 2>/dev/null > "$BASE/scan.list"
+  find "$host_root" -path "$host_root/.fileflows-original-backups" -prune -o -type f \( -iname '*.mkv' -o -iname '*.mp4' -o -iname '*.m4v' \) -print 2>/dev/null > "$BASE/scan.list"
   while IFS= read -r file; do
     if [ "$DRY_RUN" != '1' ] && [ "$SUBMITTED_THIS_RUN" -ge "$MAX_SUBMISSIONS" ]; then
       break
@@ -119,8 +121,8 @@ scan_root() {
       fi
       # Keep a same-filesystem rollback hardlink only for eligible files.
       case "$file" in
-        /volume1/media/tv/*) backup="$BASE/original-backups/tv/$relative" ;;
-        /volume1/media/movies/*) backup="$BASE/original-backups/movies/$relative" ;;
+        /volume1/media/tv/*) backup="$TV_BACKUP_ROOT/$relative" ;;
+        /volume1/media/movies/*) backup="$MOVIES_BACKUP_ROOT/$relative" ;;
         *) continue ;;
       esac
       if [ ! -e "$backup" ]; then
@@ -153,17 +155,22 @@ scan_root() {
   rm -f "$BASE/scan.list"
 }
 
-cleanup_backups() {
+cleanup_one_backup_root() {
+  backup_root="$1"
+  current_root="$2"
+  container_root="$3"
+  [ -d "$backup_root" ] || return 0
   now=$(date '+%s')
-  find "$BASE/original-backups" -type f -print 2>/dev/null | while IFS= read -r backup; do
+  find "$backup_root" -type f -print 2>/dev/null | while IFS= read -r backup; do
     backup_mtime=$(stat_mtime "$backup") || continue
     age=$((now - backup_mtime))
     [ "$age" -ge "$BACKUP_RETENTION_SECONDS" ] || continue
     case "$backup" in
-      "$BASE/original-backups/tv"/*) relative=${backup#"$BASE/original-backups/tv"/}; current="/volume1/media/tv/$relative"; cpath="/media/tv/$relative" ;;
-      "$BASE/original-backups/movies"/*) relative=${backup#"$BASE/original-backups/movies"/}; current="/volume1/media/movies/$relative"; cpath="/media/movies/$relative" ;;
+      "$backup_root"/*) relative=${backup#"$backup_root"/} ;;
       *) continue ;;
     esac
+    current="$current_root/$relative"
+    cpath="$container_root/$relative"
     [ -f "$current" ] || continue
     backup_inode=$(stat -c '%i' "$backup" 2>/dev/null || stat -f '%i' "$backup")
     current_inode=$(stat -c '%i' "$current" 2>/dev/null || stat -f '%i' "$current")
@@ -177,6 +184,11 @@ cleanup_backups() {
     rm -f "$backup"
     log "rollback-expired age=$age file=$cpath backup=$backup"
   done
+}
+
+cleanup_backups() {
+  cleanup_one_backup_root "$TV_BACKUP_ROOT" '/volume1/media/tv' '/media/tv'
+  cleanup_one_backup_root "$MOVIES_BACKUP_ROOT" '/volume1/media/movies' '/media/movies'
 }
 
 SUBMITTED_THIS_RUN=0

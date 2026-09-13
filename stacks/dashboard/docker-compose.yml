@@ -21,7 +21,7 @@ services:
 
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:v1.76.2
+    image: ghcr.io/homarr-labs/homarr:v1.77.1
     networks:
       - pangolin
     restart: unless-stopped

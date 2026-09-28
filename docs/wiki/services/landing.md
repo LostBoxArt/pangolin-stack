@@ -43,13 +43,6 @@ None — this is a bespoke static page built in-repo.
     restart: unless-stopped
     volumes:
       - ../../sites/dennisb-landing:/usr/share/nginx/html:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.linkstack.rule=Host(`example.com`)"
-      - "traefik.http.routers.linkstack.entrypoints=websecure"
-      - "traefik.http.routers.linkstack.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.linkstack.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.linkstack.loadbalancer.server.port=80"
 ```
 
 Note: Traefik router and service names intentionally kept as `linkstack-*`

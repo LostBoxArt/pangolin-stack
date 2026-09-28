@@ -12,15 +12,15 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-09-28
+last_lint: 2026-09-28
 ---
 # traefik
 
 Edge reverse-proxy and TLS terminator for everything exposed behind
 `*.example.com`. Shares Gerbil's network namespace.
 
-- **Image**: `traefik:latest` ⚠️ (upstream pins `v3.6`)
+- **Image**: `traefik:v3.7.13` (pinned to the verified running release)
 - **Compose file**: `stacks/core/docker-compose.yml`
 - **Network mode**: `service:gerbil` — all ports appear on the gerbil container
 - **Config**:
@@ -67,7 +67,7 @@ traefik:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: traefik:latest
+    image: traefik:v3.7.13
     network_mode: service:gerbil
     restart: unless-stopped
     volumes:
@@ -82,21 +82,58 @@ traefik:
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Image tag | `traefik:v3.6` | `traefik:latest` | ⚠️ unintentional drift |
+| Image tag | `traefik:v3.6` | `traefik:v3.7.13` | pinned to the verified running release — ✓ |
 | `rules/` bind | not in upstream | `../../config/traefik/rules:/rules` | intentional — we split dynamic rules |
 | Docker socket | not in upstream | mounted | intentional — Docker provider labels |
 | `wud.watch=false` label | n/a | present | tells `whatsupdocker`-style watchers to skip this image (we still pin manually) |
 
 ## Findings
 
-### F-TRAEFIK-1 — `:latest` tag (`high` / H1)
+### F-TRAEFIK-1 — `:latest` tag (`high` / H1, resolved 2026-09-28)
 Traefik minors are not always backward-compatible with middleware syntax.
 If an unattended `docker compose pull` on `core` grabs a Traefik 4.x with
 breaking changes, the proxy will fail to start and take down all public
 routes including Pangolin itself (which you need to log in and fix).
 
-The Badger plugin is already pinned in `traefik_config.yml` to
-`v1.4.0` — the image should match that pin discipline.
+The image is now pinned to `v3.7.13`, matching the verified running image
+digest. The Badger plugin remains pinned to `v1.7.0`.
+
+### F-TRAEFIK-3 — placeholder `*.example.com` labels burning Let's Encrypt quota (`high` / resolved 2026-09-28)
+Several service compose files carried leftover Traefik router labels still
+pointing at placeholder hostnames (`example.com`, `termix.example.com`,
+`home.example.com`, `dockhand.example.com`, `dash.example.com`,
+`auth.example.com`). Pangolin generates its own routers for those services via
+the `@http` provider, so the labels were redundant — but Traefik still tried to
+issue a certificate for every one of them, on every start. Let's Encrypt
+rejects them outright:
+
+```
+unable to generate a certificate for the domains [home.example.com]:
+urn:ietf:params:acme:error:rejectedIdentifier :: Cannot issue for
+"home.example.com": The ACME server refuses to issue a certificate for this
+domain name, because it is forbidden by policy
+```
+
+Measured rate: **45 failed ACME orders per day** (`rejectedIdentifier` count in
+`config/traefik/logs/traefik.log` before the fix; zero after). That burns the
+per-account failed-validation budget that the 25 real hostnames need, so a
+transient hiccup on a legitimate renewal could start hard-failing.
+
+Fixed by deleting the six label blocks. After the change Traefik reports zero
+`example.com` routers and no further rejected orders.
+
+**Rule:** never leave Traefik router labels pointing at hostnames that are not
+real, and never point two providers at the same FQDN. Either Pangolin owns a
+route or a docker label does — not both.
+
+### F-TRAEFIK-4 — CrowdSec trusted forwarded headers were wide open (`medium` / resolved 2026-09-28)
+`config/traefik/rules/dynamic_config.yml` had
+`ForwardedHeadersTrustedIPs: [0.0.0.0/0]`, meaning every client was trusted to
+supply `X-Forwarded-For`. Traefik is directly exposed, not behind a proxy that
+strips client headers, so anyone could have chosen which IP CrowdSec evaluates
+and bans. Narrowed to loopback, the private ranges, `100.89.137.0/20`, and the
+exact Cloudflare edge CIDRs (only the apex is still Cloudflare-proxied; every
+other host is grey-cloud and hits the origin directly).
 
 ### F-TRAEFIK-2 — docker.sock mounted read-write
 Traefik needs to *read* Docker events; it does not write. Some deployments
@@ -107,10 +144,10 @@ tracking as a future hardening step.
 
 ## Remediation
 
-### Fix F-TRAEFIK-1 — pin the image
+### Fix F-TRAEFIK-1 — pin the image (completed 2026-09-28)
 
 ```yaml
-    image: traefik:v3.6
+    image: traefik:v3.7.13
 ```
 
 Then commit, then `./stackctl.sh pull core` to verify the right digest is

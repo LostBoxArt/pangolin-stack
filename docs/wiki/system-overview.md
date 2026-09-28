@@ -82,7 +82,9 @@ Control and tunnel flow:
 
 ### Historical note
 - `adguard-home` was removed from the CloudNode on 2026-04-21 and is not part
-  of the active stack layout.
+  of the active stack layout. The dead `stacks/dns/` compose file, the
+  `dns-tls` (853) Traefik entrypoint, and `config/adguard-home/` were finally
+  deleted on 2026-09-28. The home router runs its own AdGuard and is unaffected.
 
 ## HomeNode Service Layout
 
@@ -170,9 +172,9 @@ All non-core stacks use the external `pangolin` Docker network.
 ## Current High-Priority Findings
 
 ### CloudNode
-- `C1` / `F-POCKETID-1`: Pocket-ID mounts the shared repo `data/` directory.
-- `H1` / `F-TRAEFIK-1`: Traefik image is still `:latest` instead of pinned.
-- `H2`: CrowdSec Traefik log mount should be read-only.
+- `F-CSWUI-3`: CrowdSec Web UI application authentication remains disabled; enabling it requires an operator-supplied initial admin credential or OIDC setup.
+- `F-CSWUI-4`: CrowdSec Web UI state permissions were tightened to `0700`/`0600`; monitor the WAL files after future upgrades.
+- `F-TRAEFIK-2`: Traefik still mounts the Docker socket read-write; socket-proxy hardening remains future work.
 
 ### HomeNode
 - `NC1` / `F-N-TRAEFIK-1`: HomeNode Traefik dashboard is exposed on `:9080` with `--api.insecure=true`.

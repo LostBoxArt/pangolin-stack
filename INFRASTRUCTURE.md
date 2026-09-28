@@ -95,15 +95,15 @@ Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everyth
 
 ## Pinned Versions
 
-- Pangolin: `fosrl/pangolin:1.17.0`
-- Gerbil: `fosrl/gerbil:1.3.1`
-- Traefik Badger plugin: `github.com/fosrl/badger@v1.4.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`
-- Newt (HomeNode): `fosrl/newt:1.11.0`
-- Olm (CloudNode systemd binary): `1.4.4` with `--override-dns=false`
+- Pangolin: `fosrl/pangolin:1.23.0`
+- Gerbil: `fosrl/gerbil:1.5.2`
+- Traefik Badger plugin: `github.com/fosrl/badger@v1.7.0`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.9.2`
+- Newt (HomeNode): `fosrl/newt:1.17.0`
+- Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
-Compatibility note: Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging and the newer provisioning-key site onboarding flow.
-Operational note: CrowdSec Web UI is pinned to `2026.3.1` because the `latest` tag pulled a broken image on March 30, 2026.
+Compatibility note: Newt `1.17.x` aligns with Pangolin `1.23.x` for private resource connection logging and the newer provisioning-key site onboarding flow.
+Operational note: CrowdSec Web UI is pinned to `2026.9.2` because the `latest` tag pulled a broken image on March 30, 2026.
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 
@@ -331,7 +331,7 @@ Add to crontab for daily refresh at 4 AM:
 ```bash
 crontab -e
 # Add this line:
-0 4 * * * /opt/homelab/scripts/blocklist-import.sh
+0 4 * * * /home/jesus/pangolin-stack/scripts/blocklist-import.sh
 ```
 
 ### View Imported Decisions

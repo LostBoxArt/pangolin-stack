@@ -12,19 +12,18 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-05-09
-last_lint: 2026-05-09
+last_ingested: 2026-09-28
+last_lint: 2026-09-28
 ---
 # homarr
 
 Personal landing / dashboard page at `home.example.com`. Embeds widgets for
 media services, torrents, system status, etc.
 
-- **Image**: `ghcr.io/homarr-labs/homarr:v1.61.1-beta.1` (pinned beta — saves ~70% memory vs `latest`) ⚠️
+- **Image**: `ghcr.io/homarr-labs/homarr:v1.77.2` (stable pin — the beta that saved ~70% memory has since landed in stable)
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
 - **Port**: `7575` (published on host, also Traefik-fronted)
 - **Data**: `/opt/homarr/appdata:/appdata` (host bind, **not** inside repo)
-- **Socket**: `/var/run/docker.sock` (for Docker integration widgets)
 - **TZ**: `Asia/Jerusalem`
 - **Env symlink**: `stacks/dashboard/.env` → `../../.env` (required — compose auto-load picks up `HOMARR_SECRET_KEY`)
 
@@ -52,10 +51,10 @@ services:
 
 ## Our Compose (relevant slice)
 
-```22:46:stacks/dashboard/docker-compose.yml
+```22:36:stacks/dashboard/docker-compose.yml
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:v1.61.1-beta.1
+    image: ghcr.io/homarr-labs/homarr:v1.77.2
     networks:
       - pangolin
     restart: unless-stopped
@@ -63,7 +62,6 @@ services:
       - qbit-proxy
     volumes:
       - /opt/homarr/appdata:/appdata
-      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 7575:7575
     environment:
@@ -71,13 +69,6 @@ services:
       - TZ=Asia/Jerusalem
     extra_hosts:
       - "torrent.example.com:192.168.1.10"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homarr.rule=Host(`home.example.com`)"
-      - "traefik.http.routers.homarr.entrypoints=websecure"
-      - "traefik.http.routers.homarr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.homarr.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
 ```
 
 ## Deviations
@@ -88,44 +79,46 @@ services:
 | `depends_on: qbit-proxy` | n/a | added | intentional — qBittorrent widget needs the proxy sidecar |
 | `extra_hosts` | n/a | added | intentional — resolves `torrent.example.com` to HomeNode directly |
 | Port publish | `7575:7575` | same | ✓ |
-| `:latest` tag | yes | no — pinned to `v1.61.1-beta.1` | intentional (memory savings, control over schema migrations) |
+| `:latest` tag | yes | no — pinned to `v1.77.2` | intentional (control over schema migrations) |
 | DB env | default (`better-sqlite3` + `/appdata/db/db.sqlite`) | default | ✓ |
 
 ## Findings
 
-### F-HOMARR-1 — `:latest` image tag → resolved: pinned to `v1.61.1-beta.1` (✓)
+### F-HOMARR-1 — `:latest` image tag → resolved, now on stable `v1.77.2` (✓)
 Update 2026-05-09: Switched from `:latest` (main branch) to `v1.61.1-beta.1` (beta branch).
-The beta merges 3 Node processes into 1 (#5600) plus idle-memory reduction (#5637),
-cutting memory from ~595 MiB to ~181 MiB. Tag is intentionally a beta release, not `:latest`.
+The beta merged 3 Node processes into 1 (#5600) plus idle-memory reduction (#5637),
+cutting memory from ~595 MiB to ~181 MiB.
 
-### F-HOMARR-1b — beta pin requires manual bump vigilance (`low`)
-The beta branch diverges from main (2 ahead, 96 behind as of 2026-05-09). Check
-[releases](https://github.com/homarr-labs/homarr/releases) periodically for stable
-releases that merge the memory work. When a stable release includes #5600, switch
-back to a stable tag.
+Update 2026-09-28: Now running the **stable** pin `v1.77.2`. The memory work has
+landed in stable and the beta branch is no longer needed.
 
 ### F-HOMARR-2 — no healthcheck (`low` / L3)
 Homarr exposes a health endpoint; adding a check helps the UI to signal
 startup progress and lets `stackctl.sh status` turn green reliably.
 
-### F-HOMARR-3 — `docker.sock` is optional, still mounted
-Fine — we use docker-integration widgets. Just noted for clarity: if you
-ever decide to disable docker widgets, drop the socket mount for defense in
-depth.
+### F-HOMARR-3 — `docker.sock` mount removed (✓ resolved 2026-09-28)
+Update 2026-09-28: The socket mount was removed. Homarr's `integration` table
+contained only `dashDot`, `qBittorrent`, and `archiveTeamWarrior` — there was
+**no Docker integration configured**, so the mount granted root-equivalent
+access to any container-escape for no functional benefit. Note that mounting the
+socket `:ro` would not have helped; the Docker API accepts writes through the
+socket regardless of the file mode, so removal was the only meaningful fix.
+
+Re-add only if a Docker widget is actually configured, and prefer
+`docker-socket-proxy` over the raw socket if that day comes.
 
 ## Remediation
 
 ### Fix F-HOMARR-1 (resolved)
 
-Pinned to `v1.61.1-beta.1`:
+Now pinned to stable `v1.77.2`:
 
 ```yaml
-    image: ghcr.io/homarr-labs/homarr:v1.61.1-beta.1
+    image: ghcr.io/homarr-labs/homarr:v1.77.2
 ```
 
-When a stable release includes the memory optimizations (PRs #5600, #5637), pin
-that stable tag instead. Check releases at
-<https://github.com/homarr-labs/homarr/releases>.
+The beta is no longer needed. Bump deliberately and check
+<https://github.com/homarr-labs/homarr/releases> before doing so.
 
 ### Fix F-HOMARR-2
 

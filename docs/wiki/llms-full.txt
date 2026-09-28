@@ -1,7 +1,7 @@
 # Pangolin Stack Wiki
 
 > LLM-oriented manifest for the Pangolin stack and its
-related homelab services as documented in `/opt/homelab`.
+related homelab services as documented in `/home/jesus/pangolin-stack`.
 
 - Scope boundary: this repo and wiki are home-only homelab context. Keep work/HPC/enterprise guidance out of answers that are grounded in this wiki unless a page explicitly says otherwise.
 

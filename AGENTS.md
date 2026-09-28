@@ -11,13 +11,12 @@ This file is the one-stop overview for agents working in this repo. It captures 
 
 ## Stack Organization
 
-Services are organized into 7 stacks under `stacks/`:
+Services are organized into 6 stacks under `stacks/`:
 
 | Stack | Services | Purpose |
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Infrastructure (starts first, creates `pangolin` network) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Protection & auth |
-| **dns** | adguard-home | DNS-over-HTTPS & filtering |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
@@ -28,7 +27,7 @@ Services are organized into 7 stacks under `stacks/`:
 
 ### Startup Order
 1. **core** (creates network, must start first)
-2. **security**, **management**, **dns** (can start in parallel)
+2. **security**, **management** (can start in parallel)
 3. **observability**, **dashboard**, **apps** (can start in parallel)
 
 All stacks except core use `networks.pangolin: external: true`.
@@ -43,9 +42,6 @@ Security:
 - CrowdSec: 6060/8080, LAPI and bouncers; ingests Traefik logs.
 - CrowdSec Web UI: admin UI for CrowdSec, 3458 (mapped to 3000 in container).
 - Pocket ID: auth provider, 1411 (behind Traefik).
-
-DNS:
-- AdGuard Home: DNS-over-HTTPS/DoT, 3000/53/853 (behind Traefik for UI).
 
 Observability:
 - Traefik Agent: log dashboard agent, 5000.
@@ -74,7 +70,6 @@ Apps:
 - LinkStack: https://example.com
 - CrowdSec Web UI: http://<cloudnode-ip>:3458
 - Dockhand: https://dockhand.example.com
-- AdGuard Home: https://dns.example.com
 
 ## Startup and Health
 - Use `./startup.sh` to pull images and start all stacks in phased order.
@@ -82,11 +77,11 @@ Apps:
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.17.1`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
-- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1` because the moving `latest` tag pulled a broken image on 2026-03-30.
-- HomeNode Newt is pinned to `1.11.0`.
-- CloudNode Olm runs as systemd binary `1.4.4` with `--override-dns=false`.
-- Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging and provisioning-key site creation.
+- Core pins: Pangolin `1.23.0`, Gerbil `1.5.2`, Traefik Badger plugin `v1.7.0`.
+- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.9.2` because the moving `latest` tag pulled a broken image on 2026-03-30.
+- HomeNode Newt is pinned to `1.17.0`.
+- CloudNode Olm runs as systemd binary `1.9.1` with `--override-dns=false`.
+- Newt `1.17.x` aligns with Pangolin `1.23.x` for private resource connection logging and provisioning-key site creation.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`
@@ -194,13 +189,7 @@ From `.env` (all are referenced in compose):
   uses a named local volume `termix_data`).
 - Homarr data is in `/opt/homarr/appdata` on the host.
 - Dockhand data is in `./data/dockhand`.
-- Docker socket is mounted for Traefik, Homarr, and Dockhand.
-
-## AdGuard Home (DNS)
-- Web UI: https://dns.example.com
-- DoH Endpoint: `https://dns.example.com/dns-query`
-- DoT Endpoint: `dns.example.com:853`
-- Manage blocklists and upstream DNS via the web UI.
+- Docker socket is mounted for Traefik and Dockhand.
 
 ## Known Operational Assumptions
 - Cloudflare DNS points `*.example.com` to the CloudNode IP with proxy enabled.

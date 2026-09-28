@@ -21,14 +21,14 @@ last_lint: 2026-04-17
 Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.
 
 ## Prerequisites
-- Repo path: `/opt/homelab`
+- Repo path: `/home/jesus/pangolin-stack`
 - Docker available on the CloudNode
 - `.env` present in the repo root
 
 ## Procedure
 1. Change to the repo root:
    ```bash
-   cd /opt/homelab
+   cd /home/jesus/pangolin-stack
    ```
 2. Force-recreate Traefik in the core stack:
    ```bash

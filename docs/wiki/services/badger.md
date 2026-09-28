@@ -24,7 +24,7 @@ edge.
 
 - **Type**: Traefik plugin (not a standalone container)
 - **Config**: `config/traefik/traefik_config.yml`
-- **Version**: `v1.4.0`
+- **Version**: `v1.7.0`
 - **LAPI key**: Issued by `cscli bouncers add traefik-badger`
 
 ## Upstream Sources
@@ -41,7 +41,7 @@ experimental:
   plugins:
     badger:
       moduleName: github.com/fosrl/badger
-      version: v1.4.0
+      version: v1.7.0
 
 http:
   middlewares:
@@ -56,7 +56,7 @@ http:
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Version | latest | pinned `v1.4.0` | aligned with Pangolin 1.17.x — ✓ |
+| Version | latest | pinned `v1.7.0` | aligned with Pangolin 1.23.x — ✓ |
 
 ## Findings
 

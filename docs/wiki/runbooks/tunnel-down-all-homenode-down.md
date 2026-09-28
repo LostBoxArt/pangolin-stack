@@ -318,7 +318,7 @@ ssh jesus@192.168.1.10 "docker logs newt --tail=10 2>&1"
 
 # 4. All public URLs respond
 for url in plex.example.com request.example.com dash.example.com \
-           dockhand.example.com termix.example.com hermi.example.com \
+           dockhand.example.com termix.example.com \
            home.example.com; do
   code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://$url/")
   echo "$url → $code"
@@ -523,7 +523,7 @@ sleep 60
 
 # Verify all public URLs
 for url in plex.example.com request.example.com dash.example.com \
-           dockhand.example.com termix.example.com hermi.example.com \
+           dockhand.example.com termix.example.com \
            home.example.com; do
   code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://$url/")
   echo "$url → $code"
@@ -581,7 +581,6 @@ ssh jesus@192.168.1.10 "curl -s -o /dev/null -w 'HTTP %{http_code}' --max-time 5
 | `dash.example.com` | 200 | Dashdot dashboard loads |
 | `dockhand.example.com` | 302 | Dockhand redirect to login |
 | `termix.example.com` | 200 | Termix web UI loads |
-| `hermi.example.com` | 302 | Hermes redirect |
 | `home.example.com` | 302 | Homarr redirect |
 
 Codes other than these (especially 502, 000, 503) indicate a problem with

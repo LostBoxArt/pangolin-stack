@@ -21,14 +21,14 @@ last_lint: 2026-04-17
 Use this to remediate `F-POCKETID-1 / C1`, where Pocket-ID mounts the shared repo `data/` directory instead of a dedicated path.
 
 ## Prerequisites
-- Repo path: `/opt/homelab`
+- Repo path: `/home/jesus/pangolin-stack`
 - Security stack downtime accepted
 - Backup recommended before moving DB or signing keys
 
 ## Procedure
 1. Stop the security stack:
    ```bash
-   cd /opt/homelab
+   cd /home/jesus/pangolin-stack
    ./stackctl.sh stop security
    ```
 2. Create the dedicated data directory and move Pocket-ID files:
@@ -39,11 +39,11 @@ Use this to remediate `F-POCKETID-1 / C1`, where Pocket-ID mounts the shared rep
    ```
 3. Update the Pocket-ID compose volume from:
    ```yaml
-   - ../../data:/app/data
+   - /home/jesus/pangolin-stack/data:/app/data
    ```
    to:
    ```yaml
-   - ../../data/pocket-id:/app/data
+   - /home/jesus/pangolin-stack/data/pocket-id:/app/data
    ```
 4. Start the security stack again:
    ```bash

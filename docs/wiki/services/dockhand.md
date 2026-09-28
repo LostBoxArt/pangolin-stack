@@ -56,7 +56,7 @@ volumes:
 
 ## Our Compose (relevant slice)
 
-```10:36:stacks/management/docker-compose.yml
+```11:26:stacks/management/docker-compose.yml
   dockhand:
     image: fnsys/dockhand:latest
     container_name: dockhand
@@ -72,16 +72,6 @@ volumes:
       - /opt/homelab/stacks:/opt/homelab/stacks
     environment:
       - TZ=UTC
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dockhand-redirect.rule=Host(`dockhand.example.com`)"
-      - "traefik.http.routers.dockhand-redirect.entrypoints=web"
-      - "traefik.http.routers.dockhand-redirect.middlewares=redirect-to-https@file"
-      - "traefik.http.routers.dockhand.rule=Host(`dockhand.example.com`)"
-      - "traefik.http.routers.dockhand.entrypoints=websecure"
-      - "traefik.http.routers.dockhand.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.dockhand.middlewares=security-headers@file"
-      - "traefik.http.services.dockhand.loadbalancer.server.port=3000"
 ```
 
 ## Deviations

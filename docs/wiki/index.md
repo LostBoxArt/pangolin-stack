@@ -71,14 +71,14 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`termix`](./services/termix.md) — Web-based SSH terminal / tunneling / file editor at `termix.example.com`.
 - [`traefik-log-dashboard (agent + UI)`](./services/traefik-log-dashboard.md) — Two services, one codebase: the **agent** tails Traefik's JSON access/error logs and exposes a parsed stream; the **dashboard** renders that stream in a React SPA with geolocation, status-code breakdowns, and service metrics.
 - [`traefik`](./services/traefik.md) — Edge reverse-proxy and TLS terminator for everything exposed behind `*.example.com`. Shares Gerbil's network namespace.
-- [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.4.0`). Not a container; runs inside Traefik.
-- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.4.4`), not a container.
+- [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.7.0`). Not a container; runs inside Traefik.
+- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.9.1`), not a container.
 
 ## CloudNode Services (Archived)
 - [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
 
 ## CloudNode Services (Removed)
-- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21**. iPhone now uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
+- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21, stack + config deleted 2026-09-28**. iPhone now uses `1.1.1.1` directly. Files recoverable at `.removed-20260928/`.
 
 ## HomeNode Services
 - [`HomeNode Media Stack Audit — 2026-09-05`](./services-homenode/media-stack-audit-2026-09-05.md) — Live, interruption-free audit of media notifications, monitoring, profiles, hardlink state, and deferred maintenance work.

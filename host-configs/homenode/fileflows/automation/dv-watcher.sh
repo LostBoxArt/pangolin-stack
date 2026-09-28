@@ -12,7 +12,7 @@ BACKUP_RETENTION_SECONDS=604800
 TV_BACKUP_ROOT='/volume1/media/tv/.fileflows-original-backups'
 MOVIES_BACKUP_ROOT='/volume1/media/movies/.fileflows-original-backups'
 DRY_RUN="${DRY_RUN:-0}"
-ALLOW_DAYTIME="${ALLOW_DAYTIME:-1}"
+ALLOW_DAYTIME="${ALLOW_DAYTIME:-0}"
 STATE="$BASE/submitted.tsv"
 CACHE="$BASE/probe-cache.tsv"
 LOG="$BASE/watcher.log"
@@ -29,8 +29,8 @@ log() {
   printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >> "$LOG"
 }
 
-# Processing is allowed at any time by default. Set ALLOW_DAYTIME=0 to
-# retain the overnight-only 01:00 through 07:59 gate.
+# Processing is overnight-only by default. Set ALLOW_DAYTIME=1 to allow daytime.
+# The overnight window is 01:00 through 07:59 in the FileFlows container timezone.
 if [ "$ALLOW_DAYTIME" != '1' ]; then
   hour=$(docker exec fileflows sh -c 'date +%H' 2>/dev/null || true)
   hour=${hour#0}

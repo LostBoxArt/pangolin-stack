@@ -382,3 +382,49 @@ artifacts.
 - arr-mcp stack health returned zero failures and zero degraded services after remediation; all adapters remain read-only and private.
 - The Radarr natural hardlink canary remains deferred because no post-migration Radarr import has occurred. The stable Prowlarr image is currently older than the running `develop` build, so switching channels was not performed without an authorized maintenance/source-of-truth update.
 
+
+## [2026-09-28] maintenance | WebUI removal, DNS stack deletion, and security cleanup
+- Removed `hermes-webui` entirely: compose service, `hermi.example.com` Pangolin resource, DB rows (`targets`, `roleResources`, 1896 `requestAuditLog` rows, its auto-created `resourcePolicies` row), container, and the `9119` publish. The container mounted `/home/jesus/.hermes` plus `docker.sock`, and a cron job (`ensure-hermes-dashboard.sh`) recreated it on boot and every 5 minutes — that cron entry and script were removed so it cannot come back. The separate `hermes-gateway` systemd platform is untouched and still active.
+- Deleted the dead `dns` stack: `stacks/dns/`, `config/adguard-home/`, and the `dns-tls` (853) entrypoint in `config/traefik/traefik_config.yml`. `dns` was dropped from the `stackctl.sh` stack list. The VPS AdGuard was never actually deployed, so no running container was lost. Discovered F-GERBIL-3 as a result: Gerbil still publishes `853:853`, but nothing listens behind it now.
+- Removed the six vestigial `*.example.com` Traefik labels from `stacks/{apps,dashboard,management,observability,security}/docker-compose.yml`. They duplicated Pangolin-owned routes and were causing **45 failed Let's Encrypt orders per day** (`rejectedIdentifier: "forbidden by policy"`), burning ACME rate-limit budget that real certs need. Post-change ACME failures: zero.
+- Security cleanup: `.env` and `config/pangolin/config.yml` locked from `644` to `600`; the five dead `ADGUARD_*` sync vars removed from `.env`; Homarr's unused `docker.sock` mount removed (no Docker integration was configured); CrowdSec `ForwardedHeadersTrustedIPs` narrowed from `0.0.0.0/0` to loopback + internal + the exact Cloudflare edge ranges so clients can no longer forge their source IP.
+- Updated `AGENTS.md` (6 stacks, not 7), `docs/wiki/index.md`, `docs/wiki/system-overview.md`, `docs/wiki/services/adguard-home.md`, `docs/wiki/services/gerbil.md`, and `docs/wiki/services/homarr.md`.
+- Verified after each step: all 12 remaining hostnames answer correctly, the HomeNode tunnel still serves `plex`, `hermes-gateway` stayed active, and `scripts/wiki_lint.py` passes clean.
+- Removed content is recoverable, not destroyed: `/home/jesus/pangolin-stack/.removed-20260928/` and `/home/jesus/.hermes/.removed-webui-20260928/`, plus `.bak-<timestamp>` copies beside each edited config.
+
+## [2026-09-28] maintenance | Version and path drift correction across all docs
+- Found and fixed widespread stale version pins and a wrong repo path that predated this session. Every value below was re-verified against the running stack, not inferred.
+- Version pins corrected everywhere (`AGENTS.md`, `README.md`, `INFRASTRUCTURE.md`, and the affected wiki service pages):
+  - Pangolin `1.17.1` / `1.17.0` / `1.18.1` → `1.23.0`
+  - Gerbil `1.3.1` → `1.5.2`
+  - Badger plugin `v1.4.0` → `v1.7.0`
+  - CrowdSec Web UI `2026.3.1` → `2026.8.3`
+  - Newt `1.11.0` / `1.12.3` → `1.17.0`
+  - Olm `1.4.4` → `1.5.0`
+  - Homarr `v1.61.1-beta.1` → stable `v1.77.2` (the memory work that justified the beta pin has landed in stable; `F-HOMARR-1b` deleted as obsolete)
+  - Lockstep triplets rewritten to match: Pangolin 1.23.x ↔ Newt 1.17.x ↔ Olm 1.5.0.
+- Corrected the repo path claim. `llms.txt`, `llms-full.txt`, and two runbooks claimed the repo lives at `/opt/homelab`, which broke the runbooks as written (`cd /opt/homelab` then `docker compose -f stacks/...` finds nothing). Real repo path is `/home/jesus/pangolin-stack`. `INFRASTRUCTURE.md` also documented the blocklist cron as `/opt/homelab/scripts/blocklist-import.sh`; the live crontab uses `/home/jesus/pangolin-stack/scripts/blocklist-import.sh`.
+- Deliberately kept the `/opt/homelab/stacks` references in `services/dockhand.md`: that is a real bind mount in the Dockhand compose, distinct from the repo path.
+- Re-verified the two gerbil deviations that older docs asserted for gerbil 1.3.1: `reachableAt` still uses port `3003` on 1.5.2 (`3003` answers, `3004` refuses), so the note now says "verified still correct on gerbil 1.5.2" instead of tying it to the old version.
+- Left in place, correctly: the dated review files `compose-review-2026-04-17.md` and `homenode-review-2026-04-17.md` are append-only, and their historical version references describe the stack as it was on that date.
+- `scripts/wiki_lint.py` passes clean after the changes.
+
+## [2026-09-28] maintenance | Three component upgrades applied and verified
+- Upgraded three components after checking each project's own upgrade docs first and confirming no undocumented manual steps were required:
+  - **Pocket-ID** `v2.15.0` → `v2.16.0`. Docs: <https://pocket-id.org/docs/setup/upgrading> — Docker upgrade is `pull` + `up -d`; no manual steps between these versions. Migrations ran automatically (`05-workflow-labels.sql`, `06-terminal-jobs.sql`). Verified: 2 users and 3 OIDC clients intact, `integrity_check=ok`, OIDC discovery/JWKS/login all 200.
+  - **CrowdSec Web UI** `2026.8.3` → `2026.9.2`. Confirmed 2026.8.3 had already migrated from `config.json` to `config.yaml`, so there was no config-format break to handle. Verified: healthy, LAPI `isConnected: true`, alerts API 200, 27 tables intact.
+  - **Olm** `1.5.0` → `1.9.1` (CloudNode systemd binary, not a container). Verified the 1.9.1 binary still accepts `--override-dns` so `ExecStart` is unchanged. Verified: `active`, `NRestarts=0`, WireGuard CONNECTED to site 1 at 127ms RTT, 0 errors from the new PID, tunnel reachable.
+- Backups taken before each change using the SQLite online-backup API, not `cp` (both Pocket-ID and CrowdSec Web UI run WAL-mode SQLite): `/tmp/pid-20260928-123257.db` and `/tmp/csw-20260928-123459.db`, both `integrity_check=ok`. Olm rollback copies at `/usr/local/bin/olm.1.5.0.rollback` and `/tmp/olm-1.5.0-current`.
+- Investigated and dismissed a suspected SSO regression: `dash.example.com` and `fileflows.example.com` appeared to flip 200→401 after the Pocket-ID upgrade. Rotated access logs show `dash` has been `{401:413, 302:276}` continuously since 2026-09-24 and `fileflows` `{401:37, 302:23, 403:5}` since 2026-09-25 — neither ever served 200 unauthenticated. SSO is enforcing correctly (unauthenticated 401; browser 302 → `pangolin.example.com/auth/resource/...`). No regression.
+- Corrected stale facts found while verifying: `services/pocket-id.md` documented the image as the floating `:v2` tag; the real pin is `v2.16.0` (now documented as exact-minor, `F-POCKETID-3`). `services/crowdsec-web-ui.md` claimed the UI was "not behind Traefik"; it is in fact fronted by Pangolin with SSO enforced, and only host port 3458 is filtered.
+- New findings recorded: `F-POCKETID-3` (floating major tag, resolved), `F-POCKETID-4` (WAL-mode DB, naive copies are not backups), `F-CSWUI-3` (application auth disabled), `F-CSWUI-4` (1.8 GB state dir with permissive modes).
+- Everything else was already current and needed no action: Pangolin 1.23.0, Gerbil 1.5.2, Newt 1.17.0, Badger v1.7.0, Traefik 3.7.13, CrowdSec v1.8.1, Homarr v1.77.2, Termix 2.8.0, Dashdot 6.3.4.
+- `scripts/wiki_lint.py` passes clean after the changes.
+
+## [2026-09-28] maintenance | Pocket-ID isolation, Traefik pin, and Gerbil cleanup
+- Migrated Pocket-ID state from the shared repo-wide `data/` mount into the dedicated `data/pocket-id/` path.
+- Created a rollback snapshot with SQLite online backup before the move; verified the live database afterward with `integrity_check=ok`, 2 users, and 3 OIDC clients.
+- Pinned Traefik from the mutable `latest` tag to `v3.7.13`; the tag resolves to the same verified running digest.
+- Removed Gerbil's dead `853/tcp` publish and recreated Gerbil followed by Traefik; public routing and the HomeNode tunnel remained healthy.
+- Tightened CrowdSec Web UI state permissions to `0700`/`0600`. Application-level auth remains disabled pending an operator-supplied admin credential or OIDC configuration; no unsafe credential was invented.
+- Verified all six Compose files, the public endpoints, core container state, Pocket-ID database integrity, and CrowdSec Web UI health.

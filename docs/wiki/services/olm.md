@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-21
-last_lint: 2026-04-21
+last_ingested: 2026-09-28
+last_lint: 2026-09-28
 ---
 
 # olm
@@ -24,7 +24,7 @@ Docker container.
 
 - **Type**: systemd service (not a container)
 - **Binary**: `/usr/local/sbin/olm`
-- **Version**: `1.4.4`
+- **Version**: `1.9.1`
 - **Runtime flag**: `--override-dns=false`
 
 ## Upstream Sources
@@ -63,7 +63,7 @@ needed. See `docs/wiki/runbooks/check-homenode-reachability-via-olm.md`.
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Version | latest | pinned `1.4.4` | aligned with Pangolin 1.17.x — ✓ |
+| Version | latest | pinned `1.9.1` | aligned with Pangolin 1.23.x — ✓ |
 | DNS override | default | `--override-dns=false` | prevents resolver drift inside Olm |
 
 ## Findings

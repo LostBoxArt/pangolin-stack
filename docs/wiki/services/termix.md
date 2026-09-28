@@ -72,7 +72,7 @@ don't include it.
 
 ## Our Compose (relevant slice)
 
-```37:53:stacks/apps/docker-compose.yml
+```21:31:stacks/apps/docker-compose.yml
   termix:
     image: ghcr.io/lukegus/termix:latest
     container_name: termix
@@ -83,18 +83,11 @@ don't include it.
       - termix_data:/app/data
     environment:
       - PORT=8080
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.termix.rule=Host(`termix.example.com`)"
-      - "traefik.http.routers.termix.entrypoints=websecure"
-      - "traefik.http.routers.termix.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.termix.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.termix.loadbalancer.server.port=8080"
 ```
 
 And:
 
-```60:62:stacks/apps/docker-compose.yml
+```32:34:stacks/apps/docker-compose.yml
   termix_data:
     driver: local
 ```

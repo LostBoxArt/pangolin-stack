@@ -70,10 +70,3 @@ services:
       - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
     volumes:
       - /:/mnt/host:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashdot.rule=Host(`dash.example.com`)"
-      - "traefik.http.routers.dashdot.entrypoints=websecure"
-      - "traefik.http.routers.dashdot.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.dashdot.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.dashdot.loadbalancer.server.port=3001"

@@ -50,7 +50,7 @@ Upstream *recommends* `privileged: true`. We explicitly avoid this and use
 
 ## Our Compose (relevant slice)
 
-```59:79:stacks/observability/docker-compose.yml
+```59:73:stacks/observability/docker-compose.yml
   dashdot:
     image: mauricenino/dashdot:latest
     container_name: dashdot
@@ -65,13 +65,6 @@ Upstream *recommends* `privileged: true`. We explicitly avoid this and use
       - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
     volumes:
       - /:/mnt/host:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashdot.rule=Host(`dash.example.com`)"
-      - "traefik.http.routers.dashdot.entrypoints=websecure"
-      - "traefik.http.routers.dashdot.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.dashdot.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.dashdot.loadbalancer.server.port=3001"
 ```
 
 ## Deviations

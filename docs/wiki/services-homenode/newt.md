@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/newt/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-10
+last_lint: 2026-10-10
 ---
 # newt
 
@@ -22,7 +22,7 @@ from HomeNode to the CloudNode Pangolin so that LAN services can be reached from
 the public `*.example.com` without opening inbound ports on the home
 router.
 
-- **Image**: `fosrl/newt:1.17.0` ✓ (pinned — matches Pangolin 1.23.x)
+- **Image**: `fosrl/newt:1.18.1` ✓ (pinned — matches Pangolin 1.24.x)
 - **Compose file**: `/volume1/docker/config/newt/docker-compose.yml`
 - **Tracked copy**: **not tracked** (finding NM1)
 - **Network**: `traefik_traefik` + `default`
@@ -34,20 +34,20 @@ router.
 
 Version alignment is mandatory:
 
-- Pangolin 1.23.x ↔ Newt 1.17.x ↔ Olm 1.9.1 ↔ Gerbil 1.5.2 (per `AGENTS.md`)
+- Pangolin 1.24.x ↔ Newt 1.18.x ↔ Olm 1.9.1 ↔ Gerbil 1.5.2 (Pangolin 1.24 requires Newt 1.18.0+ for private exit-node resources)
 
 ## Our Compose
 
 ```yaml
 services:
   newt:
-    image: fosrl/newt:1.17.0
+    image: fosrl/newt:1.18.1
     container_name: newt
     restart: unless-stopped
     environment:
       - PANGOLIN_ENDPOINT=https://pangolin.example.com
-      - NEWT_ID=8d7jieh8md475z8
-      - NEWT_SECRET=85a8sjbtpdvzxrigwqw0jkotokmyskvfj4vc04umhvgks3fc
+      - NEWT_ID=<stored-in-private-env>
+      - NEWT_SECRET=<stored-in-private-env>
     networks:
       - default
       - traefik_traefik
@@ -57,7 +57,7 @@ services:
 
 | Aspect | Recommended | Ours | Intent |
 |---|---|---|---|
-| Version | pinned | `1.17.0` ✓ | intentional, aligned |
+| Version | pinned | `1.18.1` ✓ | intentional, aligned |
 | `NEWT_ID` | in `.env` | **in compose** | unintentional — credential leak |
 | `NEWT_SECRET` | in `.env` | **in compose** | unintentional — credential leak |
 | Healthcheck | recommended | none | drift |
@@ -92,8 +92,8 @@ Will need sanitization before tracking (strip secrets into `.env`).
 On HomeNode, create `/volume1/docker/config/newt/.env`:
 
 ```
-NEWT_ID=8d7jieh8md475z8
-NEWT_SECRET=85a8sjbtpdvzxrigwqw0jkotokmyskvfj4vc04umhvgks3fc
+NEWT_ID=<stored-in-private-env>
+NEWT_SECRET=<stored-in-private-env>
 ```
 
 Update compose:
@@ -101,7 +101,7 @@ Update compose:
 ```yaml
 services:
   newt:
-    image: fosrl/newt:1.17.0
+    image: fosrl/newt:1.18.1
     container_name: newt
     restart: unless-stopped
     env_file: [.env]
@@ -128,7 +128,7 @@ via Pangolin UI → Sites → this site → regenerate credentials.
       start_period: 20s
 ```
 
-Adjust the port/path against what Newt 1.17.0 actually exposes (the
+Adjust the port/path against what Newt 1.18.1 actually exposes (the
 socket may be different — `docker exec newt netstat -tlnp` will tell you).
 
 ### Fix F-N-NEWT-3

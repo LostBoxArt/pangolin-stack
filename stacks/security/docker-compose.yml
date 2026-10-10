@@ -52,8 +52,9 @@ services:
 
   crowdsec-web-ui:
     # Pin a known-good release; the moving latest tag pulled a broken image on 2026-03-30.
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.9.2
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3
     container_name: crowdsec-web-ui
+    user: "1001:1001"
     networks:
       - pangolin
     restart: unless-stopped
@@ -66,12 +67,11 @@ services:
       CROWDSEC_URL: http://crowdsec:8080
       CROWDSEC_USER: crowdsec-web-ui
       CROWDSEC_PASSWORD: ${CROWDSEC_WEB_UI_PASSWORD}
-      DB_DIR: /app/config
     volumes:
-      - /home/jesus/pangolin-stack/config/crowdsec-web-ui:/app/config
+      - /home/jesus/pangolin-stack/config/crowdsec-web-ui:/app/data
 
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.16.0
+    image: ghcr.io/pocket-id/pocket-id:v2.18.0
     container_name: pocket-id
     networks:
       - pangolin

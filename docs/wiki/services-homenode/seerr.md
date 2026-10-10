@@ -12,15 +12,15 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/seerr/docker-compose.yml", "host-configs/homenode/seerr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-09-05
-last_lint: 2026-09-05
+last_ingested: 2026-10-10
+last_lint: 2026-10-10
 ---
 # seerr
 
 Media request front-end for end users — they ask for a movie / show, it
 hands the request to Sonarr / Radarr for fulfilment.
 
-- **Image**: `ghcr.io/seerr-team/seerr:v3.4.1` ✓
+- **Image**: `ghcr.io/seerr-team/seerr:v3.5.0` ✓
 - **Compose file**: `/volume1/docker/config/seerr/docker-compose.yml`
 - **Tracked copy**: `host-configs/homenode/seerr/docker-compose.yml` ✓
 - **Port (internal)**: `5055`
@@ -38,7 +38,7 @@ hands the request to Sonarr / Radarr for fulfilment.
 ```yaml
 services:
   seerr:
-    image: ghcr.io/seerr-team/seerr:v3.4.1
+    image: ghcr.io/seerr-team/seerr:v3.5.0
     container_name: seerr
     init: true
     restart: unless-stopped
@@ -68,7 +68,7 @@ services:
 
 ### Current Deployment (verified 2026-09-05)
 
-- Container: `seerr` on HomeNode; image `ghcr.io/seerr-team/seerr:v3.4.1`.
+- Container: `seerr` on HomeNode; image `ghcr.io/seerr-team/seerr:v3.5.0`.
 - Data: `/volume1/docker/config/jellyseerr:/app/config`.
 - Compose source: `/volume1/docker/config/seerr/docker-compose.yml`.
 - Healthcheck: healthy; internal Traefik route returned HTTP 200.
@@ -77,9 +77,9 @@ services:
 
 ## Deviations / Findings
 
-### F-N-SEERR-1 — official Seerr project and pinned stable release (resolved 2026-09-05)
+### F-N-SEERR-1 — official Seerr project and pinned stable release (resolved 2026-10-10)
 `seerr-team/seerr` is the official Seerr project. The live container was
-verified at stable release `v3.4.1`, which is also the current upstream latest
+verified at stable release `v3.5.0`, which is also the current upstream latest
 release. Keep the image pinned to that tag and check the official release page
 before future upgrades.
 
@@ -87,15 +87,15 @@ before future upgrades.
 `/volume1/docker/config/jellyseerr:/app/config` is the verified live mount.
 The directory name differs from the service name because this state originated
 as Jellyseerr. It must not be renamed during routine maintenance. A verified
-backup was created before the v3.4.1 recreation; the settings and database
+backup was created before the v3.5.0 recreation; the settings and database
 hashes were unchanged.
 
 ### F-N-SEERR-3 — commented IPAM removed (resolved 2026-09-05)
 The live Compose definition uses the external `traefik_traefik` network without a
 hard-coded container address or dangling IPAM comment.
 
-### F-N-SEERR-4 — mutable image tag (resolved 2026-09-05)
-The image is now pinned to the verified upstream stable release `v3.4.1`.
+### F-N-SEERR-4 — mutable image tag (resolved 2026-10-10)
+The image is now pinned to the verified upstream stable release `v3.5.0`.
 Future upgrades must compare the official release tag and image digest first.
 
 ### F-N-SEERR-5 — `LOG_LEVEL=debug` in steady state (`low`)
@@ -105,10 +105,12 @@ Drop to `info` once the fork is stable in your environment.
 
 ## Remediation
 
-No image migration is required. Keep `ghcr.io/seerr-team/seerr:v3.4.1` and
+No image migration is required. Keep `ghcr.io/seerr-team/seerr:v3.5.0` and
 upgrade only after checking the official release and preserving a verified
 backup of the `jellyseerr` data directory.
-### Positive baseline items (keep these)
+### v3.5.0 breaking-change check
+
+Seerr v3.5.0 changed the Plex/Jellyfin library API: the library read endpoints no longer accept `sync` or `enable` query parameters and reading no longer changes enabled state. The deployment has no local client using those parameters. After the upgrade, Seerr remained healthy, the request inventory remained 69 records, and the media MCP reported all seven configured services healthy.
 
 This is actually one of the better-hardened compose files on HomeNode:
 

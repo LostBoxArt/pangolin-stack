@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-09-28
-last_lint: 2026-09-28
+last_ingested: 2026-10-10
+last_lint: 2026-10-10
 ---
 # gerbil
 
@@ -95,7 +95,7 @@ gerbil:
 |---|---|---|---|
 | Version | templated | pinned `1.5.2` | aligned with Pangolin 1.23.x — ✓ |
 | `reachableAt` port | `3004` | `3003` | **verified still correct on gerbil 1.5.2** — `3003` answers, `3004` refuses; don't "fix" this without re-testing |
-| `remoteConfig` endpoint | `/api/v1/` | `/api/v1/gerbil/get-config` + explicit `--reportBandwidthTo` | split endpoints still accepted on gerbil 1.5.2 / pangolin 1.23.0 — ✓ |
+| `remoteConfig` endpoint | `/api/v1/` | `/api/v1/gerbil/get-config` + explicit `--reportBandwidthTo` | split endpoints still accepted on gerbil 1.5.2 / pangolin 1.24.0 — ✓ |
 | `443/udp` (HTTP/3) | exposed | **not exposed** | unintentional drift |
 | `853/tcp` | not exposed | removed 2026-09-28 | AdGuard CloudNode stack is gone; no listener remains |
 | Healthcheck | none | none | matches upstream |

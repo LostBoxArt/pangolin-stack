@@ -66,7 +66,7 @@ services:
   mysql:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: xeFgUGb5mPPn5q2d
+      MYSQL_ROOT_PASSWORD: <stored-in-private-env>
 ```
 
 Upstream assumes MySQL. LinkStack *also* supports SQLite out of the box,

@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-21
+last_ingested: 2026-10-10
+last_lint: 2026-10-10
 ---
 # pangolin
 
@@ -21,7 +21,7 @@ Fossorial Pangolin — control plane, dashboard, API, and database for the
 whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read
 config from it.
 
-- **Image**: `fosrl/pangolin:1.23.0`
+- **Image**: `fosrl/pangolin:1.24.0`
 - **Compose file**: `stacks/core/docker-compose.yml`
 - **Internal port**: `3001/tcp` (fronted by Traefik at `pangolin.example.com`)
 - **Data**: `./config/` (bound into container at `/app/config`, includes
@@ -74,7 +74,7 @@ pangolin:
         - -f
         - http://localhost:3001/api/v1/
       timeout: 3s
-    image: fosrl/pangolin:1.23.0
+    image: fosrl/pangolin:1.24.0
     restart: unless-stopped
     volumes:
       - ../../config:/app/config
@@ -84,7 +84,7 @@ pangolin:
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Version | templated (latest supported) | pinned `1.23.0` | Aligns with Newt 1.17.x, Olm 1.9.1 (per `AGENTS.md`) — ✓ |
+| Version | templated (latest supported) | pinned `1.24.0` | Aligns with Newt 1.18.x, Olm 1.9.1 (per `AGENTS.md`) — ✓ |
 | `deploy.resources` | `limits: 1g`, `reservations: 256m` | none | unintentional drift |
 | Healthcheck timing | 10s / 10s / 15 | 3s / 3s / 5 | aggressive; more CPU churn |
 | Network | `default` renamed `pangolin` | explicit `pangolin` | equivalent |
@@ -157,5 +157,5 @@ Or adjust the compose volume to mount `config/pangolin` directly to
 - When bumping the pin, read
   <https://github.com/fosrl/pangolin/releases> *and*
   <https://docs.pangolin.net/self-host/how-to-update> first.
-- Pangolin 1.23.x ↔ Newt 1.17.x ↔ Olm 1.9.1 — keep this triplet in lockstep.
+- Pangolin 1.24.x ↔ Newt 1.18.x ↔ Olm 1.9.1 — keep this compatibility set aligned. Pangolin 1.24 requires Newt 1.18.0+ for private exit-node resources.
 - Backup `config/db/` before every upgrade (`./backup.sh`).

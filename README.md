@@ -25,15 +25,16 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 
 ## Version Pins
 
-- Pangolin: `fosrl/pangolin:1.23.0`
+- Pangolin: `fosrl/pangolin:1.24.0`
 - Gerbil: `fosrl/gerbil:1.5.2`
+- Traefik: `traefik:v3.7.14`
 - Traefik Badger plugin: `v1.7.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.9.2`
-- Newt (HomeNode): `fosrl/newt:1.17.0`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3`
+- Newt (HomeNode): `fosrl/newt:1.18.1`
 - Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
-Newt `1.17.x` aligns with Pangolin `1.23.x` for HTTPS private resources, alerting, multi-site routing, and WebSocket upgrades on private HTTP resources.
-CrowdSec Web UI is pinned to `2026.9.2` because the moving `latest` tag pulled a broken image on March 30, 2026.
+Newt `1.18.x` aligns with Pangolin `1.24.x`; Pangolin 1.24 requires Newt `1.18.0+` for private exit-node resources.
+CrowdSec Web UI is pinned to `2026.10.3`; this release migrated the state directory to the image's `/app/data` layout, so the compose mount and runtime UID are explicit.
 Traefik shares Gerbil's network namespace. If `gerbil` is recreated during an upgrade, recreate `traefik` immediately afterward:
 
 ```bash

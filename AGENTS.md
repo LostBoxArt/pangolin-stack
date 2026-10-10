@@ -77,11 +77,11 @@ Apps:
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.23.0`, Gerbil `1.5.2`, Traefik Badger plugin `v1.7.0`.
-- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.9.2` because the moving `latest` tag pulled a broken image on 2026-03-30.
-- HomeNode Newt is pinned to `1.17.0`.
+- Core pins: Pangolin `1.24.0`, Gerbil `1.5.2`, Traefik `v3.7.14`, Badger plugin `v1.7.0`.
+- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3`; its persistent state uses `/app/data` and the host service UID.
+- HomeNode Newt is pinned to `1.18.1`.
 - CloudNode Olm runs as systemd binary `1.9.1` with `--override-dns=false`.
-- Newt `1.17.x` aligns with Pangolin `1.23.x` for private resource connection logging and provisioning-key site creation.
+- Newt `1.18.x` aligns with Pangolin `1.24.x`; Pangolin 1.24 requires Newt `1.18.0+` for private exit-node resources.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`

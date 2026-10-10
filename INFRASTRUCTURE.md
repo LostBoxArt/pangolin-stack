@@ -95,15 +95,16 @@ Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everyth
 
 ## Pinned Versions
 
-- Pangolin: `fosrl/pangolin:1.23.0`
+- Pangolin: `fosrl/pangolin:1.24.0`
 - Gerbil: `fosrl/gerbil:1.5.2`
+- Traefik: `traefik:v3.7.14`
 - Traefik Badger plugin: `github.com/fosrl/badger@v1.7.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.9.2`
-- Newt (HomeNode): `fosrl/newt:1.17.0`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3`
+- Newt (HomeNode): `fosrl/newt:1.18.1`
 - Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
-Compatibility note: Newt `1.17.x` aligns with Pangolin `1.23.x` for private resource connection logging and the newer provisioning-key site onboarding flow.
-Operational note: CrowdSec Web UI is pinned to `2026.9.2` because the `latest` tag pulled a broken image on March 30, 2026.
+Compatibility note: Newt `1.18.x` aligns with Pangolin `1.24.x`; Pangolin 1.24 requires Newt `1.18.0+` for private exit-node resources.
+Operational note: CrowdSec Web UI `2026.10.3` uses `/app/data` as its persistent state path and runs as the host service UID in this deployment.
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 

@@ -428,3 +428,10 @@ artifacts.
 - Removed Gerbil's dead `853/tcp` publish and recreated Gerbil followed by Traefik; public routing and the HomeNode tunnel remained healthy.
 - Tightened CrowdSec Web UI state permissions to `0700`/`0600`. Application-level auth remains disabled pending an operator-supplied admin credential or OIDC configuration; no unsafe credential was invented.
 - Verified all six Compose files, the public endpoints, core container state, Pocket-ID database integrity, and CrowdSec Web UI health.
+
+## [2026-10-10] maintenance | Stack version documentation and stale media metadata
+- Updated current version references to the live CloudNode pins: Pangolin 1.24.0, Traefik v3.7.14, Homarr v2.4.0, Pocket-ID v2.18.0, and CrowdSec Web UI 2026.10.3.
+- Updated current HomeNode references to Newt 1.18.1, Seerr v3.5.0, Recyclarr 8.7.3, and FileFlows 26.10 with its verified digest in the tracked Compose copy.
+- Preserved dated historical audit references as historical rather than rewriting them into current-state claims.
+- Removed a stale Sonarr record for *The Grand Tour (2026)* with `deleteFiles=false`; the six existing files and Plex/Jellyfin library entry remain intact. The current TVDB record remains marked deleted, so the series is not re-added to Sonarr until a valid metadata mapping exists.
+- Sanitized credential-like values from documentation examples before publication; real values remain in private runtime configuration only.

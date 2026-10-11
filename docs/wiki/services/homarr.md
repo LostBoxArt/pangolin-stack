@@ -20,7 +20,7 @@ last_lint: 2026-10-10
 Personal landing / dashboard page at `home.example.com`. Embeds widgets for
 media services, torrents, system status, etc.
 
-- **Image**: `ghcr.io/homarr-labs/homarr:v2.4.0` (stable pin — v2 migration completed and database verified)
+- **Image**: `ghcr.io/homarr-labs/homarr:v2.4.1` (stable pin — v2 migration completed and database verified)
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
 - **Port**: `7575` (published on host, also Traefik-fronted)
 - **Data**: `/opt/homarr/appdata:/appdata` (host bind, **not** inside repo)
@@ -54,7 +54,7 @@ services:
 ```22:36:stacks/dashboard/docker-compose.yml
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:v2.4.0
+    image: ghcr.io/homarr-labs/homarr:v2.4.1
     networks:
       - pangolin
     restart: unless-stopped
@@ -79,17 +79,17 @@ services:
 | `depends_on: qbit-proxy` | n/a | added | intentional — qBittorrent widget needs the proxy sidecar |
 | `extra_hosts` | n/a | added | intentional — resolves `torrent.example.com` to HomeNode directly |
 | Port publish | `7575:7575` | same | ✓ |
-| `:latest` tag | yes | no — pinned to `v2.4.0` | intentional (control over schema migrations) |
+| `:latest` tag | yes | no — pinned to `v2.4.1` | intentional (control over schema migrations) |
 | DB env | default (`better-sqlite3` + `/appdata/db/db.sqlite`) | default | ✓ |
 
 ## Findings
 
-### F-HOMARR-1 — `:latest` image tag → resolved, now on stable `v2.4.0` (✓)
+### F-HOMARR-1 — `:latest` image tag → resolved, now on stable `v2.4.1` (✓)
 Update 2026-05-09: Switched from `:latest` (main branch) to `v1.61.1-beta.1` (beta branch).
 The beta merged 3 Node processes into 1 (#5600) plus idle-memory reduction (#5637),
 cutting memory from ~595 MiB to ~181 MiB.
 
-Update 2026-10-10: Upgraded to the pinned v2 migration release `v2.4.0`. The
+Update 2026-10-10: Upgraded to the pinned v2 migration release `v2.4.1`. The
 SQLite database passed integrity verification after migration; the board and
 application inventory remained intact. The Docker socket remains intentionally
 absent.
@@ -113,10 +113,10 @@ Re-add only if a Docker widget is actually configured, and prefer
 
 ### Fix F-HOMARR-1 (resolved)
 
-Now pinned to stable `v2.4.0`:
+Now pinned to stable `v2.4.1`:
 
 ```yaml
-    image: ghcr.io/homarr-labs/homarr:v2.4.0
+    image: ghcr.io/homarr-labs/homarr:v2.4.1
 ```
 
 The beta is no longer needed. Bump deliberately and check

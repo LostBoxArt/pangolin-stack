@@ -78,7 +78,6 @@ Control and tunnel flow:
 
 ### Apps
 - `landing`
-- `termix`
 
 ### Historical note
 - `adguard-home` was removed from the CloudNode on 2026-04-21 and is not part
@@ -134,7 +133,6 @@ All non-core stacks use the external `pangolin` Docker network.
 - `https://home.example.com`
 - `https://dash.example.com`
 - `https://traefik-logs.example.com`
-- `https://termix.example.com`
 - `https://example.com`
 
 ## Critical Operational Rules

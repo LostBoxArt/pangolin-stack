@@ -100,7 +100,7 @@ add your IP to the Allowlist (Security → WAF → Tools).
 
 ## HomeNode SSH Tunnel Issues (separate from 403s)
 
-If Termix or other SSH-through-tunnel connections fail with "Connection lost
+If SSH-through-tunnel client connections fail with "Connection lost
 before handshake" while direct CloudNode SSH works:
 
 ### Diagnosis

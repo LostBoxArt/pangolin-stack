@@ -48,7 +48,6 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [qbit-proxy](./services/qbit-proxy.md)
 - [landing](./services/landing.md)
 - [linkstack](./services/linkstack.md) (archived)
-- [termix](./services/termix.md)
 
 ### HomeNode services
 - [traefik (HomeNode)](./services-homenode/traefik.md)
@@ -67,6 +66,12 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [plex](./services-homenode/plex.md)
 - [seerr](./services-homenode/seerr.md)
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
+
+## Current security snapshot (verified 2026-10-23)
+
+- Pangolin `1.25.3` runs Node `v24.22.1`, resolving the Node2Shell advisory; current Traefik is `v3.7.16` and Badger remains `v1.7.0` because upstream reports `v1.8.0` fails Traefik's plugin integrity check.
+- HomeNode Newt `1.19.0`, CloudNode Olm `1.9.1`, Gerbil `1.5.2`, Homarr `v2.8.0`, Pocket-ID `v2.19.1`, and CrowdSec Web UI `2026.10.9` were verified in the current deployment. See the service pages for evidence and sources.
+- qbit-proxy runs Node `v24.22.1` on the `node:24-slim` base; internal and routed HTTP probes returned 200 after the rebuild.
 
 ## Critical Rules
 

@@ -17,18 +17,3 @@ services:
     volumes:
       - /home/jesus/pangolin-stack/sites/dennisb-landing:/usr/share/nginx/html:ro
       - /home/jesus/pangolin-stack/sites/dennisb-landing/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-
-  termix:
-    image: ghcr.io/lukegus/termix:latest
-    container_name: termix
-    networks:
-      - pangolin
-    restart: unless-stopped
-    volumes:
-      - termix_data:/app/data
-    environment:
-      - PORT=8080
-
-volumes:
-  termix_data:
-    driver: local

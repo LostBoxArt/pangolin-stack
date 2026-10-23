@@ -29,8 +29,8 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [Glossary](./glossary.md): compact definitions for recurring terms
 - [LLM Wiki Pattern](./llm-wiki-pattern.md): adopted external best practices
 - [Wiki Log](./log.md): append-only structural maintenance log
-- [Compose Review 2026-04-17](./compose-review-2026-04-17.md): latest CloudNode audit
-- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md): latest HomeNode audit
+- [Compose Review 2026-04-17](./compose-review-2026-04-17.md): latest dated full CloudNode audit; historical, not live state
+- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md): latest dated full HomeNode audit; historical, not live state
 
 ## Service Pages
 
@@ -50,7 +50,6 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [qbit-proxy](./services/qbit-proxy.md)
 - [landing](./services/landing.md)
 - [linkstack](./services/linkstack.md) (archived)
-- [termix](./services/termix.md)
 
 ### HomeNode services
 - [traefik (HomeNode)](./services-homenode/traefik.md)
@@ -72,6 +71,7 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 
 ## Critical Rules
 
+- Current security state (2026-10-23): Pangolin `1.25.3` / Node `v24.22.1`; Badger stays at `v1.7.0` until the upstream `v1.8.0` plugin-integrity issue is fixed. See [Pangolin](./services/pangolin.md) and [Badger](./services/badger.md).
 - Pangolin, Gerbil, Newt, Olm, Badger, and CrowdSec Web UI stay pinned.
 - If Gerbil is recreated, Traefik must be recreated too.
 - Pocket-ID shared-data bug remains unfixed until the service page says

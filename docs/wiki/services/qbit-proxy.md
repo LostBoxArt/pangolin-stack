@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-05-09
-last_lint: 2026-05-09
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # qbit-proxy
 
@@ -23,6 +23,7 @@ in-repo Dockerfile.
 - **Build context**: `./qbit-proxy/`
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
 - **Internal port**: `8081`
+- **Build base**: `node:24-slim`; the running image reports Node `v24.22.1` (verified 2026-10-23)
 - **Target**: `torrent.example.com` (resolves via Homarr's `extra_hosts` to
   `192.168.1.10`)
 
@@ -64,6 +65,12 @@ the fix is still needed when bumping Homarr:
       - TARGET_HOST=torrent.example.com
       - TARGET_IP=192.168.1.10
 ```
+
+## Latest deployment verification — 2026-10-23
+
+The Dockerfile base was updated from `node:20-slim` to `node:24-slim` on
+2026-10-22. The running container reports Node `v24.22.1`; its internal HTTP
+probe and the routed torrent endpoint returned HTTP 200 after the rebuild.
 
 ## Deviations
 

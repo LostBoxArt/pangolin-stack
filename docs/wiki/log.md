@@ -12,13 +12,32 @@ related: ["./README.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-05-09
-last_lint: 2026-05-09
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # Wiki Log
 
 Append-only record of structural wiki changes, maintenance passes, and review
 artifacts.
+
+## [2026-10-23] security + upgrade | Pangolin 1.25.3
+- Updated Pangolin from `1.24.0` to `1.25.3`; verified the live Node runtime is `v24.22.1`, the container is healthy, and the local API returns HTTP 200. The upstream release identifies the Node2Shell fix; details and source links are in `services/pangolin.md`.
+- Tested the migration on an isolated database copy, verified production database integrity and foreign keys, and preserved the post-upgrade route set (22 routers / 11 services). Gerbil and Traefik were not restarted.
+- Kept Traefik at `v3.7.16` (above Pangolin's `3.6+` requirement) and Badger at `v1.7.0` because upstream reports the `v1.8.0` plugin-integrity failure.
+- Live-verified Newt `1.19.0`, Olm `1.9.1`, and Gerbil `1.5.2`. Removed the temporary four-hour Pangolin image watcher after verifying the fixed runtime.
+- Updated the active version/compatibility references and LLM entry points. Historical dated records remain unchanged.
+
+## [2026-10-22] stack refresh | dashboard, identity, security UI, and proxy runtime
+- Upgraded Homarr to `v2.8.0`; the SQLite integrity check passed, the local dashboard returned HTTP 200, and the container had zero restarts at verification.
+- Rebuilt qbit-proxy on `node:24-slim`; the running runtime reported Node `v24.22.1`, and both internal and routed HTTP probes returned 200.
+- Updated Pocket-ID to `v2.19.1` and CrowdSec Web UI to `2026.10.9`; both current containers were healthy with zero restarts when rechecked on 2026-10-23.
+- Refreshed current-state references while preserving dated historical version notes.
+
+## [2026-10-16] decommission | Termix removed from CloudNode apps stack
+- Removed the Termix Compose service and its named-volume declaration; `docker compose ... up -d --remove-orphans` removed the container. The apps stack now contains only `landing`.
+- Retained the detached `pangolin-apps_termix_data` volume as a reversible rollback copy.
+- Removed Termix from the active Hermes watchdog URL list and cleared its stale failure counter. Updated the active service inventory, endpoint lists, port matrix, and runbook probes.
+- Pangolin resource-route deletion was pending on 2026-10-16. A read-only check on 2026-10-23 still found `21-termix-router` and `21-termix-service` in the live provider configuration (22 routers / 11 services); the Termix container is absent. Route cleanup remains open and was not performed as part of this documentation update.
 
 ## [2026-07-18] incident + runbook | tunnel down, all HomeNode sites unreachable
 - **Symptom**: All HomeNode-backed `*.example.com` sites returned 502/timeout. Pangolin showed site `homelab` as `online=0`. Watchdog false-alarmed on all 7 HomeNode SSH services.

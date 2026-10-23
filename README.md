@@ -21,20 +21,22 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | linkstack, termix | User applications |
+| **apps** | landing | User applications |
 
 ## Version Pins
 
-- Pangolin: `fosrl/pangolin:1.24.0`
+- Pangolin: `fosrl/pangolin:1.25.3` (Node runtime `v24.22.1`)
 - Gerbil: `fosrl/gerbil:1.5.2`
-- Traefik: `traefik:v3.7.14`
+- Traefik: `traefik:v3.7.16`
 - Traefik Badger plugin: `v1.7.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3`
-- Newt (HomeNode): `fosrl/newt:1.18.1`
+- Homarr: `ghcr.io/homarr-labs/homarr:v2.8.0`
+- Pocket-ID: `ghcr.io/pocket-id/pocket-id:v2.19.1`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9`
+- Newt (HomeNode): `fosrl/newt:1.19.0`
 - Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
-Newt `1.18.x` aligns with Pangolin `1.24.x`; Pangolin 1.24 requires Newt `1.18.0+` for private exit-node resources.
-CrowdSec Web UI is pinned to `2026.10.3`; this release migrated the state directory to the image's `/app/data` layout, so the compose mount and runtime UID are explicit.
+The deployed Pangolin/Newt/Olm/Gerbil tuple was verified on 2026-10-23; see [`docs/wiki/services/pangolin.md`](docs/wiki/services/pangolin.md) for the security-update evidence and compatibility notes. Pangolin 1.25.3 requires Traefik 3.6+ for all load-balancing options; the current Traefik pin satisfies this. Keep Badger at `v1.7.0` until the upstream plugin-integrity issue with `v1.8.0` is fixed; see the [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3).
+CrowdSec Web UI is pinned to `2026.10.9`; release `2026.10.3` introduced the `/app/data` persistent-state layout, which remains explicit in the deployment.
 Traefik shares Gerbil's network namespace. If `gerbil` is recreated during an upgrade, recreate `traefik` immediately afterward:
 
 ```bash
@@ -147,7 +149,7 @@ pangolin-stack/
 │   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
 │   ├── management/docker-compose.yml   # dockhand
 │   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
-│   └── apps/docker-compose.yml         # linkstack, termix
+│   └── apps/docker-compose.yml         # landing
 ├── config/                             # Service configs (traefik, crowdsec, pangolin)
 ├── data/                               # Runtime data (gitignored)
 ├── .env                                # Shared environment variables
@@ -181,8 +183,7 @@ sudo systemctl status olm-watchdog.timer  # Watchdog timer status
 | Homarr | https://home.example.com |
 | Dashdot | https://dash.example.com |
 | Dockhand | https://dockhand.example.com |
-| LinkStack | https://example.com |
-| Termix | https://termix.example.com |
+| Landing | https://example.com |
 | CrowdSec Web UI | http://<cloudnode-ip>:3458 |
 
 ## Troubleshooting

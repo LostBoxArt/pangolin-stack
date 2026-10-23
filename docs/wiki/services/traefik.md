@@ -12,15 +12,15 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-10
-last_lint: 2026-10-10
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # traefik
 
 Edge reverse-proxy and TLS terminator for everything exposed behind
 `*.example.com`. Shares Gerbil's network namespace.
 
-- **Image**: `traefik:v3.7.14` (pinned to the verified running release)
+- **Image**: `traefik:v3.7.16` (pinned to the verified running release)
 - **Compose file**: `stacks/core/docker-compose.yml`
 - **Network mode**: `service:gerbil` — all ports appear on the gerbil container
 - **Config**:
@@ -67,7 +67,7 @@ traefik:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: traefik:v3.7.14
+    image: traefik:v3.7.16
     network_mode: service:gerbil
     restart: unless-stopped
     volumes:
@@ -82,10 +82,10 @@ traefik:
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Image tag | `traefik:v3.6` | `traefik:v3.7.14` | pinned to the verified running release — ✓ |
+| Image tag | `traefik:v3.6` | `traefik:v3.7.16` | pinned to the verified running release — ✓ |
 | `rules/` bind | not in upstream | `../../config/traefik/rules:/rules` | intentional — we split dynamic rules |
 | Docker socket | not in upstream | mounted | intentional — Docker provider labels |
-| `wud.watch=false` label | n/a | present | tells `whatsupdocker`-style watchers to skip this image (we still pin manually) |
+| `wud.watch=false` label | n/a | present | WUD-specific opt-out metadata; does not prove WUD is installed or prevent other Compose/Dockhand pulls |
 
 ## Findings
 
@@ -95,13 +95,13 @@ If an unattended `docker compose pull` on `core` grabs a Traefik 4.x with
 breaking changes, the proxy will fail to start and take down all public
 routes including Pangolin itself (which you need to log in and fix).
 
-The image is now pinned to `v3.7.14`, matching the verified running image
+The image is now pinned to `v3.7.16`, matching the verified running image
 digest. The Badger plugin remains pinned to `v1.7.0`.
 
 ### F-TRAEFIK-3 — placeholder `*.example.com` labels burning Let's Encrypt quota (`high` / resolved 2026-09-28)
 Several service compose files carried leftover Traefik router labels still
-pointing at placeholder hostnames (`example.com`, `termix.example.com`,
-`home.example.com`, `dockhand.example.com`, `dash.example.com`,
+pointing at placeholder hostnames (`example.com`, `home.example.com`,
+`dockhand.example.com`, `dash.example.com`,
 `auth.example.com`). Pangolin generates its own routers for those services via
 the `@http` provider, so the labels were redundant — but Traefik still tried to
 issue a certificate for every one of them, on every start. Let's Encrypt
@@ -147,7 +147,7 @@ tracking as a future hardening step.
 ### Fix F-TRAEFIK-1 — pin the image (completed 2026-09-28)
 
 ```yaml
-    image: traefik:v3.7.14
+    image: traefik:v3.7.16
 ```
 
 Then commit, then `./stackctl.sh pull core` to verify the right digest is
@@ -166,5 +166,9 @@ on the `pangolin` network and point Traefik's Docker provider at
   will NOT show traefik. It is attached to gerbil's namespace.
 - Logs: `config/traefik/logs/access.log` (JSON format, consumed by
   CrowdSec and the traefik-log-dashboard agent).
-- Badger plugin pin is in `config/traefik/traefik_config.yml` under
-  `experimental.plugins`.
+- Pangolin release notes say `3.6+` is required for all load-balancing options; deployed `v3.7.16` satisfies the requirement.[1]
+- Badger remains pinned at `v1.7.0` because the same release notes report a plugin-integrity failure in `v1.8.0`; see [Badger](./badger.md).
+
+## Sources
+
+1. [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3)

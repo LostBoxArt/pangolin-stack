@@ -39,7 +39,6 @@ Primary public edge and control-plane server.
 - [[../services/homarr.md]]
 - [[../services/qbit-proxy.md]]
 - [[../services/landing.md]]
-- [[../services/termix.md]]
 
 ## Archived services
 - [[../services/linkstack.md]] — archived on 2026-04-21 after `landing`

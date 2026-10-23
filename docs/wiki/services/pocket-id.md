@@ -12,15 +12,15 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/security/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-10
-last_lint: 2026-10-10
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # pocket-id
 
 OIDC / passkey-first identity provider. Used as the SSO gateway behind
 Traefik for admin UIs (`auth.example.com`).
 
-- **Image**: `ghcr.io/pocket-id/pocket-id:v2.18.0` (pinned to exact minor)
+- **Image**: `ghcr.io/pocket-id/pocket-id:v2.19.1` (live-verified 2026-10-23)
 - **Compose file**: `stacks/security/docker-compose.yml`
 - **Internal port**: `1411` (fronted by Traefik)
 - **Data**: `/home/jesus/pangolin-stack/data/pocket-id:/app/data` (dedicated Pocket-ID state)
@@ -36,7 +36,7 @@ Traefik for admin UIs (`auth.example.com`).
 ```yaml
 services:
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.18.0
+    image: ghcr.io/pocket-id/pocket-id:v2.19.1
     restart: unless-stopped
     env_file: .env
     ports:
@@ -57,9 +57,9 @@ in the Pocket-ID install folder. Ours now uses the dedicated
 
 ## Our Compose (relevant slice)
 
-```73:94:stacks/security/docker-compose.yml
+```73:102:stacks/security/docker-compose.yml
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.18.0
+    image: ghcr.io/pocket-id/pocket-id:v2.19.1
     container_name: pocket-id
     networks:
       - pangolin
@@ -129,7 +129,8 @@ action item here, just a sanity reminder.
 The compose file used `ghcr.io/pocket-id/pocket-id:v2`, a moving major tag. Pocket ID
 runs database migrations automatically on startup, so a silent major-tag move can
 migrate the schema forward before you have a validated rollback. Now pinned to the
-exact `v2.18.0`. Upgrades are `pull` + `up -d` per
+exact `v2.19.1`. The live container was healthy with zero restarts on
+2026-10-23. Upgrades are `pull` + `up -d` per
 <https://pocket-id.org/docs/setup/upgrading> — no manual steps were required between
 v2.17.0 and v2.18.0 in this deployment.
 

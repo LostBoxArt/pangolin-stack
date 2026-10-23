@@ -318,13 +318,12 @@ ssh jesus@192.168.1.10 "docker logs newt --tail=10 2>&1"
 
 # 4. All public URLs respond
 for url in plex.example.com request.example.com dash.example.com \
-           dockhand.example.com termix.example.com \
+           dockhand.example.com \
            home.example.com; do
   code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://$url/")
   echo "$url → $code"
 done
 # Expect: plex 401, request 307, dash 200, dockhand 302,
-#         termix 200, hermi 302, home 302
 ```
 
 ## Root Cause: NAT rebinding churn (intermittent)
@@ -523,7 +522,7 @@ sleep 60
 
 # Verify all public URLs
 for url in plex.example.com request.example.com dash.example.com \
-           dockhand.example.com termix.example.com \
+           dockhand.example.com \
            home.example.com; do
   code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://$url/")
   echo "$url → $code"
@@ -580,7 +579,6 @@ ssh jesus@192.168.1.10 "curl -s -o /dev/null -w 'HTTP %{http_code}' --max-time 5
 | `request.example.com` | 307 | Seerr redirect to login page |
 | `dash.example.com` | 200 | Dashdot dashboard loads |
 | `dockhand.example.com` | 302 | Dockhand redirect to login |
-| `termix.example.com` | 200 | Termix web UI loads |
 | `home.example.com` | 302 | Homarr redirect |
 
 Codes other than these (especially 502, 000, 503) indicate a problem with

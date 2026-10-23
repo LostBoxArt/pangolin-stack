@@ -43,10 +43,11 @@ Coverage spans **two hosts**:
   answer from, lint, and update this wiki.
 - [LLM Wiki Pattern](./llm-wiki-pattern.md) — design notes for how this wiki
   adopts current LLM-wiki and `llms.txt` best practices.
-- [Compose Review 2026-04-17](./compose-review-2026-04-17.md) — current latest
-  CloudNode audit; if a newer `compose-review-*.md` exists, use that instead.
-- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md) — current latest
-  HomeNode audit; if a newer `homenode-review-*.md` exists, use that instead.
+- [Compose Review 2026-04-17](./compose-review-2026-04-17.md) — latest dated
+  full CloudNode audit, not a live-state report; see current service pages and
+  `log.md` for newer deployment facts.
+- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md) — latest dated
+  full HomeNode audit, not a live-state report; verify current state separately.
 - [Index](./index.md) — flat content catalog of the current wiki.
 - [Glossary](./glossary.md) — compact definitions for recurring homelab terms.
 - [Wiki Log](./log.md) — append-only maintenance log for wiki updates, audits,
@@ -108,7 +109,6 @@ Each page follows the same structure:
 ### Apps (`stacks/apps/docker-compose.yml`)
 
 - [landing](./services/landing.md)
-- [termix](./services/termix.md)
 
 > Historical: [linkstack](./services/linkstack.md) was replaced by `landing` on 2026-04-21.
 

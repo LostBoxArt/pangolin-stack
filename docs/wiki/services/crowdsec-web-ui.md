@@ -12,15 +12,15 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/security/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-10
-last_lint: 2026-10-10
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # crowdsec-web-ui
 
 Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image
 (not shipped by CrowdSec team).
 
-- **Image**: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3` (pinned)
+- **Image**: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9` (live-verified 2026-10-23)
 - **Compose file**: `stacks/security/docker-compose.yml`
 - **Host port**: `3458:3000` (direct local access; keep filtered)
 - **Public route**: Pangolin-fronted `crowdsec.example.com` with SSO
@@ -38,7 +38,7 @@ README is the only documentation.
 
 ```53:71:stacks/security/docker-compose.yml
   crowdsec-web-ui:
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9
     container_name: crowdsec-web-ui
     user: "1001:1001"
     networks:
@@ -59,7 +59,11 @@ README is the only documentation.
 
 ## Deviations
 
-`2026.10.3` migrated the persistent state layout from `/app/config` to `/app/data`. The deployment keeps the state directory owner-only and runs the container as UID/GID `1001:1001` so the host account and watchdog can still read the tracked configuration.
+Release `2026.10.3` migrated the persistent state layout from `/app/config` to
+`/app/data`. The current `2026.10.9` image retains that layout; the deployment
+keeps the state directory owner-only and runs as UID/GID `1001:1001` so the host
+account and watchdog can still read the tracked configuration. The current
+container was healthy with zero restarts on 2026-10-23.
 
 ## Findings
 

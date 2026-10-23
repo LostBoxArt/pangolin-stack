@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-09-28
-last_lint: 2026-09-28
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 
 # olm
@@ -63,7 +63,7 @@ needed. See `docs/wiki/runbooks/check-homenode-reachability-via-olm.md`.
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Version | latest | pinned `1.9.1` | aligned with Pangolin 1.23.x — ✓ |
+| Version | latest | pinned `1.9.1` | active with Pangolin `1.25.3` on 2026-10-23 — ✓ |
 | DNS override | default | `--override-dns=false` | prevents resolver drift inside Olm |
 
 ## Findings

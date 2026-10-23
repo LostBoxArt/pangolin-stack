@@ -20,7 +20,7 @@ Services are organized into 6 stacks under `stacks/`:
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | landing, termix | User applications |
+| **apps** | landing | User applications |
 
 | **homenode-core** | olm, gerbil, pangolin | Tunnel, relay, control plane |
 | **homenode-apps** | newt, prowlarr, profilarr, recyclarr, seerr, sonarr, radarr, bazarr, flaresolverr, plex, qbittorrent, dashdot | Monitoring, storage, auth, torrent, media, DNS, apps |
@@ -56,8 +56,7 @@ Dashboard:
 - qbit-proxy: local proxy for qBittorrent widget, 8081 (internal).
 
 Apps:
-- LinkStack: landing page, 80 (behind Traefik).
-- Termix: web SSH, 8080 (behind Traefik).
+- Landing: public landing page, 80 (behind Traefik).
 
 ## Public Endpoints
 - Pangolin: https://pangolin.example.com
@@ -66,8 +65,7 @@ Apps:
 - Pocket ID: https://auth.example.com
 - Homarr: https://home.example.com
 - Dashdot: https://dash.example.com
-- Termix: https://termix.example.com
-- LinkStack: https://example.com
+- Landing: https://example.com
 - CrowdSec Web UI: http://<cloudnode-ip>:3458
 - Dockhand: https://dockhand.example.com
 
@@ -77,11 +75,14 @@ Apps:
 - Health waits for container status to be running and healthchecks to be healthy.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.24.0`, Gerbil `1.5.2`, Traefik `v3.7.14`, Badger plugin `v1.7.0`.
-- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3`; its persistent state uses `/app/data` and the host service UID.
-- HomeNode Newt is pinned to `1.18.1`.
+- Core pins verified 2026-10-23: Pangolin `1.25.3`, Gerbil `1.5.2`, Traefik `v3.7.16`, Badger plugin `v1.7.0`.
+- Pangolin `1.25.3` runs Node `v24.22.1`; its release notes record the Node2Shell fix. See `docs/wiki/services/pangolin.md` for evidence and sources.
+- Dashboard/auth pins (live-verified 2026-10-23): Homarr `v2.8.0`, Pocket-ID `v2.19.1`.
+- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9`; its persistent state uses `/app/data` and the host service UID. The layout migration was introduced in release `2026.10.3`.
+- HomeNode Newt is pinned to `1.19.0` (live-verified 2026-10-23).
 - CloudNode Olm runs as systemd binary `1.9.1` with `--override-dns=false`.
-- Newt `1.18.x` aligns with Pangolin `1.24.x`; Pangolin 1.24 requires Newt `1.18.0+` for private exit-node resources.
+- Current observed Fossorial tuple: Pangolin `1.25.3`, Gerbil `1.5.2`, Newt `1.19.0`, Olm `1.9.1`; treat this as the deployed state, not a promise of future compatibility.
+- Pangolin `1.25.3` requires Traefik `3.6+` for all load-balancing options. Keep Badger at `v1.7.0`: the release notes warn `v1.8.0` fails Traefik's plugin integrity check. Recheck upstream before changing either pin.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`
@@ -125,7 +126,7 @@ pangolin-stack/
 │   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
 │   ├── management/docker-compose.yml   # dockhand
 │   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
-│   ├── apps/docker-compose.yml         # landing, termix
+│   ├── apps/docker-compose.yml         # landing
 ├── config/                             # service configs (pangolin, crowdsec, traefik)
 ├── config/db/                          # Pangolin database
 ├── config/traefik/rules/               # Traefik dynamic rules
@@ -185,8 +186,8 @@ From `.env` (all are referenced in compose):
 - Restore stops services, restores files, and re-imports volumes.
 
 ## Docker Volumes and External Data
-- External volumes: none (landing uses a bind-mounted `sites/` directory; termix
-  uses a named local volume `termix_data`).
+- Active stacks have no declared named volumes (landing uses a bind-mounted
+  `sites/` directory).
 - Homarr data is in `/opt/homarr/appdata` on the host.
 - Dockhand data is in `./data/dockhand`.
 - Docker socket is mounted for Traefik and Dockhand.

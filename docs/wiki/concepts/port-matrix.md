@@ -34,7 +34,6 @@ This page is the quickest view of which host or service owns which important por
 | 3458/tcp | CrowdSec Web UI | host-published | admin UI | explicitly documented as host-published |
 | 3000/tcp | Dockhand | internal, fronted by Traefik | container management | exposed at `dockhand.example.com` |
 | 7575/tcp | Homarr | internal, fronted by Traefik | dashboard UI | exposed at `home.example.com` |
-| 8080/tcp | Termix | internal, fronted by Traefik | web terminal | exposed at `termix.example.com` |
 | 1411/tcp | Pocket-ID | internal, fronted by Traefik | identity provider | passkey/OIDC |
 
 ## HomeNode edge and app ports

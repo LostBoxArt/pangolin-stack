@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["config/traefik/traefik_config.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-21
-last_lint: 2026-04-21
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 
 # badger
@@ -56,11 +56,16 @@ http:
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Version | latest | pinned `v1.7.0` | aligned with Pangolin 1.23.x — ✓ |
+| Version | latest | pinned `v1.7.0` | retained for Pangolin `1.25.3`; see active upstream issue below — ✓ |
 
 ## Findings
 
-None currently documented.
+### F-BADGER-1 — `v1.8.0` fails Traefik plugin integrity check (`high` / active 2026-10-23)
+
+Pangolin `1.25.3` release notes warn that Badger `v1.8.0` fails Traefik's
+plugin integrity check and disables the plugin. Keep `v1.7.0` until the
+upstream Traefik issue is fixed. Redirects work on `v1.7.0`; permanent
+redirects require `v1.8.0` and are therefore unavailable for now.[1]
 
 ## Operational Notes
 
@@ -68,4 +73,8 @@ None currently documented.
 traffic) because the LAPI becomes unreachable. This was the root cause of the
 2026-04-21 global 403 incident. See `docs/wiki/runbooks/403-all-sites.md`.
 - The plugin is loaded by Traefik at startup. Changing the config requires a
-Traefik restart or dynamic config reload.
+  Traefik restart or dynamic config reload.
+
+## Sources
+
+1. [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3)

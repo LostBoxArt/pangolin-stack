@@ -68,7 +68,6 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`pangolin`](./services/pangolin.md) — Fossorial Pangolin — control plane, dashboard, API, and database for the whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read config from it.
 - [`pocket-id`](./services/pocket-id.md) — OIDC / passkey-first identity provider. Used as the SSO gateway behind Traefik for admin UIs (`auth.example.com`).
 - [`qbit-proxy`](./services/qbit-proxy.md) — Local reverse-proxy sidecar for Homarr's qBittorrent widget. Built from in-repo Dockerfile.
-- [`termix`](./services/termix.md) — Web-based SSH terminal / tunneling / file editor at `termix.example.com`.
 - [`traefik-log-dashboard (agent + UI)`](./services/traefik-log-dashboard.md) — Two services, one codebase: the **agent** tails Traefik's JSON access/error logs and exposes a parsed stream; the **dashboard** renders that stream in a React SPA with geolocation, status-code breakdowns, and service metrics.
 - [`traefik`](./services/traefik.md) — Edge reverse-proxy and TLS terminator for everything exposed behind `*.example.com`. Shares Gerbil's network namespace.
 - [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.7.0`). Not a container; runs inside Traefik.
@@ -78,6 +77,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
 
 ## CloudNode Services (Removed)
+
 - [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21, stack + config deleted 2026-09-28**. iPhone now uses `1.1.1.1` directly. Files recoverable at `.removed-20260928/`.
 
 ## HomeNode Services

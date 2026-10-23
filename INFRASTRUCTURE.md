@@ -89,22 +89,24 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 | `observability` | Monitoring & logs | traefik-agent, traefik-dashboard, dashdot |
 | `management` | Container orchestration | dockhand |
 | `dashboard` | User dashboards | homarr, qbit-proxy |
-| `apps` | User applications | linkstack, termix |
+| `apps` | User applications | landing |
 
 Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everything.
 
 ## Pinned Versions
 
-- Pangolin: `fosrl/pangolin:1.24.0`
+- Pangolin: `fosrl/pangolin:1.25.3` (Node runtime `v24.22.1`)
 - Gerbil: `fosrl/gerbil:1.5.2`
-- Traefik: `traefik:v3.7.14`
+- Traefik: `traefik:v3.7.16`
 - Traefik Badger plugin: `github.com/fosrl/badger@v1.7.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.3`
-- Newt (HomeNode): `fosrl/newt:1.18.1`
+- Homarr: `ghcr.io/homarr-labs/homarr:v2.8.0`
+- Pocket-ID: `ghcr.io/pocket-id/pocket-id:v2.19.1`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9`
+- Newt (HomeNode): `fosrl/newt:1.19.0`
 - Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
-Compatibility note: Newt `1.18.x` aligns with Pangolin `1.24.x`; Pangolin 1.24 requires Newt `1.18.0+` for private exit-node resources.
-Operational note: CrowdSec Web UI `2026.10.3` uses `/app/data` as its persistent state path and runs as the host service UID in this deployment.
+Compatibility note (verified 2026-10-23): Pangolin `1.25.3`, Gerbil `1.5.2`, Newt `1.19.0`, Olm `1.9.1`, and Traefik `v3.7.16` are the deployed set. Pangolin 1.25.3 requires Traefik 3.6+ for all load-balancing options; keep Badger at `v1.7.0` because upstream reports `v1.8.0` fails Traefik's plugin integrity check. See the [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3).
+Operational note: CrowdSec Web UI `2026.10.9` retains the `/app/data` layout introduced in `2026.10.3` and runs as the host service UID in this deployment.
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 
@@ -290,7 +292,7 @@ The stack implements defense-in-depth geo-blocking using both CrowdSec and Traef
 
 2. **Traefik GeoBlock Middleware** (`config/traefik/rules/geoblock-middleware.yml`)
    - Immediate edge blocking using GeoJS API
-   - Applied to: LinkStack, Termix, Homarr, Dashdot
+   - Applied to: Landing, Homarr, Dashdot
    - Not applied to: PocketID (has own MaxMind), Pangolin, CrowdSec, Dockhand
 
 ### Management

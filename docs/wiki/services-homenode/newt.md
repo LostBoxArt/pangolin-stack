@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/newt/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-10
-last_lint: 2026-10-10
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # newt
 
@@ -22,7 +22,7 @@ from HomeNode to the CloudNode Pangolin so that LAN services can be reached from
 the public `*.example.com` without opening inbound ports on the home
 router.
 
-- **Image**: `fosrl/newt:1.18.1` ✓ (pinned — matches Pangolin 1.24.x)
+- **Image**: `fosrl/newt:1.19.0` ✓ (live-verified 2026-10-23)
 - **Compose file**: `/volume1/docker/config/newt/docker-compose.yml`
 - **Tracked copy**: **not tracked** (finding NM1)
 - **Network**: `traefik_traefik` + `default`
@@ -32,22 +32,23 @@ router.
 - Releases: <https://github.com/fosrl/newt/releases>
 - Docs: <https://docs.pangolin.net/self-host/sites/newt>
 
-Version alignment is mandatory:
-
-- Pangolin 1.24.x ↔ Newt 1.18.x ↔ Olm 1.9.1 ↔ Gerbil 1.5.2 (Pangolin 1.24 requires Newt 1.18.0+ for private exit-node resources)
+Current deployed tuple (live-verified 2026-10-23): Pangolin `1.25.3` ↔
+Newt `1.19.0` ↔ Olm `1.9.1` ↔ Gerbil `1.5.2`. This records the observed
+state, not a forward-compatibility guarantee. Check upstream release notes and
+documented minimums before future upgrades.
 
 ## Our Compose
 
 ```yaml
 services:
   newt:
-    image: fosrl/newt:1.18.1
+    image: fosrl/newt:1.19.0
     container_name: newt
     restart: unless-stopped
     environment:
       - PANGOLIN_ENDPOINT=https://pangolin.example.com
-      - NEWT_ID=<stored-in-private-env>
-      - NEWT_SECRET=<stored-in-private-env>
+      - NEWT_ID=<REDACTED>
+      - NEWT_SECRET=<REDACTED>
     networks:
       - default
       - traefik_traefik
@@ -57,7 +58,7 @@ services:
 
 | Aspect | Recommended | Ours | Intent |
 |---|---|---|---|
-| Version | pinned | `1.18.1` ✓ | intentional, aligned |
+| Version | pinned | `1.19.0` ✓ | intentional, aligned |
 | `NEWT_ID` | in `.env` | **in compose** | unintentional — credential leak |
 | `NEWT_SECRET` | in `.env` | **in compose** | unintentional — credential leak |
 | Healthcheck | recommended | none | drift |
@@ -65,13 +66,10 @@ services:
 ## Findings
 
 ### F-N-NEWT-1 — credentials in compose file (`high` / NH1)
-`NEWT_ID` and `NEWT_SECRET` are plaintext in the compose file. As soon as
-this file goes into `host-configs/homenode/` in git (which NM1 asks us to
-do), the tunnel credentials are in the repo forever.
-
-Even without git, they're readable by anyone who can `cat` the compose
-file on HomeNode, which on Synology DSM is anyone in the `administrators`
-group.
+`NEWT_ID` and `NEWT_SECRET` are still supplied inline in the private HomeNode
+Compose file as of 2026-10-23. Their values are intentionally omitted from this
+sanitized page, and the Compose file is not tracked in the public repository.
+Move them to a private `.env` file before adding a sanitized Compose copy to Git.
 
 ### F-N-NEWT-2 — no healthcheck (`medium` / NM10)
 If Newt's tunnel flaps, the only visible symptom is that all
@@ -101,7 +99,7 @@ Update compose:
 ```yaml
 services:
   newt:
-    image: fosrl/newt:1.18.1
+    image: fosrl/newt:1.19.0
     container_name: newt
     restart: unless-stopped
     env_file: [.env]
@@ -128,7 +126,7 @@ via Pangolin UI → Sites → this site → regenerate credentials.
       start_period: 20s
 ```
 
-Adjust the port/path against what Newt 1.18.1 actually exposes (the
+Adjust the port/path against what Newt 1.19.0 actually exposes (the
 socket may be different — `docker exec newt netstat -tlnp` will tell you).
 
 ### Fix F-N-NEWT-3

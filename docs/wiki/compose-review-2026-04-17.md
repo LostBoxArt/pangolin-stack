@@ -132,7 +132,7 @@ Upstream compose sets `user: apache:apache`. Ours doesn't. See
 ### M8. Termix is missing the `guacd` sidecar
 Upstream ships with `guacamole/guacd` for RDP/VNC support. If you only ever
 SSH through Termix this is fine; if you ever want RDP/VNC it will fail. See
-[termix](./services/termix.md).
+Termix (service page removed 2026-10-23).
 
 ### M9. AdGuard Home has no `TZ` 📜 **historical**
 Timestamps in logs will be UTC. See [adguard-home](./services/adguard-home.md)
@@ -157,7 +157,7 @@ Low-risk cruft. See [crowdsec](./services/crowdsec.md).
   is trivial. [gerbil](./services/gerbil.md).
 - **L3**. Homarr has no healthcheck. [homarr](./services/homarr.md).
 - **L4**. LinkStack/Termix have no healthcheck.
-  [linkstack](./services/linkstack.md) (archived), [termix](./services/termix.md).
+  [linkstack](./services/linkstack.md) (archived), Termix (service page removed 2026-10-23).
 - **L5**. Dashdot: we already use `group_add: "986"` instead of upstream's
   `privileged: true`. **This is better than upstream** — recorded so nobody
   "helpfully" adds `privileged: true` back. [dashdot](./services/dashdot.md).

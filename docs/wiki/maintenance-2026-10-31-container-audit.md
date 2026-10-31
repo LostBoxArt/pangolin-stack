@@ -191,3 +191,22 @@ load average 30 → 4. Upload settled at the 10 MiB/s cap.
 
 - No files changed outside qBittorrent's own config; the API settings above are
   the only state.
+
+### Follow-up 2026-11-01 — night boost and 30-day cleanup
+
+- **Night window**: qBittorrent's bandwidth scheduler runs 01:00–07:00 every day with
+  alternate limits of 20 MiB/s up/down; the rest of the day stays at 10 MiB/s.
+  Measured at 20 MiB/s: `md1` 45–53 % util, I/O pressure `avg10` ~25 %, load 3.7 —
+  acceptable. The 15-active-upload queue limit, not the byte cap, is what keeps the
+  array responsive.
+- In qBittorrent 5.3 the scheduler day field is a single-choice enum exposed as
+  `1=Weekdays`, `2=Weekend`, `3..9=Mon..Sun`. The int API rejects `127`; "every day"
+  only round-trips through the preference string (`Scheduler\days=EveryDay`), which is
+  what is set in `qBittorrent.conf`.
+- **30-day cleanup**: `max_seeding_time=43200`, `max_inactive_seeding_time=43200`,
+  action `RemoveWithContent`. Enabling it removed 165 torrents on the next check and
+  began deleting ~1.6 TB of download copies. All remaining torrents resolve inside
+  `/downloads` or `/data/downloads`; none pointed at the media library, and the
+  library directories were verified present afterwards.
+- Side finding: the alternate speed mode had latched on with the stock 10 KiB/s alt
+  limit, which had silently reduced upload to ~1 KB/s. Alt limits are now 20 MiB/s.

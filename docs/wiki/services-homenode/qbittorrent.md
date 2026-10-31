@@ -137,7 +137,11 @@ Not a compose change. Runbook:
 ## TorrentLeech seeding policy
 
 - TorrentLeech requires either a 1:1 ratio or minimum total seeding time; the official minimum is 10 days for Registered, then 8/7/6/4 days for Power/Super/Extreme/TL God classes.
-- qBittorrent global inactive-seeding cleanup is set to 30 days (`43200` minutes), with the action set to remove the torrent record only, not downloaded content.
+- Global share limit: `ShareLimitAction=RemoveWithContent` with both `max_seeding_time` and
+  `max_inactive_seeding_time` set to 30 days (`43200` minutes). Torrents older than 30 days
+  are removed together with their download files.
+- Arr imports are copies, not hardlinks (`nlink=1` on the download files), so deleting the
+  download copy never touches `movies/` or `tv/`. Verified on 2026-11-01 before enabling.
 - Sonarr and Radarr use the post-import category `seeding`; Arr will not remove completed torrents in that category.
 - The `seeding` qBittorrent category exists for imported torrents. Existing torrents are not moved automatically.
 

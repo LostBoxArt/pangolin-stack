@@ -152,3 +152,42 @@ Config backup: `/root/config.xml.bak-qbit-20261031-203424`.
 - Router: `/root/config.xml.bak-qbit-20261031-203424`.
 - AppSec: delete `config/crowdsec/acquis.d/appsec.yaml` and set
   `CrowdsecAppsecEnabled: false`.
+
+## Follow-up 2026-11-01 — qBittorrent seeding saturated the HDD array
+
+After the 6881/tcp+udp publication and router forward landed, qBittorrent became
+inbound-connectable and served ~25 MB/s upload. Serving 274 torrents off the
+4-disk RAID5 produced 1500–2000 random reads/s: `md1` and `dm-2` sat at 100 %
+util, iowait 77 %, load average 20–30 with one runnable process.
+
+Docker health checks for `bazarr` and `radarr` (10 s timeout, 3 retries) timed
+out during those stalls and Docker reported them unhealthy. Neither container
+restarted; the alerts were transient and the apps were fine.
+
+Applied live through the WebUI API (`/api/v2/app/setPreferences`):
+
+| Setting | Before | After |
+| --- | --- | --- |
+| `queueing_enabled` | false | true |
+| `max_active_uploads` | 100 | 15 |
+| `max_active_torrents` | 100 | 60 |
+| `up_limit` | 0 (unlimited) | 10 MiB/s |
+
+Result: `md1` util 40 %, `dm-2` 45–55 %, `some avg10` I/O pressure 98 % → 22 %,
+load average 30 → 4. Upload settled at the 10 MiB/s cap.
+
+- Persisted by qBittorrent in `qBittorrent.conf` as
+  `Session\QueueingSystemEnabled=true`, `Session\MaxActiveUploads=15`,
+  `Session\MaxActiveTorrents=60`, `Session\GlobalUPSpeedLimit=10240`.
+- Rollback: POST `{"up_limit":0,"queueing_enabled":false}` to the same endpoint.
+- TorrentLeech ratio is unaffected in practice: seeding time keeps accruing and
+  10 MiB/s is still far above the line needed for 1:1.
+- Known noise, not fixed: at startup qBittorrent tries to move torrents from
+  `/downloads/...` to `/data/downloads/...`. Both mounts resolve to the same
+  host directory (`/volume1/media`), so every move fails with `Invalid argument`.
+  Harmless and pre-existing (36 occurrences in the previous log too).
+
+### Rollback (this follow-up)
+
+- No files changed outside qBittorrent's own config; the API settings above are
+  the only state.

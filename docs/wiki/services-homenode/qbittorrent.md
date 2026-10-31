@@ -152,3 +152,7 @@ Not a compose change. Runbook:
   (see CloudNode [qbit-proxy](../services/qbit-proxy.md)) because of the
   `Secure` cookie issue introduced in qBit 5.1.4. Do NOT point Homarr
   directly at `https://torrent.example.com`.
+- **I/O limits (2026-11-01)**: queueing on, max 15 active uploads / 60 torrents,
+  upload capped at 10 MiB/s. Without the cap, seeding 274 torrents random-reads
+  the RAID5 into 100 % util and starves the other containers' health checks.
+  Raise the cap only after checking `iostat -x` and `/proc/pressure/io`.

@@ -1,3 +1,4 @@
+# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
 services:
   profilarr:
     image: santiagosayshey/profilarr:latest

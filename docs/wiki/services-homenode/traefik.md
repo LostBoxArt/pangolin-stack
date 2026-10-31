@@ -12,7 +12,7 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/traefik/docker-compose.yml", "host-configs/homenode/traefik/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
+last_ingested: 2026-10-27
 last_lint: 2026-04-17
 ---
 # traefik (HomeNode)
@@ -23,7 +23,7 @@ Home-LAN reverse proxy for all HomeNode services. Terminates TLS for
 - **Image**: `traefik:latest` ⚠️
 - **Compose file**: `/volume1/docker/traefik/docker-compose.yml`
 - **Tracked copy**: `host-configs/homenode/traefik/docker-compose.yml`
-- **Ports**: `80`, `443`, **`9080:8080` (dashboard, insecure)** ⚠️
+- **Ports**: host `80`, `443`; dashboard `8080` is container-only with no host publication
 - **Networks**: `traefik_traefik` (external) — all HomeNode services join it
 - **Cert resolver**: `cloudflare` (DNS-01 via Cloudflare API,
   credentials in `.env`)
@@ -47,7 +47,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "9080:8080"   # Dashboard (insecure for now)
     command:
       - "--api.dashboard=true"
       - "--api.insecure=true"
@@ -85,20 +84,16 @@ services:
 | Aspect | CloudNode | HomeNode | Intent |
 |---|---|---|---|
 | Cert resolver | `letsencrypt` (HTTP-01) | `cloudflare` (DNS-01) | HomeNode is LAN-only; DNS-01 avoids exposing port 80 to the internet |
-| Dashboard | off | **on, insecure, published** | unintentional leak |
-| docker.sock | read-write | **read-only** ✓ | HomeNode is better here |
+| Dashboard | off | on, container-only | access through SSH forwarding |
+| docker.sock | read-write | read-only bind mount | socket access still permits Docker API operations; this is not API authorization |
 | Access logs | JSON, consumed by CrowdSec | none | no CrowdSec on HomeNode |
 | CrowdSec plugin | yes | no | no local CrowdSec |
 | Network namespace | shared with Gerbil | standalone | n/a |
 
 ## Findings
 
-### F-N-TRAEFIK-1 — dashboard exposed on LAN (`critical` / NC1)
-`--api.insecure=true` + port `9080:8080` = unauthenticated dashboard at
-`http://192.168.1.10:9080`. Discloses all routers, services,
-entrypoints, middleware config, cert expiry. Any LAN device, any
-container on the `traefik_traefik` network, and the CloudNode (through Olm)
-can read it.
+### F-N-TRAEFIK-1 — host dashboard publication removed (resolved 2026-10-27)
+The former `9080:8080` host publication is removed. A loopback-only binding still answered through the NAS's network path during testing, so it was insufficient. With no publication, native Mac TCP and VPS probes through both Tailscale and Olm failed to reach host port 9080. The API still uses `--api.insecure=true`; shared Docker-network peers can reach its container port, and operators use SSH forwarding.
 
 ### F-N-TRAEFIK-2 — `:latest` image (`high` / NH2)
 See CloudNode F-TRAEFIK-1 for rationale — same risk, different host.
@@ -108,40 +103,23 @@ Traefik's default log format is text-only and written to stdout. No JSON
 access log means no CrowdSec ingestion possible even if we wanted to add a
 local CrowdSec.
 
-### F-N-TRAEFIK-4 — docker.sock is read-only (documented positive)
-Upstream often mounts rw; we mount `:ro`. Keep this. The Docker provider
-in Traefik only needs read access to the events stream.
+### F-N-TRAEFIK-4 — Docker socket access
+The existing `:ro` bind is retained. It does not make Docker API access read-only; changing the socket boundary requires a separately tested access proxy.
 
 ## Remediation
 
-### Fix F-N-TRAEFIK-1 — secure the dashboard
+### Dashboard access after F-N-TRAEFIK-1
 
-Minimum: drop the port publish and rely on `docker exec` + curl from the
-HomeNode host if you need dashboard access. Remove these lines:
+Discover the current container address, then forward its dashboard port over SSH. Repeat discovery after container recreation:
 
-```yaml
-      - "9080:8080"
-      - "--api.insecure=true"
+```bash
+TRAEFIK_IP=$(ssh jesus@192.168.1.10 "docker inspect traefik --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}'" | awk '{print $1}')
+test -n "$TRAEFIK_IP" && ssh -N -L "127.0.0.1:19080:${TRAEFIK_IP}:8080" jesus@192.168.1.10
 ```
 
-Better: expose the dashboard through Traefik itself on a gated router:
+Open `http://127.0.0.1:19080/dashboard/`. On 2026-10-27, `/api/overview` returned 200 through this forward; the same image remained healthy, public 80/443 bindings were preserved, and Seerr, Dashdot and AdGuard HTTPS responses were unchanged.
 
-```yaml
-    command:
-      - "--api.dashboard=true"
-      # do NOT set --api.insecure
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.example.com`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth"
-      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$2y$$05$$..."
-```
-
-Generate the basicauth hash with `htpasswd -nbB admin <password>` and
-**escape every `$` as `$$`** in compose.
+The duplicate `dynamic/request.yaml` was removed after confirming the enabled `seerr@docker` router serves the same hostname and container port. Its HTTPS redirect remained 307. `dynamic/adguard.yaml` points to an active router-hosted AdGuard instance and is retained.
 
 ### Fix F-N-TRAEFIK-2
 

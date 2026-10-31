@@ -1,0 +1,17 @@
+# Sanitized live snapshot, 2026-10-27. Supply credentials privately.
+services:
+  newt:
+    image: fosrl/newt:1.19.0
+    container_name: newt
+    restart: unless-stopped
+    environment:
+      - PANGOLIN_ENDPOINT=https://pangolin.example.com
+      - NEWT_ID=${NEWT_ID:?Set NEWT_ID in the private deployment environment}
+      - NEWT_SECRET=${NEWT_SECRET:?Set NEWT_SECRET in the private deployment environment}
+    networks:
+      - default
+      - traefik_traefik
+
+networks:
+  traefik_traefik:
+    external: true

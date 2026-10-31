@@ -1,6 +1,7 @@
+# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
 services:
   recyclarr:
-    image: ghcr.io/recyclarr/recyclarr:8.7.1
+    image: ghcr.io/recyclarr/recyclarr:8.8.0
     container_name: recyclarr
     user: 1000:1000
     restart: unless-stopped
@@ -15,3 +16,4 @@ services:
 
 networks:
   traefik_traefik:
+    external: true

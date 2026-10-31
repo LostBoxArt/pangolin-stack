@@ -21,7 +21,7 @@ services:
 
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:v2.8.0
+    image: ghcr.io/homarr-labs/homarr:v2.8.2
     networks:
       - pangolin
     restart: unless-stopped
@@ -30,7 +30,7 @@ services:
     volumes:
       - /opt/homarr/appdata:/appdata
     ports:
-      - 7575:7575
+      - "127.0.0.1:7575:7575"
     environment:
       - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
       - TZ=Asia/Jerusalem

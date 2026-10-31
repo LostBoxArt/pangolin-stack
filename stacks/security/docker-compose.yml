@@ -14,7 +14,7 @@ services:
       - pangolin
     environment:
       ACQUIRE_FILES: /var/log/traefik/*.log
-      COLLECTIONS: crowdsecurity/traefik crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules
+      COLLECTIONS: crowdsecurity/traefik crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules crowdsecurity/linux
       ENROLL_INSTANCE_NAME: pangolin-crowdsec
       ENROLL_TAGS: docker
       GID: "1000"
@@ -36,8 +36,8 @@ services:
     labels:
       - traefik.enable=false
     ports:
-      - 6060:6060
-      - 8080:8080
+      - "127.0.0.1:6060:6060"
+      - "127.0.0.1:8080:8080"
     restart: unless-stopped
     volumes:
       - /home/jesus/pangolin-stack/config/crowdsec:/etc/crowdsec
@@ -52,14 +52,14 @@ services:
 
   crowdsec-web-ui:
     # Pin a known-good release; the moving latest tag pulled a broken image on 2026-03-30.
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10
     container_name: crowdsec-web-ui
     user: "1001:1001"
     networks:
       - pangolin
     restart: unless-stopped
     ports:
-      - "3458:3000"
+      - "127.0.0.1:3458:3000"
     depends_on:
       crowdsec:
         condition: service_healthy

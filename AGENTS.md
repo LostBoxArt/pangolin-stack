@@ -272,3 +272,31 @@ curl -sk -H "Cookie: dockhand_session=${TOKEN}" \
 ## When Editing Docs
 - Keep `README.md` and `INFRASTRUCTURE.md` in sync with compose files.
 - If services move between stacks, update this file too.
+
+## Maintenance state — 2026-10-27
+
+- FileFlows and its DV watcher are decommissioned. Their containers, dedicated data and test media, deployment files, routes, watchdog checks, active inventory entries and vault item have been removed. Preserve shared infrastructure and historical audit/rollback records; do not recreate the retired services from old backups.
+- `home-services.py` loads Hermes bootstrap before importing its vault module. Read-only service checks and the MCP connection are verified working.
+- New stack backups include landing sites, the proxy build context and CrowdSec's full configuration tree. Pangolin uses a validated online SQLite snapshot. Other live databases remain uncoordinated copies; database integrity checks do not establish a full application restore.
+- Backup archives/logs and the NAS recovery-kit PDF now have owner-only file permissions. Existing backups were retained.
+- qbit-proxy runs on Node 24 with upstream TLS verification, a 10-second request deadline and a version-response healthcheck. Current qBittorrent cookies/status forwarding and API access from Homarr are verified; full browser widget rendering was not tested.
+
+
+## Verified maintenance update — 2026-10-27
+
+Use `docs/wiki/maintenance-2026-10-27.md` for the current live inventory, applied
+changes, verification and reviewed exclusions. FileFlows is retired; do not
+recreate it from an old archive. Olm uses root-only CONFIG_FILE with UMask0077
+and its credential was rotated. Newt's canonical Git compose now uses private
+Dockhand variables; its previous embedded secret is invalid. Its existing site
+identity, pinned image and original deployment schedule were preserved.
+Ordinary NAS traffic currently prefers Tailscale policy routing; a separate
+forced-interface Olm health probe also passed. NAS Traefik's dashboard has no
+host-published port; use the documented SSH-forwarded container API.
+
+Verification complete (2026-10-27): six CloudNode database snapshots, encrypted
+copies in both directions, independent recovery-key checks and isolated native
+application recovery passed. The dated maintenance record supersedes earlier
+notes about pending Olm rotation or uncoordinated database copies. Both off-host
+timers are enabled with user lingering; see the recovery runbook for commands
+and the explicit scope of validation.

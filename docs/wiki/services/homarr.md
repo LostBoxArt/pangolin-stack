@@ -20,7 +20,7 @@ last_lint: 2026-10-23
 Personal landing / dashboard page at `home.example.com`. Embeds widgets for
 media services, torrents, system status, etc.
 
-- **Image**: `ghcr.io/homarr-labs/homarr:v2.8.0` (live-verified 2026-10-23)
+- **Image**: `ghcr.io/homarr-labs/homarr:v2.8.2` (live-verified 2026-10-23)
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
 - **Port**: `7575` (published on host, also Traefik-fronted)
 - **Data**: `/opt/homarr/appdata:/appdata` (host bind, **not** inside repo)
@@ -54,7 +54,7 @@ services:
 ```22:36:stacks/dashboard/docker-compose.yml
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:v2.8.0
+    image: ghcr.io/homarr-labs/homarr:v2.8.2
     networks:
       - pangolin
     restart: unless-stopped
@@ -120,7 +120,7 @@ Re-add only if a Docker widget is actually configured, and prefer
 Now pinned to stable `v2.8.0`:
 
 ```yaml
-    image: ghcr.io/homarr-labs/homarr:v2.8.0
+    image: ghcr.io/homarr-labs/homarr:v2.8.2
 ```
 
 The beta is no longer needed. Bump deliberately and check

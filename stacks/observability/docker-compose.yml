@@ -15,7 +15,7 @@ services:
       - pangolin
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     volumes:
       - /home/jesus/pangolin-stack/data/positions:/data
       - /home/jesus/pangolin-stack/config/traefik/logs:/logs:ro
@@ -40,7 +40,7 @@ services:
       - pangolin
     restart: unless-stopped
     ports:
-      - "3457:3000"
+      - "127.0.0.1:3457:3000"
     environment:
       - AGENT_API_URL=http://traefik-agent:5000
       - AGENT_API_TOKEN=${TRAEFIK_DASHBOARD_TOKEN}
@@ -63,7 +63,7 @@ services:
       - pangolin
     restart: unless-stopped
     ports:
-      - 3001:3001
+      - "127.0.0.1:3001:3001"
     group_add:
       - "986"  # docker group
     environment:

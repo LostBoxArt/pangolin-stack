@@ -60,6 +60,9 @@ cmd_start() {
     [ -z "$stack" ] && usage
     echo -e "${YELLOW}Starting $stack stack...${NC}"
     $(get_compose_cmd "$stack") up -d --remove-orphans
+    if [ "$stack" = core ]; then
+        "$SCRIPT_DIR/scripts/ensure-traefik-netns.sh"
+    fi
     echo -e "${GREEN}✓ $stack stack started${NC}"
 }
 
@@ -76,6 +79,9 @@ cmd_restart() {
     [ -z "$stack" ] && usage
     echo -e "${YELLOW}Restarting $stack stack...${NC}"
     $(get_compose_cmd "$stack") restart
+    if [ "$stack" = core ]; then
+        "$SCRIPT_DIR/scripts/ensure-traefik-netns.sh"
+    fi
     echo -e "${GREEN}✓ $stack stack restarted${NC}"
 }
 

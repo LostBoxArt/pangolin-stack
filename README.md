@@ -29,14 +29,14 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 - Gerbil: `fosrl/gerbil:1.5.2`
 - Traefik: `traefik:v3.7.16`
 - Traefik Badger plugin: `v1.7.0`
-- Homarr: `ghcr.io/homarr-labs/homarr:v2.8.0`
+- Homarr: `ghcr.io/homarr-labs/homarr:v2.8.2`
 - Pocket-ID: `ghcr.io/pocket-id/pocket-id:v2.19.1`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10`
 - Newt (HomeNode): `fosrl/newt:1.19.0`
 - Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
 The deployed Pangolin/Newt/Olm/Gerbil tuple was verified on 2026-10-23; see [`docs/wiki/services/pangolin.md`](docs/wiki/services/pangolin.md) for the security-update evidence and compatibility notes. Pangolin 1.25.3 requires Traefik 3.6+ for all load-balancing options; the current Traefik pin satisfies this. Keep Badger at `v1.7.0` until the upstream plugin-integrity issue with `v1.8.0` is fixed; see the [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3).
-CrowdSec Web UI is pinned to `2026.10.9`; release `2026.10.3` introduced the `/app/data` persistent-state layout, which remains explicit in the deployment.
+CrowdSec Web UI is pinned to `2026.10.10`; release `2026.10.3` introduced the `/app/data` persistent-state layout, which remains explicit in the deployment.
 Traefik shares Gerbil's network namespace. If `gerbil` is recreated during an upgrade, recreate `traefik` immediately afterward:
 
 ```bash

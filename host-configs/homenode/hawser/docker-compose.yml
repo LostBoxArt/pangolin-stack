@@ -1,0 +1,37 @@
+# Sanitized live snapshot, 2026-10-27. Supply credentials privately.
+# Hawser - Dockhand Remote Agent
+#
+# This replaces docker-socket-proxy for NAS-VPS Docker management.
+# Hawser provides full Docker API access (not just read-only).
+#
+# Configuration:
+# - DOCKHAND_SERVER_URL: WebSocket URL to Dockhand (Edge mode) or leave empty for Standard mode
+# - TOKEN: Authentication token (generate in Dockhand Settings > Environments)
+# - AGENT_NAME: Display name in Dockhand UI
+#
+# Current mode: Standard (exposes port 2376 for Dockhand to connect to)
+# To switch to Edge mode, set DOCKHAND_SERVER_URL and remove port exposure.
+
+services:
+  hawser:
+    image: ghcr.io/finsys/hawser:latest
+    container_name: hawser
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      # Standard mode: Dockhand connects to this port
+      - "192.168.1.10:2375:2376"
+    environment:
+      # Authentication token (generate in Dockhand Settings > Environments > Hawser Standard)
+      - TOKEN=${HAWSER_TOKEN:?Set HAWSER_TOKEN in the private deployment environment}
+      - AGENT_NAME=nasus
+      - LOG_LEVEL=info
+      # Uncomment for Edge mode (Hawser connects out to VPS Dockhand):
+      # - DOCKHAND_SERVER_URL=wss://dockhand.example.com/api/hawser/connect
+    networks:
+      - traefik_traefik
+
+networks:
+  traefik_traefik:
+    external: true

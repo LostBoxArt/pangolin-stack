@@ -1,6 +1,7 @@
+# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
 services:
   seerr:
-    image: ghcr.io/seerr-team/seerr:v3.5.0
+    image: ghcr.io/seerr-team/seerr:v3.5.1
     container_name: seerr
     init: true
     restart: unless-stopped

@@ -1,0 +1,21 @@
+# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
+services:
+  dash:
+    image: mauricenino/dashdot:latest
+    container_name: dash
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/mnt/host:ro
+    networks:
+      - traefik_traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dash.rule=Host(`dash.example.com`)"
+      - "traefik.http.routers.dash.entrypoints=websecure"
+      - "traefik.http.routers.dash.tls.certresolver=cloudflare"
+      - "traefik.http.services.dash.loadbalancer.server.port=3001"
+
+networks:
+  traefik_traefik:
+    external: true

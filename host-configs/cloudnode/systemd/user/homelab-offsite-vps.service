@@ -1,0 +1,11 @@
+[Unit]
+Description=Encrypt completed CloudNode backup to NAS
+
+[Service]
+Type=oneshot
+UMask=0077
+EnvironmentFile=%h/.config/homelab-backups/offsite.env
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=4h
+ExecStart=%h/.local/bin/offsite-backup vps

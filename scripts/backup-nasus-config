@@ -1,0 +1,102 @@
+#!/bin/sh
+set -eu
+umask 077
+
+RESTIC="$HOME/.local/bin/restic-0.19.1"
+PASSWORD_FILE="$HOME/.config/homelab-backups/nasus-restic.password"
+REPOSITORY=/volume1/backups/restic-nasus-config
+STAGE=/volume1/backups/.nasus-config-stage
+ENGINE="$HOME/.local/lib/homelab-backups/backup-nasus-config.py"
+STATE="$HOME/.local/state/homelab-backups"
+mkdir -p "$STATE" "$STAGE" "$REPOSITORY"
+chmod 700 "$STATE" "$STAGE" "$REPOSITORY"
+exec 9>"$STATE/nasus-config.lock"
+flock -n 9 || { echo 'NAS configuration backup is already running' >&2; exit 75; }
+test "$(stat -c %a "$PASSWORD_FILE")" = 600
+test "$(stat -c %u "$PASSWORD_FILE")" = "$(id -u)"
+test "$(sha256sum "$RESTIC" | cut -d' ' -f1)" = 20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639
+
+IDS=$(docker ps -q)
+test -n "$IDS"
+FORMAT='{"name":{{json .Name}},"image":{{json .Image}},"mounts":{{json .Mounts}},"compose":{{json (index .Config.Labels "com.docker.compose.project.config_files")}}}'
+# Container IDs come directly from Docker, not shell input or configuration values.
+docker inspect --format "$FORMAT" $IDS > "$STAGE/inventory.jsonl"
+PYTHON_IMAGE=$(docker inspect --format '{{.Image}}' bazarr)
+PLEX_IMAGE=$(docker inspect --format '{{.Image}}' plex)
+UID_NUMBER=$(id -u)
+GID_NUMBER=$(id -g)
+
+mkdir -p "$STAGE/historical-checks"
+for SERVICE in plex seerr; do
+    CONFIG=$SERVICE
+    test "$SERVICE" != seerr || CONFIG=jellyseerr
+    # Read descriptor metadata in only this application's PID namespace.
+    # No ptrace attach, live SQL writes, or host PID namespace is used.
+    docker run --rm --pid="container:$SERVICE" --cap-add SYS_PTRACE --network none --read-only \
+        --mount type=bind,source=/volume1,target=/source/volume1,readonly \
+        --mount "type=bind,source=$ENGINE,target=/backup-engine.py,readonly" \
+        --entrypoint /lsiopy/bin/python3 "$PYTHON_IMAGE" \
+        /backup-engine.py --verify-historical-root "/source/volume1/docker/config/$CONFIG" \
+        > "$STAGE/historical-checks/$SERVICE.json"
+done
+
+docker run --rm --network none --read-only \
+    --env PYTHONDONTWRITEBYTECODE=1 \
+    --mount type=bind,source=/volume1,target=/source/volume1,readonly \
+    --mount type=bind,source=/volume2,target=/source/volume2,readonly \
+    --mount type=bind,source=/usr/local/bin,target=/source/usr/local/bin,readonly \
+    --mount type=bind,source=/usr/builtin/etc/crontabs/root,target=/source/usr/builtin/etc/crontabs/root,readonly \
+    --mount type=bind,source=/usr/local/AppCentral/docker-ce/bin/docker,target=/source/usr/local/AppCentral/docker-ce/bin/docker,readonly \
+    --mount "type=bind,source=$HOME/.local/bin/backup-nasus-config,target=/source$HOME/.local/bin/backup-nasus-config,readonly" \
+    --mount "type=bind,source=$ENGINE,target=/source$HOME/.local/lib/homelab-backups/backup-nasus-config.py,readonly" \
+    --mount "type=bind,source=$STAGE,target=/backup-stage" \
+    --mount "type=bind,source=$ENGINE,target=/backup-engine.py,readonly" \
+    --mount "type=bind,source=$STAGE/inventory.jsonl,target=/inventory.jsonl,readonly" \
+    --entrypoint /lsiopy/bin/python3 "$PYTHON_IMAGE" \
+    /backup-engine.py --owner-uid "$UID_NUMBER" --owner-gid "$GID_NUMBER" --host-home "$HOME" \
+    --historical-proof-directory /backup-stage/historical-checks
+
+mkdir -p "$STAGE/current/runtime"
+chmod 700 "$STAGE/current/runtime"
+# Required for cold recovery of managed stacks whose secrets live in Dockhand.
+# This file contains credentials and must never be printed or committed.
+docker inspect $IDS > "$STAGE/current/runtime/services.json"
+chmod 600 "$STAGE/current/runtime/services.json"
+test "$(printf '%s\n' "$IDS" | sort)" = "$(docker ps -q | sort)" || {
+    echo 'Active containers changed while staging; rerun backup' >&2
+    exit 1
+}
+cp "$STAGE/inventory.jsonl" "$STAGE/current/runtime/inventory.jsonl"
+chmod 600 "$STAGE/current/runtime/inventory.jsonl"
+cp "$STAGE/historical-checks/plex.json" "$STAGE/historical-checks/seerr.json" "$STAGE/current/runtime/"
+
+docker run --rm --network none --read-only \
+    --mount "type=bind,source=$STAGE/current,target=/validate,readonly" \
+    --entrypoint /lsiopy/bin/python3 "$PYTHON_IMAGE" -c \
+    'import json; d=json.load(open("/validate/BACKUP-MANIFEST.json")); print("\n".join(x["path"] for x in d["databases"] if x["validation"]=="plex-pending"))' \
+    > "$STAGE/plex-paths.list"
+PLEX_COUNT=0
+while IFS= read -r DATABASE; do
+    test -n "$DATABASE" || continue
+    RESULT=$(docker run --rm --network none --read-only \
+        --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m,mode=1777 \
+        --mount "type=bind,source=$STAGE/current,target=/validate,readonly" \
+        --entrypoint '/usr/lib/plexmediaserver/Plex SQLite' "$PLEX_IMAGE" \
+        -readonly "/validate/$DATABASE" 'PRAGMA integrity_check;')
+    test "$RESULT" = ok || { echo 'Plex snapshot integrity verification failed' >&2; exit 1; }
+    PLEX_COUNT=$((PLEX_COUNT + 1))
+done < "$STAGE/plex-paths.list"
+test "$PLEX_COUNT" -ge 2
+
+docker run --rm --network none --read-only \
+    --mount "type=bind,source=$STAGE/current,target=/validate" \
+    --entrypoint /lsiopy/bin/python3 "$PYTHON_IMAGE" -c \
+    'import json; p="/validate/BACKUP-MANIFEST.json"; d=json.load(open(p)); [x.update(validation="plex-integrity-ok") for x in d["databases"] if x["validation"]=="plex-pending"]; json.dump(d,open(p,"w"),indent=2)'
+
+if ! test -f "$REPOSITORY/config"; then
+    "$RESTIC" --repo "$REPOSITORY" --password-file "$PASSWORD_FILE" init
+fi
+"$RESTIC" --json --repo "$REPOSITORY" --password-file "$PASSWORD_FILE" \
+    backup --host NASUS --tag nasus-config-consistent "$STAGE/current" > "$STAGE/restic-last.jsonl"
+"$RESTIC" --quiet --repo "$REPOSITORY" --password-file "$PASSWORD_FILE" check
+tail -n 1 "$STAGE/restic-last.jsonl"

@@ -20,7 +20,7 @@ last_lint: 2026-10-23
 Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image
 (not shipped by CrowdSec team).
 
-- **Image**: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9` (live-verified 2026-10-23)
+- **Image**: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10` (live-verified 2026-10-23)
 - **Compose file**: `stacks/security/docker-compose.yml`
 - **Host port**: `3458:3000` (direct local access; keep filtered)
 - **Public route**: Pangolin-fronted `crowdsec.example.com` with SSO
@@ -38,7 +38,7 @@ README is the only documentation.
 
 ```53:71:stacks/security/docker-compose.yml
   crowdsec-web-ui:
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10
     container_name: crowdsec-web-ui
     user: "1001:1001"
     networks:

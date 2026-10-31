@@ -99,14 +99,15 @@ Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everyth
 - Gerbil: `fosrl/gerbil:1.5.2`
 - Traefik: `traefik:v3.7.16`
 - Traefik Badger plugin: `github.com/fosrl/badger@v1.7.0`
-- Homarr: `ghcr.io/homarr-labs/homarr:v2.8.0`
+- Homarr: `ghcr.io/homarr-labs/homarr:v2.8.2`
 - Pocket-ID: `ghcr.io/pocket-id/pocket-id:v2.19.1`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.9`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10`
 - Newt (HomeNode): `fosrl/newt:1.19.0`
 - Olm (CloudNode systemd binary): `1.9.1` with `--override-dns=false`
 
 Compatibility note (verified 2026-10-23): Pangolin `1.25.3`, Gerbil `1.5.2`, Newt `1.19.0`, Olm `1.9.1`, and Traefik `v3.7.16` are the deployed set. Pangolin 1.25.3 requires Traefik 3.6+ for all load-balancing options; keep Badger at `v1.7.0` because upstream reports `v1.8.0` fails Traefik's plugin integrity check. See the [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3).
-Operational note: CrowdSec Web UI `2026.10.9` retains the `/app/data` layout introduced in `2026.10.3` and runs as the host service UID in this deployment.
+Operational note: CrowdSec Web UI `2026.10.10` retains the `/app/data` layout introduced in `2026.10.3` and runs as the host service UID in this deployment.
+Termix was removed from the CloudNode apps stack on 2026-10-16; the container and Compose service are gone. Its Pangolin resource route cleanup is still open — see the 2026-10-16 log entry.
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 

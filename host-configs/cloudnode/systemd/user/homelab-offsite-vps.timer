@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily encrypted CloudNode backup after local archive
+
+[Timer]
+OnCalendar=*-*-* 03:40:00 Asia/Jerusalem
+RandomizedDelaySec=5m
+Persistent=true
+Unit=homelab-offsite-vps.service
+
+[Install]
+WantedBy=timers.target

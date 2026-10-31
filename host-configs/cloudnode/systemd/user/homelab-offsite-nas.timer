@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly NAS configuration backup and off-host recovery copy
+
+[Timer]
+OnCalendar=Sat *-*-* 05:00:00 Asia/Jerusalem
+RandomizedDelaySec=10m
+Persistent=true
+Unit=homelab-offsite-nas.service
+
+[Install]
+WantedBy=timers.target

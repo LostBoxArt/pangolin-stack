@@ -80,6 +80,7 @@ Control and tunnel flow:
 - `landing`
 
 ### Historical note
+- `termix` was removed from the CloudNode apps stack on 2026-10-16. Its Pangolin public-resource route still requires authenticated deletion; the detached data volume is retained temporarily.
 - `adguard-home` was removed from the CloudNode on 2026-04-21 and is not part
   of the active stack layout. The dead `stacks/dns/` compose file, the
   `dns-tls` (853) Traefik entrypoint, and `config/adguard-home/` were finally

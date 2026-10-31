@@ -9,127 +9,48 @@ entities:
   primary: homenode-seerr
   mentions: []
 related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.md"]
-sources: ["/volume1/docker/config/seerr/docker-compose.yml", "host-configs/homenode/seerr/docker-compose.yml"]
+sources: ["/volume1/docker/config/seerr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-10
-last_lint: 2026-10-10
+last_ingested: 2026-10-27
+last_lint: 2026-10-27
 ---
 # seerr
 
-Media request front-end for end users — they ask for a movie / show, it
-hands the request to Sonarr / Radarr for fulfilment.
+Seerr manages media requests and connects to Sonarr, Radarr, and the media server.
+The verified deployment uses `ghcr.io/seerr-team/seerr:v3.5.1`; this maintenance
+performed no Seerr upgrade or migration.
 
-- **Image**: `ghcr.io/seerr-team/seerr:v3.5.0` ✓
-- **Compose file**: `/volume1/docker/config/seerr/docker-compose.yml`
-- **Tracked copy**: `host-configs/homenode/seerr/docker-compose.yml` ✓
-- **Port (internal)**: `5055`
-- **Router**: `request.example.com`
-- **Volume**: `/volume1/docker/config/jellyseerr:/app/config` ✓ intentional legacy directory; verified live and protected by backup
+## Current source (2026-10-27)
 
-## Upstream Sources
+The live definition is `/volume1/docker/config/seerr/docker-compose.yml` and its
+sanitized copy is `host-configs/homenode/seerr/docker-compose.yml`. It retains
+UID/GID 1000, `init`, `no-new-privileges`, memory limits, the existing status
+healthcheck, and `traefik_traefik` connectivity.
 
-- Official project: <https://github.com/seerr-team/seerr>
-- Original Jellyseerr: <https://github.com/fallenbagel/jellyseerr>
-- Ancestor Overseerr: <https://github.com/sct/overseerr>
+The data bind remains `/volume1/docker/config/jellyseerr:/app/config`.
+That historical directory name is not an unused installation: it contains the
+active Seerr data. Preserve it in backup discovery. Do not rename or delete it
+merely to match the service name, and do not switch back to a different image
+based on the older wiki's unsupported fork/downgrade recommendation.
 
-## Our Compose
+Docker labels route `request.example.com` to port 5055. The duplicate NAS file
+route was removed after verifying the label router; the expected public redirect
+was preserved. See [NAS Traefik](./traefik.md).
 
-```yaml
-services:
-  seerr:
-    image: ghcr.io/seerr-team/seerr:v3.5.0
-    container_name: seerr
-    init: true
-    restart: unless-stopped
-    security_opt: ["no-new-privileges:true"]
-    user: "1000:1000"
-    environment:
-      - LOG_LEVEL=debug
-      - TZ=Asia/Jerusalem
-    deploy:
-      resources:
-        limits: { memory: 1G }
-        reservations: { memory: 512M }
-    volumes:
-      - /volume1/docker/config/jellyseerr:/app/config
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
-      start_period: 20s
-      timeout: 3s
-      interval: 15s
-      retries: 3
-    networks:
-      - traefik_traefik
-    labels:
-      - "traefik.http.routers.seerr.rule=Host(`request.example.com`)"
-      - "traefik.http.services.seerr.loadbalancer.server.port=5055"
+## Verify safely
+
+```bash
+docker inspect seerr --format '{{.State.Status}} {{.State.Health.Status}}'
+docker exec seerr wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status
 ```
 
-### Current Deployment (verified 2026-09-05)
+Expected: running/healthy and a successful native status request. Read-only
+service verification also authenticated successfully. Do not submit media
+requests or approvals to test availability: they can create downloads and send
+notifications.
 
-- Container: `seerr` on HomeNode; image `ghcr.io/seerr-team/seerr:v3.5.0`.
-- Data: `/volume1/docker/config/jellyseerr:/app/config`.
-- Compose source: `/volume1/docker/config/seerr/docker-compose.yml`.
-- Healthcheck: healthy; internal Traefik route returned HTTP 200.
-- A verified backup was taken before recreation; the database and settings
-  hashes matched afterward.
+## Upstream sources
 
-## Deviations / Findings
-
-### F-N-SEERR-1 — official Seerr project and pinned stable release (resolved 2026-10-10)
-`seerr-team/seerr` is the official Seerr project. The live container was
-verified at stable release `v3.5.0`, which is also the current upstream latest
-release. Keep the image pinned to that tag and check the official release page
-before future upgrades.
-
-### F-N-SEERR-2 — data volume is `jellyseerr/` (intentional)
-`/volume1/docker/config/jellyseerr:/app/config` is the verified live mount.
-The directory name differs from the service name because this state originated
-as Jellyseerr. It must not be renamed during routine maintenance. A verified
-backup was created before the v3.5.0 recreation; the settings and database
-hashes were unchanged.
-
-### F-N-SEERR-3 — commented IPAM removed (resolved 2026-09-05)
-The live Compose definition uses the external `traefik_traefik` network without a
-hard-coded container address or dangling IPAM comment.
-
-### F-N-SEERR-4 — mutable image tag (resolved 2026-10-10)
-The image is now pinned to the verified upstream stable release `v3.5.0`.
-Future upgrades must compare the official release tag and image digest first.
-
-### F-N-SEERR-5 — `LOG_LEVEL=debug` in steady state (`low`)
-Debug logging is fine when diagnosing, but leaves it in production
-generates a lot of noise and bloats the `/app/config/logs/` directory.
-Drop to `info` once the fork is stable in your environment.
-
-## Remediation
-
-No image migration is required. Keep `ghcr.io/seerr-team/seerr:v3.5.0` and
-upgrade only after checking the official release and preserving a verified
-backup of the `jellyseerr` data directory.
-### v3.5.0 breaking-change check
-
-Seerr v3.5.0 changed the Plex/Jellyfin library API: the library read endpoints no longer accept `sync` or `enable` query parameters and reading no longer changes enabled state. The deployment has no local client using those parameters. After the upgrade, Seerr remained healthy, the request inventory remained 69 records, and the media MCP reported all seven configured services healthy.
-
-This is actually one of the better-hardened compose files on HomeNode:
-
-- `init: true` — reaps zombie processes from the node runtime.
-- `security_opt: no-new-privileges` — stops privilege escalation via
-  setuid binaries inside the container.
-- `deploy.resources.limits.memory: 1G` — prevents a runaway from OOM-ing
-  the NAS.
-- Explicit healthcheck with reasonable timings.
-
-Keep all of the above when you fix the other findings.
-
-## Operational Notes
-
-- seerr talks to Sonarr / Radarr / Plex via their APIs. Internal
-  hostnames: `http://sonarr:8989`, `http://radarr:7878`,
-  `http://plex:32400`.
-- Request approval / denial emits notifications — webhooks to Discord /
-  Telegram work from inside the Docker network just fine.
-- First-run setup: creates the admin from Plex OAuth. If Plex can't reach
-  `seerr:5055` over the Docker network, setup hangs — verify with
-  `docker exec seerr wget -qO- http://plex:32400/identity`.
+- [Seerr source and image project](https://github.com/seerr-team/seerr)
+- [Seerr documentation](https://docs.seerr.dev/)

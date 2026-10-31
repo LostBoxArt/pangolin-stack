@@ -49,7 +49,7 @@ services:
       - /volume1/media/movies:/movies
       - /volume1/media/tv:/tv
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:6767/system/status >/dev/null || exit 1"]
+      test: ["CMD", "/lsiopy/bin/python3", "-c", "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:6767/api/system/ping', timeout=8)).get('status') == 'OK'"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -63,8 +63,7 @@ services:
 ## Deviations / Findings
 
 - **`:latest` image** (`medium` / NM2).
-- **Healthcheck**: `/system/status` is the canonical endpoint for Bazarr
-  (not `/ping`, unlike Sonarr/Radarr). Correct.
+- **Healthcheck**: validate JSON `status: OK` from `/api/system/ping`. The old `/system/status` path could return the frontend and falsely pass. Check authenticated APIs separately for upstream integration health.
 - **Volumes match Sonarr/Radarr**: Bazarr retains `/movies` and `/tv` as
   compatibility aliases and also has `/data` available. Its stored paths remain
   on the legacy aliases intentionally until the observation period is complete;

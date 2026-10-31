@@ -110,6 +110,7 @@ Each page follows the same structure:
 
 - [landing](./services/landing.md)
 
+> Historical: [Termix](./services/termix.md) was removed from the CloudNode Compose stack on 2026-10-16. Its Pangolin public-resource route remains pending authenticated cleanup; its data volume is retained temporarily.
 > Historical: [linkstack](./services/linkstack.md) was replaced by `landing` on 2026-04-21.
 
 ## HomeNode — `/volume1/docker/`
@@ -191,3 +192,12 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 - Hosts: `docs/wiki/hosts/*.md`
 - Networks: `docs/wiki/networks/*.md`
 - Runbooks: `docs/wiki/runbooks/*.md`
+
+
+## Verified maintenance references — 2026-10-27
+
+- [Current verified maintenance](./maintenance-2026-10-27.md)
+- [Encrypted backup and recovery](./runbooks/backup-recovery.md)
+- [NAS configuration recovery](./runbooks/backup-nasus-config.md)
+- [Monitoring and MCP tunnel](./runbooks/monitoring-and-arr-mcp.md)
+- [arr-mcp](./services-homenode/arr-mcp.md)

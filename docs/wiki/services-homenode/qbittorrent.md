@@ -140,8 +140,12 @@ Not a compose change. Runbook:
 - Global share limit: `ShareLimitAction=RemoveWithContent` with both `max_seeding_time` and
   `max_inactive_seeding_time` set to 30 days (`43200` minutes). Torrents older than 30 days
   are removed together with their download files.
-- Arr imports are copies, not hardlinks (`nlink=1` on the download files), so deleting the
-  download copy never touches `movies/` or `tv/`. Verified on 2026-11-01 before enabling.
+- Deleting a download copy never touches `movies/` or `tv/`: imported items are hardlinked
+  (`nlink=2`, deleting the download link frees no space) and unimported ones are separate
+  files. Verified 2026-11-01 before enabling.
+- Per-torrent `seeding_time_limit=-1` overrides the global rule. Flash-imported torrents
+  carried that value; they were normalised to `-2` (use global) with
+  `POST /api/v2/torrents/setShareLimits`.
 - Sonarr and Radarr use the post-import category `seeding`; Arr will not remove completed torrents in that category.
 - The `seeding` qBittorrent category exists for imported torrents. Existing torrents are not moved automatically.
 

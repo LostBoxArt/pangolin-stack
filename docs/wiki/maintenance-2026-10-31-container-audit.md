@@ -204,9 +204,15 @@ load average 30 → 4. Upload settled at the 10 MiB/s cap.
   only round-trips through the preference string (`Scheduler\days=EveryDay`), which is
   what is set in `qBittorrent.conf`.
 - **30-day cleanup**: `max_seeding_time=43200`, `max_inactive_seeding_time=43200`,
-  action `RemoveWithContent`. Enabling it removed 165 torrents on the next check and
-  began deleting ~1.6 TB of download copies. All remaining torrents resolve inside
-  `/downloads` or `/data/downloads`; none pointed at the media library, and the
-  library directories were verified present afterwards.
+  action `RemoveWithContent`. Enabling it dropped the torrent list from 274 to 85 and
+  shrank `/volume1/media/downloads` from ~1.4 TB to 910 GB (only ~500 GB physically
+  freed; the rest were hardlinks to seeded library copies). Library sizes were
+  unchanged (`movies` 824 GB, `tv` 3.3 TB) and all remaining torrents resolve inside
+  `/downloads` or `/data/downloads`.
+- 24 torrents survived the first pass because they carried a per-torrent
+  `seeding_time_limit=-1` (unlimited), which overrides the global limit. All torrents
+  were normalised to `-2` (use global) via `POST /api/v2/torrents/setShareLimits`,
+  which removed them. Any torrent that arrives with an explicit `-1` will ignore the
+  30-day rule.
 - Side finding: the alternate speed mode had latched on with the stock 10 KiB/s alt
   limit, which had silently reduced upload to ~1 KB/s. Alt limits are now 20 MiB/s.

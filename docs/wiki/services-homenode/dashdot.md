@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/dashdot/docker-compose.yml", "host-configs/homenode/dashdot/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # dashdot (HomeNode)
 
@@ -21,11 +21,11 @@ System dashboard for HomeNode, separate from [CloudNode Dashdot](../services/das
 
 - **Image**: `mauricenino/dashdot:latest`; observed running version `6.3.4` on 2026-10-27.
 - **Compose file**: `/volume1/docker/config/dashdot/docker-compose.yml`.
-- **Tracked copy**: `host-configs/homenode/dashdot/docker-compose.yml` (sanitized addresses).
+- **Tracked copy**: `host-configs/homenode/dashdot/docker-compose.yml` (sanitized live snapshot, 2026-10-31).
 - **Internal port**: `3001`, routed by HomeNode Traefik at `dash.example.com`.
-- **Host access**: existing `privileged: true`, with `/:/mnt/host:ro`.
+- **Host access**: unprivileged; `no-new-privileges` is enabled, with `/:/mnt/host:ro`.
 
-## Supported configuration
+## Upstream-supported configuration (reference)
 
 The [official Compose installation](https://getdashdot.com/docs/installation/docker-compose) specifies the host root mount and privileged mode. The [6.3.4 setup implementation](https://github.com/MauriceNino/dashdot/blob/v6.3.4/apps/server/src/setup.ts) reads host network paths and enters the host network namespace through `/mnt/host`.
 
@@ -35,7 +35,8 @@ services:
     image: mauricenino/dashdot:latest
     container_name: dash
     restart: unless-stopped
-    privileged: true
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /:/mnt/host:ro
     networks:
@@ -52,11 +53,15 @@ networks:
     external: true
 ```
 
+The NAS's DSM root mount does not expose `/volume1`, so the storage widget
+is empty there. This is a Synology mount limitation, not evidence that the
+service is missing storage data.
+
 ## Host mount repair (2026-10-27)
 
-The previous mount exposed the application's config directory as `/mnt/host`. It now exposes the NAS root read-only, matching the official installation. Only Dashdot was recreated, using the same cached image, environment and existing privileges.
+The previous mount exposed the application's config directory as `/mnt/host`. It was changed to the NAS root read-only, matching the official installation. On 2026-10-31, privileged mode was removed and `no-new-privileges` added. The storage widget remains empty because DSM's root mount does not expose `/volume1`.
 
-Verification confirmed the mounted host's `/volume1`, `/proc` mount table and network sysfs are visible. The dashboard returned HTTPS 200 and its API continued reporting four CPU cores, 16.5 GB RAM and six storage entries, including the 12 TB array. Those hardware metrics were already present before repair; the change supplies the missing host filesystem paths.
+The 2026-10-27 host-mount repair was verified at that time. The 2026-10-31 audit found the NAS DSM root mount does not expose `/volume1`, so the storage widget is currently empty. This Synology limitation persists with the unprivileged container and read-only root mount.
 
 The NAS runs ASUSTOR ADM and lacks the standard host `etc/os-release` file. The OS widget still reports the container's Alpine release. Do not assume the mount repairs that separate OS identification limitation.
 
@@ -72,6 +77,6 @@ Expected: the mount source is `/`, destination `/mnt/host`, read-only; host path
 
 ## Operational boundaries
 
-- Existing privileged mode was retained because it is part of the documented setup. Removing it or guessing replacement capabilities needs separate widget testing.
+The HomeNode instance now runs unprivileged with `no-new-privileges`; the prior privileged mode was removed on 2026-10-31. This does not change the NAS limitation that its DSM root mount does not expose `/volume1`.
 - The image tag remains `latest`; this maintenance used the existing cached image and performed no version upgrade.
 - CloudNode and HomeNode both route `dash.example.com` on separate proxies. DNS and the selected proxy determine which instance is reached. Preserve the active NAS instance; a hostname migration requires checking its callers first.

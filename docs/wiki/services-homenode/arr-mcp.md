@@ -12,15 +12,16 @@ related: ["../maintenance-2026-10-27.md", "./newt.md"]
 sources: ["host-configs/homenode/arr-mcp/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # arr-mcp
 
 Authenticated media-stack MCP service, verified as image
-`ghcr.io/bardesss/arr-mcp:1.44.5` on 2026-10-27. Its NAS Compose file is
+`ghcr.io/bardesss/arr-mcp:1.50.0` on 2026-10-31. The contradictory
+`ARR_MCP_VERSION` override was removed. Its NAS Compose file is
 `/volume1/docker/config/arr-mcp/docker-compose.yml`; the sanitized reference is
-`host-configs/homenode/arr-mcp/docker-compose.yml`.
+`host-configs/homenode/arr-mcp/docker-compose.yml` is the sanitized live snapshot, 2026-10-31.
 
 The config mount is `/volume1/docker/config/arr-mcp:/config`. Bearer credentials
 and media-service API keys remain private in that configuration, outside Git.
@@ -32,11 +33,14 @@ authenticated MCP initialization/tool listing returned 39 tools after both
 Olm and Newt maintenance. Neither check invokes tools that modify media.
 See the 2026-10-27 maintenance note for the verification context.
 
-The captured Compose environment still contains historical
-`ARR_MCP_VERSION=1.21.2`. It was preserved as observed; use the image version
-and authenticated protocol metadata when assessing the running release. This
-maintenance did not upgrade or reconfigure arr-mcp.
+`ghcr.io/bardesss/arr-mcp:1.50.0` was verified on 2026-10-31. The earlier `ARR_MCP_VERSION=1.21.2` override has been removed; do not use the historical Compose snapshot below as the current deployment definition.
+
+## Current release
+
+`ghcr.io/bardesss/arr-mcp:1.50.0` is deployed. The historical
+`ARR_MCP_VERSION=1.21.2` Compose override was removed so it no longer
+contradicts the image tag.
 
 ## Upstream source
 
-- [arr-mcp 1.44.5 documentation](https://github.com/bardesss/arr-mcp/blob/v1.44.5/README.md)
+- [arr-mcp upstream documentation](https://github.com/bardesss/arr-mcp)

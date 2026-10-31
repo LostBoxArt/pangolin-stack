@@ -12,15 +12,15 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-23
-last_lint: 2026-10-23
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # traefik
 
 Edge reverse-proxy and TLS terminator for everything exposed behind
 `*.example.com`. Shares Gerbil's network namespace.
 
-- **Image**: `traefik:v3.7.16` (pinned to the verified running release)
+- **Image**: `traefik:v3.7.17` (pinned to the verified running release)
 - **Compose file**: `stacks/core/docker-compose.yml`
 - **Network mode**: `service:gerbil` — all ports appear on the gerbil container
 - **Config**:
@@ -28,8 +28,9 @@ Edge reverse-proxy and TLS terminator for everything exposed behind
   - Dynamic rules: `config/traefik/rules/`
   - ACME/LE certs: `config/letsencrypt/acme.json`
   - Access logs: `config/traefik/logs/access.log` (JSON)
-- **Docker socket**: mounted read-write (needed for Docker provider
-  label discovery)
+- **Docker socket**: mounted read-only for Docker provider label discovery
+- **API**: `api.insecure: false`; ping is enabled on `:8080` for the container healthcheck
+- **Access log**: `Authorization` is dropped
 
 ## Upstream Sources
 
@@ -67,7 +68,7 @@ traefik:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: traefik:v3.7.16
+    image: traefik:v3.7.17
     network_mode: service:gerbil
     restart: unless-stopped
     volumes:
@@ -75,16 +76,16 @@ traefik:
       - ../../config/letsencrypt:/letsencrypt
       - ../../config/traefik/logs:/var/log/traefik
       - ../../config/traefik/rules:/rules
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 ```
 
 ## Deviations
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Image tag | `traefik:v3.6` | `traefik:v3.7.16` | pinned to the verified running release — ✓ |
+| Image tag | `traefik:v3.6` | `traefik:v3.7.17` | pinned to the verified running release — ✓ |
 | `rules/` bind | not in upstream | `../../config/traefik/rules:/rules` | intentional — we split dynamic rules |
-| Docker socket | not in upstream | mounted | intentional — Docker provider labels |
+| Docker socket | not in upstream | mounted read-only | intentional — Docker provider labels; API access remains powerful |
 | `wud.watch=false` label | n/a | present | WUD-specific opt-out metadata; does not prove WUD is installed or prevent other Compose/Dockhand pulls |
 
 ## Findings
@@ -95,7 +96,7 @@ If an unattended `docker compose pull` on `core` grabs a Traefik 4.x with
 breaking changes, the proxy will fail to start and take down all public
 routes including Pangolin itself (which you need to log in and fix).
 
-The image is now pinned to `v3.7.16`, matching the verified running image
+The image is now pinned to `v3.7.17`, matching the verified running image
 digest. The Badger plugin remains pinned to `v1.7.0`.
 
 ### F-TRAEFIK-3 — placeholder `*.example.com` labels burning Let's Encrypt quota (`high` / resolved 2026-09-28)
@@ -135,30 +136,25 @@ and bans. Narrowed to loopback, the private ranges, `100.89.137.0/20`, and the
 exact Cloudflare edge CIDRs (only the apex is still Cloudflare-proxied; every
 other host is grey-cloud and hits the origin directly).
 
-### F-TRAEFIK-2 — docker.sock mounted read-write
-Traefik needs to *read* Docker events; it does not write. Some deployments
-use a socket proxy (e.g. `tecnativa/docker-socket-proxy`) that exposes only
-the read-only endpoints. Not flagged in this review because Gerbil namespace
-sharing already means Traefik sees the host network stack, but worth
-tracking as a future hardening step.
+### F-TRAEFIK-2 — Docker socket is read-only (resolved 2026-10-31)
+The Docker socket bind now uses `:ro`. This protects the socket path from
+filesystem writes but does not make Docker API operations read-only.
 
 ## Remediation
 
 ### Fix F-TRAEFIK-1 — pin the image (completed 2026-09-28)
 
 ```yaml
-    image: traefik:v3.7.16
+    image: traefik:v3.7.17
 ```
 
 Then commit, then `./stackctl.sh pull core` to verify the right digest is
 fetched, then `./stackctl.sh restart core` — remembering that **Traefik must
 be recreated whenever Gerbil is recreated** (see [gerbil](./gerbil.md)).
 
-### Future hardening (F-TRAEFIK-2, not urgent)
+### Future hardening (Docker API boundary)
 
-Swap `/var/run/docker.sock:/var/run/docker.sock` for a socket-proxy service
-on the `pangolin` network and point Traefik's Docker provider at
-`tcp://docker-socket-proxy:2375`.
+The socket path is mounted `:ro`, but this does not authorize Docker API operations. A socket proxy may further restrict the API surface if desired.
 
 ## Operational Notes
 
@@ -166,7 +162,7 @@ on the `pangolin` network and point Traefik's Docker provider at
   will NOT show traefik. It is attached to gerbil's namespace.
 - Logs: `config/traefik/logs/access.log` (JSON format, consumed by
   CrowdSec and the traefik-log-dashboard agent).
-- Pangolin release notes say `3.6+` is required for all load-balancing options; deployed `v3.7.16` satisfies the requirement.[1]
+- Pangolin release notes say `3.6+` is required for all load-balancing options; deployed `v3.7.17` satisfies the requirement.[1]
 - Badger remains pinned at `v1.7.0` because the same release notes report a plugin-integrity failure in `v1.8.0`; see [Badger](./badger.md).
 
 ## Sources

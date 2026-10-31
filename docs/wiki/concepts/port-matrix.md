@@ -42,20 +42,24 @@ This page is the quickest view of which host or service owns which important por
 |---|---|---|---|---|
 | 80/tcp | HomeNode Traefik | LAN / routed | HTTP entrypoint | LAN reverse proxy |
 | 443/tcp | HomeNode Traefik | LAN / routed | HTTPS entrypoint | Cloudflare DNS-01 certs |
-| 9080/tcp | HomeNode Traefik dashboard | LAN / risk surface | admin dashboard | `NC1`, currently insecure |
+| 9080/tcp | HomeNode Traefik | not published | former dashboard/API host port | old host mapping removed; API insecure disabled |
 | 2375/tcp | Hawser | LAN / CloudNode-reachable | remote Docker API proxy | `NC2`, token-protected but high risk if misconfigured |
 | 1411/tcp | Pocket-ID equivalent not on HomeNode | n/a | n/a | identity is CloudNode-side |
 | 32400/tcp | Plex | WAN forward → HomeNode NAS | direct media ingress | router forwards WAN `32400/tcp` to the NAS; Pangolin/Newt is web UI only |
+| 6881/tcp | qBittorrent | WAN forward → HomeNode NAS | peer traffic | published by qBittorrent and forwarded on the router |
+| 6881/udp | qBittorrent | WAN forward → HomeNode NAS | peer traffic | published by qBittorrent and forwarded on the router |
 | 8080/tcp | qBittorrent | internal / routed | torrent web UI | exposed via Traefik |
 
 ## How it applies here
+- CrowdSec AppSec `7422/tcp` is internal-only and not published.
+- Traefik ping health endpoints on CloudNode `8080/tcp` and HomeNode `8082/tcp` are internal and not published.
 - CloudNode uses Traefik behind Gerbil's namespace-sharing model.
 - HomeNode uses a flat `traefik_traefik` network and a separate Traefik instance.
-- The quickest port-risk checks are currently `9080` on HomeNode Traefik and `2375` on Hawser.
+- The quickest port-risk checks are currently `2375` on Hawser; HomeNode Traefik's insecure API setting has been removed.
 
 ## Gotchas
 - CloudNode Traefik does not look like a normal network member because it rides Gerbil's namespace.
-- HomeNode Traefik dashboard and Hawser API port are the current known compromise-risk surfaces.
+- HomeNode Traefik's insecure API setting has been removed; Hawser API port remains a known risk surface.
 - Port ownership questions often require both the service page and the network page, not just compose snippets.
 
 ## Related concepts

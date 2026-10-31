@@ -12,17 +12,17 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/security/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-23
-last_lint: 2026-10-23
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # crowdsec-web-ui
 
 Web admin UI for CrowdSec decisions / alerts / bouncers. Third-party image
 (not shipped by CrowdSec team).
 
-- **Image**: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10` (live-verified 2026-10-23)
+- **Image**: `ghcr.io/theduffman85/crowdsec-web-ui:2026.10.13` (live-verified 2026-10-31)
 - **Compose file**: `stacks/security/docker-compose.yml`
-- **Host port**: `3458:3000` (direct local access; keep filtered)
+- **Host port**: `127.0.0.1:3458:3000` (loopback-only)
 - **Public route**: Pangolin-fronted `crowdsec.example.com` with SSO
 - **Data**: `./config/crowdsec-web-ui/` bound at `/app/data`; the container runs as UID/GID `1001:1001` to preserve owner-only host permissions
 
@@ -38,14 +38,14 @@ README is the only documentation.
 
 ```53:71:stacks/security/docker-compose.yml
   crowdsec-web-ui:
-    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.10
+    image: ghcr.io/theduffman85/crowdsec-web-ui:2026.10.13
     container_name: crowdsec-web-ui
     user: "1001:1001"
     networks:
       - pangolin
     restart: unless-stopped
     ports:
-      - "3458:3000"
+      - "127.0.0.1:3458:3000"
     depends_on:
       crowdsec:
         condition: service_healthy
@@ -60,17 +60,14 @@ README is the only documentation.
 ## Deviations
 
 Release `2026.10.3` migrated the persistent state layout from `/app/config` to
-`/app/data`. The current `2026.10.9` image retains that layout; the deployment
+`/app/data`. The current `2026.10.13` image retains that layout; the deployment
 keeps the state directory owner-only and runs as UID/GID `1001:1001` so the host
-account and watchdog can still read the tracked configuration. The current
-container was healthy with zero restarts on 2026-10-23.
+account and watchdog can still read the tracked configuration. The current deployment was healthy after the 2026-10-31 audit.
 
 ## Findings
 
 ### F-CSWUI-1 — direct host port remains a defense-in-depth risk (`low`)
-The public route is fronted by Pangolin and SSO, but `3458:3000` is still
-published directly on the host without TLS. Keep the host port filtered and do
-not treat the public SSO route as a substitute for application authentication.
+The public route is fronted by Pangolin and SSO. Host port `3458` is bound to loopback only, not all interfaces; keep host filtering in place as defense in depth.
 
 ### F-CSWUI-2 — credential in-plaintext in env (acceptable)
 `CROWDSEC_PASSWORD=${CROWDSEC_WEB_UI_PASSWORD}` sourced from `.env`. No fix

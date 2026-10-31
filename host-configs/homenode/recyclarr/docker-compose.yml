@@ -1,7 +1,7 @@
-# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
+# Sanitized live snapshot, 2026-10-31. Addresses use repository examples.
 services:
   recyclarr:
-    image: ghcr.io/recyclarr/recyclarr:8.8.0
+    image: ghcr.io/recyclarr/recyclarr:8.8.1
     container_name: recyclarr
     user: 1000:1000
     restart: unless-stopped

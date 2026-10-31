@@ -57,12 +57,18 @@ services:
     command:
       - --configFile=/etc/traefik/traefik_config.yml
     container_name: traefik
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ping || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
       - wud.watch=false
     depends_on:
       pangolin:
         condition: service_healthy
-    image: traefik:v3.7.16
+    image: traefik:v3.7.17
     network_mode: service:gerbil
     restart: unless-stopped
     volumes:
@@ -70,4 +76,4 @@ services:
       - /home/jesus/pangolin-stack/config/letsencrypt:/letsencrypt
       - /home/jesus/pangolin-stack/config/traefik/logs:/var/log/traefik
       - /home/jesus/pangolin-stack/config/traefik/rules:/rules
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro

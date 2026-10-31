@@ -1,4 +1,4 @@
-# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
+# Sanitized live snapshot, 2026-10-31. Addresses use repository examples.
 services:
   seerr:
     image: ghcr.io/seerr-team/seerr:v3.5.1
@@ -9,7 +9,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=info
       - TZ=Asia/Jerusalem
     deploy:
       resources:

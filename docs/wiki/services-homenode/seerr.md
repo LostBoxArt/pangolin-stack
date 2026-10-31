@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/seerr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # seerr
 
@@ -21,12 +21,11 @@ Seerr manages media requests and connects to Sonarr, Radarr, and the media serve
 The verified deployment uses `ghcr.io/seerr-team/seerr:v3.5.1`; this maintenance
 performed no Seerr upgrade or migration.
 
-## Current source (2026-10-27)
+## Current source (2026-10-31)
 
-The live definition is `/volume1/docker/config/seerr/docker-compose.yml` and its
-sanitized copy is `host-configs/homenode/seerr/docker-compose.yml`. It retains
+The live definition is `/volume1/docker/config/seerr/docker-compose.yml`. The tracked copy at `host-configs/homenode/seerr/docker-compose.yml`  The live deployment retains
 UID/GID 1000, `init`, `no-new-privileges`, memory limits, the existing status
-healthcheck, and `traefik_traefik` connectivity.
+healthcheck, and `traefik_traefik` connectivity; `LOG_LEVEL` is `info`.
 
 The data bind remains `/volume1/docker/config/jellyseerr:/app/config`.
 That historical directory name is not an unused installation: it contains the

@@ -1,7 +1,7 @@
-# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
+# Sanitized live snapshot, 2026-10-31. Addresses use repository examples.
 services:
   profilarr:
-    image: santiagosayshey/profilarr:latest
+    image: ghcr.io/dictionarry-hub/profilarr:2.3.1
     container_name: profilarr
     restart: unless-stopped
     environment:

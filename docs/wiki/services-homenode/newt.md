@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["host-configs/homenode/newt/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 
 # newt
@@ -32,8 +32,7 @@ current Git source. Compare the selected source and running configuration
 before editing.
 
 The sanitized reference is `host-configs/homenode/newt/docker-compose.yml`.
-It requires private `NEWT_ID` and `NEWT_SECRET` variables. Never put their
-populated values in this wiki, Git, command arguments, or shared output.
+The deployment uses a private `.env` file with mode `0600` for `NEWT_ID` and `NEWT_SECRET`. The literal previously present in Compose was stale and did not match the running container; Compose now references the environment variables. Never put populated values in this wiki, Git, command arguments, or shared output.
 Protect deployment environment files with mode `0600` and include them only
 in restricted, encrypted recovery copies.
 

@@ -20,6 +20,11 @@ last_lint: 2026-10-31
 Append-only record of structural wiki changes, maintenance passes, and review
 artifacts.
 
+## [2026-10-31] maintenance | full container audit and remediation
+- Recorded the 2026-10-31 audit and updated active service pages to current deployed state: CloudNode Traefik 3.7.17 hardening, CrowdSec AppSec listener, Homarr 2.10.1 migration rollback requirement, and current security/UI pins; HomeNode image pins, qBittorrent WAN peer ports, Newt environment credentials, Traefik hardening, and service settings.
+- Added internal-only CrowdSec AppSec and Traefik ping endpoints to the port matrix and linked the audit from the index. The audit also documents the Profilarr fork/security fix, qBittorrent settings already in place, and the Newt stale Compose credential discovery.
+- Verified changes with `python3 scripts/wiki_lint.py`; all wiki checks passed. No live infrastructure was changed in this documentation update.
+
 ## [2026-10-31] maintenance | Plex host networking and direct 32400
 - Moved Plex from Docker bridge networking to host networking, fixing client-IP masking and the roughly 80 Mbps throughput cap. Moved its database to the `/volume2/plex-db` SSD bind mount.
 - Added a HomeNode Traefik file-provider route for `plex.example.com` and a direct WAN `32400/tcp` router forward to the NAS; Pangolin/Newt remains for the web UI and no longer carries media.

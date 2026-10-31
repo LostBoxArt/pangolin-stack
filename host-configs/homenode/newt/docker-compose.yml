@@ -1,4 +1,4 @@
-# Sanitized live snapshot, 2026-10-27. Supply credentials privately.
+# Sanitized live snapshot, 2026-10-31. Supply credentials privately.
 services:
   newt:
     image: fosrl/newt:1.19.0

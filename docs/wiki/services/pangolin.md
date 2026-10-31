@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/core/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-23
-last_lint: 2026-10-23
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # pangolin
 
@@ -165,7 +165,7 @@ Or adjust the compose volume to mount `config/pangolin` directly to
 - Pangolin `1.25.3`'s release notes say the image updates Node to resolve Node2Shell `CVE-2026-111497`; the tagged Dockerfile uses Node `24.22.1-slim`, and the Node.js October security release includes `v24.22.1`.[1][2][3]
 - Live verification: the container is healthy, `node --version` reports `v24.22.1`, and the Pangolin API returns HTTP 200. The deployed image digest matched the registry digest.
 - Before production rollout, an isolated database-copy canary completed the migrations and passed SQLite integrity and foreign-key checks. The production API and route provider were healthy after deployment: 22 routers and 11 services remained present; Gerbil and Traefik were not restarted.
-- The same Pangolin release requires Traefik `3.6+` for all load-balancing options. The deployed Traefik `v3.7.16` meets that requirement.[1]
+- The same Pangolin release requires Traefik `3.6+` for all load-balancing options. The deployed CloudNode Traefik `v3.7.17` meets that requirement.[1]
 - Keep Badger at `v1.7.0`: the release notes report that Badger `v1.8.0` fails Traefik's plugin integrity check and disables the plugin. Redirects work on `v1.7.0`; permanent redirects require `v1.8.0`, so that feature remains unavailable until the upstream issue is fixed.[1]
 - The temporary four-hour image watcher was removed after the fixed runtime was verified.
 

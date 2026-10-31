@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/qbittorrent/docker-compose.yml", "host-configs/homenode/qbittorrent/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # qbittorrent
 
@@ -23,13 +23,18 @@ outbound swarm traffic exits on the ISP IP.
 
 - **Image**: `linuxserver/qbittorrent:latest` ⚠️
 - **Compose file**: `/volume1/docker/config/qbittorrent/docker-compose.yml`
-- **Tracked copy**: `host-configs/homenode/qbittorrent/docker-compose.yml` ✓
-- **Port (internal)**: `8080` (WEBUI_PORT)
+- **Tracked copy**: `host-configs/homenode/qbittorrent/docker-compose.yml` (sanitized live snapshot, 2026-10-31, including the 6881 publications)
+- **Ports**: `6881:6881/tcp` and `6881:6881/udp` published for peer traffic; both WAN-forwarded by the router
+- **Web UI port (internal)**: `8080` (WEBUI_PORT)
 - **Router**: `torrent.example.com`
 - **Volumes**:
   - `/volume1/docker/config/qbittorrent:/config`
   - `/volume1/media/downloads:/downloads`
   - `/volume1/media:/data`
+
+qBittorrent's CSRF protection, host-header validation, and reverse-proxy
+support were already correct; the audit only addressed connectivity. The WAN
+forward exposes the peer port, not the Web UI, which remains Traefik-routed.
 
 ## Upstream Sources
 
@@ -52,6 +57,7 @@ services:
     volumes:
       - /volume1/docker/config/qbittorrent:/config
       - /volume1/media/downloads:/downloads
+    # Current deployment also publishes qBittorrent peer traffic on 6881/tcp and 6881/udp.
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080 >/dev/null || exit 1"]
       interval: 30s

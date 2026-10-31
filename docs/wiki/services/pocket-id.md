@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/security/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-23
-last_lint: 2026-10-23
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # pocket-id
 
@@ -24,6 +24,8 @@ Traefik for admin UIs (`auth.example.com`).
 - **Compose file**: `stacks/security/docker-compose.yml`
 - **Internal port**: `1411` (fronted by Traefik)
 - **Data**: `/home/jesus/pangolin-stack/data/pocket-id:/app/data` (dedicated Pocket-ID state)
+
+The `ALLOW_DOWNGRADE` setting is intentionally absent: it allowed an older image to start against a newer database, which is not a safe rollback path.
 
 ## Upstream Sources
 

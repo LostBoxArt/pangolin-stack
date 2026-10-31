@@ -1,10 +1,11 @@
-# Sanitized live snapshot, 2026-10-27. Addresses use repository examples.
+# Sanitized live snapshot, 2026-10-31. Addresses use repository examples.
 services:
   dash:
     image: mauricenino/dashdot:latest
     container_name: dash
     restart: unless-stopped
-    privileged: true
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /:/mnt/host:ro
     networks:

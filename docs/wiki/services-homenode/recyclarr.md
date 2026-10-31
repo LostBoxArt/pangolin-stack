@@ -12,22 +12,21 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/recyclarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # recyclarr
 
 Recyclarr applies configured quality profiles and custom formats to Sonarr and
-Radarr. The verified deployment pins `ghcr.io/recyclarr/recyclarr:8.8.0`.
+Radarr. The verified deployment pins `ghcr.io/recyclarr/recyclarr:8.8.1`.
 It runs as `1000:1000`, mounts `/volume1/docker/config/recyclarr:/config`, joins
 `traefik_traefik`, and retains its existing daily schedule and timezone.
 
 ## Current source (2026-10-27)
 
 The live definition is `/volume1/docker/config/recyclarr/docker-compose.yml`.
-The sanitized copy is `host-configs/homenode/recyclarr/docker-compose.yml`.
-Its full network block parses correctly. The repository copy adds a final newline;
-no runtime configuration or image was changed to create this snapshot.
+- **Tracked copy**: `host-configs/homenode/recyclarr/docker-compose.yml` (sanitized live snapshot, 2026-10-31)
+The tracked repository copy matches the live `8.8.1` pin; preserve it during unrelated edits.
 
 The upstream Docker documentation explains major/minor/exact-version tags and
 migration checks. Keep the tested exact pin during unrelated maintenance. Review

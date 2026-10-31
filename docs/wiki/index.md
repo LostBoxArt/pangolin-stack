@@ -32,6 +32,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 
 ## Verified maintenance
 - [`2026-10-27 maintenance`](./maintenance-2026-10-27.md)
+- [`2026-10-31 container audit and remediation`](./maintenance-2026-10-31-container-audit.md)
 - [`2026-10-31 Plex host networking and direct media access`](./maintenance-2026-10-31.md)
 
 ## Reviews

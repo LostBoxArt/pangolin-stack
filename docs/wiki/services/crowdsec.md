@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/security/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # crowdsec
 
@@ -25,6 +25,7 @@ Badger plugin + host firewall).
 - **Compose file**: `stacks/security/docker-compose.yml`
 - **Ports**: `6060` (Prometheus metrics), `8080` (LAPI) — published to host loopback only. The host firewall bouncer uses `http://127.0.0.1:8080/`; container clients use `crowdsec:8080`.
 - **Config**: `./config/crowdsec/` (acquis, profiles, parsers)
+- **AppSec**: CrowdSec 1.8.2 listens on `0.0.0.0:7422` via the acquisition source in `config/crowdsec/acquis.d/appsec.yaml` (`source: appsec`, `appsec_config: crowdsecurity/appsec-default`). Traefik's `CrowdsecAppsecEnabled` is true; trusted `ClientTrustedIPs` bypass AppSec.
 - **DB**: `./config/crowdsec/db/` (SQLite by default)
 
 ## Upstream Sources
@@ -182,6 +183,20 @@ docker exec crowdsec crowdsec -t
 ```
 
 The standalone command exits after validation. Keep normal daemon startup enabled. See the [1.8.1 entrypoint](https://github.com/crowdsecurity/crowdsec/blob/v1.8.1/build/docker/docker_start.sh).
+
+### AppSec (verified 2026-10-31)
+
+CrowdSec 1.8.2 loads the AppSec listener as an acquisition source, not a
+top-level setting: `config/crowdsec/acquis.d/appsec.yaml` declares
+`source: appsec`, `listen_addr: 0.0.0.0:7422`, and
+`appsec_config: crowdsecurity/appsec-default`. The Traefik plugin connects to
+`crowdsec:7422` with `CrowdsecAppsecEnabled: true`. This listener is internal;
+port 7422 is not published. Requests from resolved client addresses in
+`ClientTrustedIPs` bypass AppSec.
+
+`crowdsecurity/appsec-default` provides virtual patching and a few product-specific rules; it does not provide generic XSS/SQLi coverage. The audit verified a virtual-patch
+payload returned 403, a normal request returned 200, and no false positives
+across the nine public sites. Do not claim generic XSS or SQLi protection.
 
 ## Verified SSH repair (2026-10-27)
 

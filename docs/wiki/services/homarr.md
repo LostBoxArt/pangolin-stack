@@ -12,17 +12,17 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-23
-last_lint: 2026-10-23
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # homarr
 
 Personal landing / dashboard page at `home.example.com`. Embeds widgets for
 media services, torrents, system status, etc.
 
-- **Image**: `ghcr.io/homarr-labs/homarr:v2.8.2` (live-verified 2026-10-23)
+- **Image**: `ghcr.io/homarr-labs/homarr:v2.10.1` (live-verified 2026-10-31)
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
-- **Port**: `7575` (published on host, also Traefik-fronted)
+- **Port**: `127.0.0.1:7575` (loopback-only host publication; also Traefik-fronted)
 - **Data**: `/opt/homarr/appdata:/appdata` (host bind, **not** inside repo)
 - **TZ**: `Asia/Jerusalem`
 - **Env symlink**: `stacks/dashboard/.env` → `../../.env` (required — compose auto-load picks up `HOMARR_SECRET_KEY`)
@@ -54,7 +54,7 @@ services:
 ```22:36:stacks/dashboard/docker-compose.yml
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:v2.8.2
+    image: ghcr.io/homarr-labs/homarr:v2.10.1
     networks:
       - pangolin
     restart: unless-stopped
@@ -63,7 +63,7 @@ services:
     volumes:
       - /opt/homarr/appdata:/appdata
     ports:
-      - 7575:7575
+      - 127.0.0.1:7575:7575
     environment:
       - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
       - TZ=Asia/Jerusalem
@@ -98,6 +98,8 @@ Update 2026-10-22: Upgraded to `v2.8.0`. SQLite `integrity_check` passed after
 the update, the local dashboard returned HTTP 200, and the container had zero
 restarts at verification.
 
+Update 2026-10-31: Upgraded to `v2.10.1`. Homarr v2 migrations rewrite the SQLite database in place, so rollback requires restoring the pre-upgrade `appdata` backup before starting the older image.
+
 ### F-HOMARR-2 — no healthcheck (`low` / L3)
 Homarr exposes a health endpoint; adding a check helps the UI to signal
 startup progress and lets `stackctl.sh status` turn green reliably.
@@ -117,10 +119,11 @@ Re-add only if a Docker widget is actually configured, and prefer
 
 ### Fix F-HOMARR-1 (resolved)
 
-Now pinned to stable `v2.8.0`:
+`v2.10.1` uses the same stable channel; check releases before deliberate
+upgrades and retain the pre-upgrade `appdata` backup for rollback.
 
 ```yaml
-    image: ghcr.io/homarr-labs/homarr:v2.8.2
+    image: ghcr.io/homarr-labs/homarr:v2.10.1
 ```
 
 The beta is no longer needed. Bump deliberately and check

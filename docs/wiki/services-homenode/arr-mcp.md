@@ -8,7 +8,7 @@ aliases: ["media MCP"]
 entities:
   primary: homenode-arr-mcp
   mentions: []
-related: ["../runbooks/monitoring-and-arr-mcp.md", "./newt.md"]
+related: ["../maintenance-2026-10-27.md", "./newt.md"]
 sources: ["host-configs/homenode/arr-mcp/docker-compose.yml"]
 confidence: high
 audience_level: operator
@@ -30,8 +30,7 @@ publishes its local endpoint only at `127.0.0.1:16060`.
 The existing `/healthz` check verifies service availability. A separate
 authenticated MCP initialization/tool listing returned 39 tools after both
 Olm and Newt maintenance. Neither check invokes tools that modify media.
-See [monitoring and tunnel operations](../runbooks/monitoring-and-arr-mcp.md)
-for exact verification and recovery commands.
+See the 2026-10-27 maintenance note for the verification context.
 
 The captured Compose environment still contains historical
 `ARR_MCP_VERSION=1.21.2`. It was preserved as observed; use the image version

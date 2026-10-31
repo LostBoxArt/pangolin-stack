@@ -8,7 +8,7 @@ aliases: ["NAS backup", "HomeNode configuration recovery"]
 entities:
   primary: runbook-backup-nasus-config
   mentions: []
-related: ["monitoring-and-arr-mcp.md", "../services-homenode/plex.md"]
+related: ["../services-homenode/plex.md", "../maintenance-2026-10-31.md"]
 sources: ["scripts/backup-nasus-config", "scripts/backup-nasus-config.py", "tests/test_nasus_backup.py"]
 confidence: high
 audience_level: operator

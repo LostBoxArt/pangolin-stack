@@ -8,7 +8,7 @@ aliases: ["deep sweep follow-up"]
 entities:
   primary: homelab-maintenance-2026-10-27
   mentions: []
-related: ["./index.md", "./services/olm.md", "./runbooks/monitoring-and-arr-mcp.md", "./concepts/port-matrix.md"]
+related: ["./index.md", "./services/olm.md", "./concepts/port-matrix.md"]
 sources: ["stacks/", "host-configs/", "backup.sh", "scripts/ensure-traefik-netns.sh"]
 confidence: high
 audience_level: operator

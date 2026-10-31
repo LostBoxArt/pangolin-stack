@@ -12,8 +12,8 @@ related: ["./system-overview.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-21
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # Pangolin Stack — Internal Wiki
 
@@ -110,7 +110,7 @@ Each page follows the same structure:
 
 - [landing](./services/landing.md)
 
-> Historical: [Termix](./services/termix.md) was removed from the CloudNode Compose stack on 2026-10-16. Its Pangolin public-resource route remains pending authenticated cleanup; its data volume is retained temporarily.
+> Historical: Termix was removed from the CloudNode Compose stack on 2026-10-16. Its Pangolin public-resource route remains pending authenticated cleanup; its data volume is retained temporarily.
 > Historical: [linkstack](./services/linkstack.md) was replaced by `landing` on 2026-04-21.
 
 ## HomeNode — `/volume1/docker/`
@@ -147,7 +147,7 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
 
 ### HomeNode-specific operating notes
-- HomeNode services all share one external Docker network: `traefik_traefik`.
+- Most HomeNode services share the external Docker network `traefik_traefik`; Plex uses host networking and is not attached to it.
 - Sync direction is **HomeNode -> repo**, never repo -> HomeNode.
 - When touching a HomeNode service, update the live HomeNode file,
   `host-configs/homenode/<service>/docker-compose.yml`, and the matching
@@ -194,10 +194,10 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 - Runbooks: `docs/wiki/runbooks/*.md`
 
 
-## Verified maintenance references — 2026-10-27
+## Verified maintenance references — 2026-10-31
 
 - [Current verified maintenance](./maintenance-2026-10-27.md)
+- [Plex host networking and direct media access](./maintenance-2026-10-31.md)
 - [Encrypted backup and recovery](./runbooks/backup-recovery.md)
 - [NAS configuration recovery](./runbooks/backup-nasus-config.md)
-- [Monitoring and MCP tunnel](./runbooks/monitoring-and-arr-mcp.md)
 - [arr-mcp](./services-homenode/arr-mcp.md)

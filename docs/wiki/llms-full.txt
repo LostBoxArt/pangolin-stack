@@ -29,6 +29,8 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [Wiki Log](./log.md): append-only structural maintenance log
 - [Compose Review 2026-04-17](./compose-review-2026-04-17.md): latest CloudNode audit
 - [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md): latest HomeNode audit
+- [Verified maintenance 2026-10-27](./maintenance-2026-10-27.md): current verified maintenance notes
+- [Verified maintenance 2026-10-31](./maintenance-2026-10-31.md): Plex host networking and direct WAN media access
 
 ## Service Pages
 

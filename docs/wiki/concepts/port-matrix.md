@@ -12,8 +12,8 @@ related: ["../system-overview.md", "../services/traefik.md", "../services-homeno
 sources: ["AGENTS.md", "docs/wiki/system-overview.md", "docs/wiki/compose-review-2026-04-17.md", "docs/wiki/homenode-review-2026-04-17.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # Port Matrix
 
@@ -45,7 +45,7 @@ This page is the quickest view of which host or service owns which important por
 | 9080/tcp | HomeNode Traefik dashboard | LAN / risk surface | admin dashboard | `NC1`, currently insecure |
 | 2375/tcp | Hawser | LAN / CloudNode-reachable | remote Docker API proxy | `NC2`, token-protected but high risk if misconfigured |
 | 1411/tcp | Pocket-ID equivalent not on HomeNode | n/a | n/a | identity is CloudNode-side |
-| 32400/tcp | Plex | direct / routed | Plex main port | media server |
+| 32400/tcp | Plex | WAN forward → HomeNode NAS | direct media ingress | router forwards WAN `32400/tcp` to the NAS; Pangolin/Newt is web UI only |
 | 8080/tcp | qBittorrent | internal / routed | torrent web UI | exposed via Traefik |
 
 ## How it applies here

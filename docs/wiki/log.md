@@ -12,13 +12,18 @@ related: ["./README.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-23
-last_lint: 2026-10-23
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # Wiki Log
 
 Append-only record of structural wiki changes, maintenance passes, and review
 artifacts.
+
+## [2026-10-31] maintenance | Plex host networking and direct 32400
+- Moved Plex from Docker bridge networking to host networking, fixing client-IP masking and the roughly 80 Mbps throughput cap. Moved its database to the `/volume2/plex-db` SSD bind mount.
+- Added a HomeNode Traefik file-provider route for `plex.example.com` and a direct WAN `32400/tcp` router forward to the NAS; Pangolin/Newt remains for the web UI and no longer carries media.
+- Measured 82 Mbps for one remote stream and about 92 Mbps aggregate across eight streams, against roughly 190 Mbps home upload.
 
 ## [2026-10-23] security + upgrade | Pangolin 1.25.3
 - Updated Pangolin from `1.24.0` to `1.25.3`; verified the live Node runtime is `v24.22.1`, the container is healthy, and the local API returns HTTP 200. The upstream release identifies the Node2Shell fix; details and source links are in `services/pangolin.md`.

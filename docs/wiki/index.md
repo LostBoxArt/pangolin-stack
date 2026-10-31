@@ -12,8 +12,8 @@ related: ["./README.md", "./log.md", "./glossary.md"]
 sources: ["docs/wiki/README.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-21
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 
 # Wiki Index
@@ -29,6 +29,10 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Wiki Index`](./index.md) — Flat catalog of the current wiki contents. This is the fastest content map for both humans and agents.
 - [`Glossary`](./glossary.md) — Short definitions for recurring Pangolin homelab terms.
 - [`Wiki Log`](./log.md) — Append-only record of structural wiki changes, maintenance passes, and review artifacts.
+
+## Verified maintenance
+- [`2026-10-27 maintenance`](./maintenance-2026-10-27.md)
+- [`2026-10-31 Plex host networking and direct media access`](./maintenance-2026-10-31.md)
 
 ## Reviews
 - [`Compose-File Review — 2026-04-17`](./compose-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `stacks/` against upstream documentation and reference compose files. Findings, severities, and remediation steps are collected there, with per-service detail in `docs/wiki/services/`.
@@ -83,12 +87,12 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 ## HomeNode Services
 - [`HomeNode Media Stack Audit — 2026-09-05`](./services-homenode/media-stack-audit-2026-09-05.md) — Live, interruption-free audit of media notifications, monitoring, profiles, hardlink state, and deferred maintenance work.
 - [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
-
+- [`arr-mcp`](./services-homenode/arr-mcp.md) — Authenticated media-stack MCP service; loopback-only port 6060 on HomeNode, reached through a supervised SSH tunnel from the CloudNode.
 - [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](./services/dashdot.md)).
 - [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr and the *arr apps proxy indexer requests through it when hitting sites protected by Cloudflare's Under-Attack Mode / Turnstile.
 - [`hawser`](./services-homenode/hawser.md) — Dockhand's remote agent. The CloudNode Dockhand connects to this agent over TCP to manage HomeNode containers in the same UI as CloudNode containers.
 - [`newt`](./services-homenode/newt.md) — Fossorial Newt, the Pangolin site connector that establishes the outbound tunnel from HomeNode to the CloudNode so home services are reachable without opening inbound ports on the router.
-- [`plex`](./services-homenode/plex.md) — Plex Media Server. Serves `plex.example.com` (Traefik-routed) and direct LAN clients. Hardware transcoding enabled via `/dev/dri`.
+- [`plex`](./services-homenode/plex.md) — Plex Media Server. Host-networked; media uses a direct WAN `32400/tcp` forward, while Pangolin serves the web UI. Hardware transcoding enabled via `/dev/dri`.
 - [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality definitions, and naming schemes in sync across the *arr apps from a central spec.
 - [`prowlarr`](./services-homenode/prowlarr.md) — Indexer manager for the *arr suite — federates torrent/usenet indexers into one API that Sonarr/Radarr query.
 - [`qbittorrent`](./services-homenode/qbittorrent.md) — Torrent client. LinuxServer.io image. Serves web UI at `torrent.example.com` (Traefik-routed). **Runs with no VPN sidecar** — outbound swarm traffic exits on the ISP IP.

@@ -313,7 +313,7 @@ databases = {}
 for service, source, archived in [
     ("pangolin", stack / "config/db/db.sqlite", "config/db/db.sqlite"),
     ("crowdsec", stack / "config/crowdsec/db/crowdsec.db", "config/crowdsec/db/crowdsec.db"),
-    ("crowdsec-web-ui", stack / "config/crowdsec-web-ui/crowdsec.db", "config/crowdsec-web-ui/crowdsec.db"),
+    ("crowdsec-web-ui", stack / "config/crowdsec-web-ui/state.db", "config/crowdsec-web-ui/state.db"),
     ("pocket-id", stack / "data/pocket-id/pocket-id.db", "data/pocket-id/pocket-id.db"),
     ("dockhand", stack / "data/dockhand/db/dockhand.db", "data/dockhand/db/dockhand.db"),
     ("homarr", pathlib.Path("/opt/homarr/appdata/db/db.sqlite"), "homarr/db/db.sqlite"),
@@ -427,8 +427,8 @@ do_backup() {
     fi
 
     snapshot_sqlite_db "${STACK_DIR}/config/crowdsec/db/crowdsec.db" "${BACKUP_PATH}/config/crowdsec/db/crowdsec.db"
-    copy_private_tree "${STACK_DIR}/config/crowdsec-web-ui" "${BACKUP_PATH}/config/crowdsec-web-ui" --exclude=./crowdsec.db --exclude=./crowdsec.db-wal --exclude=./crowdsec.db-shm
-    snapshot_sqlite_db "${STACK_DIR}/config/crowdsec-web-ui/crowdsec.db" "${BACKUP_PATH}/config/crowdsec-web-ui/crowdsec.db"
+    copy_private_tree "${STACK_DIR}/config/crowdsec-web-ui" "${BACKUP_PATH}/config/crowdsec-web-ui" --exclude=./state.db --exclude=./state.db-wal --exclude=./state.db-shm --exclude=./cache.db --exclude=./cache.db-wal --exclude=./cache.db-shm --exclude=./crowdsec.db --exclude=./crowdsec.db-wal --exclude=./crowdsec.db-shm
+    snapshot_sqlite_db "${STACK_DIR}/config/crowdsec-web-ui/state.db" "${BACKUP_PATH}/config/crowdsec-web-ui/state.db"
 
     # 6. Gerbil key
     echo -e "${YELLOW}[6/9] Gerbil WireGuard key...${NC}"
@@ -580,7 +580,8 @@ databases = []
 for service, relative in [
     ("pangolin", "config/db/db.sqlite"),
     ("crowdsec", "config/crowdsec/db/crowdsec.db"),
-    ("crowdsec-web-ui", "config/crowdsec-web-ui/crowdsec.db"),
+    ("crowdsec-web-ui", "config/crowdsec-web-ui/state.db"),
+    ("crowdsec-web-ui-legacy", "config/crowdsec-web-ui/crowdsec.db"),
     ("pocket-id", "data/pocket-id/pocket-id.db"),
     ("dockhand", "data/dockhand/db/dockhand.db"),
     ("homarr", "homarr/db/db.sqlite"),

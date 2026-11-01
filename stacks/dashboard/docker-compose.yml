@@ -36,3 +36,13 @@ services:
       - TZ=Asia/Jerusalem
     extra_hosts:
       - "torrent.dennisb.xyz:192.168.0.10"
+      - "sonarr.dennisb.xyz:192.168.0.10"
+      - "radarr.dennisb.xyz:192.168.0.10"
+      - "bazarr.dennisb.xyz:192.168.0.10"
+      - "prowlarr.dennisb.xyz:192.168.0.10"
+      - "profilarr.dennisb.xyz:192.168.0.10"
+      - "flaresolverr.dennisb.xyz:192.168.0.10"
+      - "nasus.dennisb.xyz:192.168.0.10"
+      - "adguard.dennisb.xyz:192.168.0.10"
+      - "plex.dennisb.xyz:192.168.0.10"
+      - "request.dennisb.xyz:192.168.0.10"

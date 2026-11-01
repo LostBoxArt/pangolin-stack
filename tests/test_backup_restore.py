@@ -10,7 +10,7 @@ import unittest
 from test_backup import fixture
 
 
-DATABASES = ["config/db/db.sqlite", "config/crowdsec/db/crowdsec.db", "config/crowdsec-web-ui/crowdsec.db", "data/pocket-id/pocket-id.db", "data/dockhand/db/dockhand.db"]
+DATABASES = ["config/db/db.sqlite", "config/crowdsec/db/crowdsec.db", "config/crowdsec-web-ui/state.db", "data/pocket-id/pocket-id.db", "data/dockhand/db/dockhand.db"]
 
 
 class RestoreTests(unittest.TestCase):

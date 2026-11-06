@@ -38,6 +38,11 @@ set -e
 # Configuration
 BACKUP_DIR="/opt/homelab/backups"
 STACK_DIR="/home/jesus/pangolin-stack"
+
+# Pinned helper image used to archive private data without host tar privileges.
+# --pull=never keeps backups offline; ensure_tool_image restores the image if
+# a docker image prune removed it.
+TOOL_IMAGE="alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a"
 LOG_FILE="${BACKUP_DIR}/backup.log"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 RETAIN_DAYS=${RETAIN_DAYS:-7}  # Default retention: 7 days
@@ -281,7 +286,7 @@ copy_private_tree() {
     local target="$2"
     shift 2
     mkdir -p "${target}"
-    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL --cap-add DAC_OVERRIDE --security-opt no-new-privileges --mount "type=bind,source=${source},target=/source,readonly" --entrypoint /bin/tar alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a "$@" -C /source -cf - . | tar -xf - -C "${target}/"); then
+    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL --cap-add DAC_OVERRIDE --security-opt no-new-privileges --mount "type=bind,source=${source},target=/source,readonly" --entrypoint /bin/tar "${TOOL_IMAGE}" "$@" -C /source -cf - . | tar -xf - -C "${target}/"); then
         log ERROR "Private data export failed: ${source}"
         return 1
     fi
@@ -364,13 +369,25 @@ export_host_recovery() {
         --mount "type=bind,source=/etc/systemd/system/crowdsec-firewall-bouncer.service,target=/export/etc/systemd/system/crowdsec-firewall-bouncer.service,readonly"
     )
     mkdir -p "${target}"
-    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL "${mounts[@]}" --entrypoint /bin/tar alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a -C /export -cf - . | tar -xf - -C "${target}/"); then
+    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL "${mounts[@]}" --entrypoint /bin/tar "${TOOL_IMAGE}" -C /export -cf - . | tar -xf - -C "${target}/"); then
         log ERROR "Host recovery export failed"
         return 1
     fi
 }
 
+ensure_tool_image() {
+    if docker image inspect "${TOOL_IMAGE}" >/dev/null 2>&1; then
+        return 0
+    fi
+    log WARN "Helper image ${TOOL_IMAGE} missing (docker image prune removes it); pulling by digest"
+    if ! docker pull "${TOOL_IMAGE}" >/dev/null 2>&1; then
+        log ERROR "Cannot pull helper image ${TOOL_IMAGE}"
+        return 1
+    fi
+}
+
 do_backup() {
+    ensure_tool_image || return 1
     umask 077
     if [ -f "${LOG_FILE}" ]; then
         chmod 600 "${LOG_FILE}"
@@ -636,6 +653,7 @@ do_restore() {
         echo "Restore requires root to preserve application ownership; run sudo ./backup.sh restore <archive>" >&2
         return 1
     fi
+    ensure_tool_image || return 1
     ARCHIVE="$1"
 
     if [ -z "$ARCHIVE" ]; then

@@ -55,18 +55,15 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [traefik (HomeNode)](./services-homenode/traefik.md)
 - [hawser](./services-homenode/hawser.md)
 - [newt](./services-homenode/newt.md)
-- [sonarr](./services-homenode/sonarr.md)
-- [radarr](./services-homenode/radarr.md)
-- [bazarr](./services-homenode/bazarr.md)
-- [prowlarr](./services-homenode/prowlarr.md)
-- [profilarr](./services-homenode/profilarr.md)
-- [recyclarr](./services-homenode/recyclarr.md)
-- [qbittorrent](./services-homenode/qbittorrent.md)
+- [scryer](./services-homenode/scryer.md) — active media manager and request front door
+- [prowlarr](./services-homenode/prowlarr.md) — active indexer manager
+- [qbittorrent](./services-homenode/qbittorrent.md) — active download client
+- [plex](./services-homenode/plex.md) — active media server
 
-- [flaresolverr](./services-homenode/flaresolverr.md)
-
-- [plex](./services-homenode/plex.md)
-- [seerr](./services-homenode/seerr.md)
+Retired 2026-11-07, rollback only: [sonarr](./services-homenode/sonarr.md),
+[radarr](./services-homenode/radarr.md), [bazarr](./services-homenode/bazarr.md),
+[profilarr](./services-homenode/profilarr.md), [recyclarr](./services-homenode/recyclarr.md),
+[seerr](./services-homenode/seerr.md), [flaresolverr](./services-homenode/flaresolverr.md)
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
 
 ## Critical Rules

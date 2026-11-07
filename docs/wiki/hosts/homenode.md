@@ -34,19 +34,20 @@ Home server that runs the media, torrent, and *arr workloads.
 - [[../services-homenode/traefik.md]]
 - [[../services-homenode/hawser.md]]
 - [[../services-homenode/newt.md]]
+- [[../services-homenode/scryer.md]]
+- [[../services-homenode/prowlarr.md]]
+- [[../services-homenode/qbittorrent.md]]
+- [[../services-homenode/plex.md]]
+- [[../services-homenode/dashdot.md]]
+
+Retired 2026-11-07, rollback only:
 - [[../services-homenode/sonarr.md]]
 - [[../services-homenode/radarr.md]]
 - [[../services-homenode/bazarr.md]]
-- [[../services-homenode/prowlarr.md]]
 - [[../services-homenode/profilarr.md]]
 - [[../services-homenode/recyclarr.md]]
-- [[../services-homenode/qbittorrent.md]]
-
-- [[../services-homenode/flaresolverr.md]]
-
-- [[../services-homenode/plex.md]]
 - [[../services-homenode/seerr.md]]
-- [[../services-homenode/dashdot.md]]
+- [[../services-homenode/flaresolverr.md]]
 
 ## Networks
 - Shared external Docker network: [[../networks/traefik-traefik.md]]

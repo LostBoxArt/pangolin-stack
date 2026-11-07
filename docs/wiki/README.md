@@ -125,23 +125,24 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 - [hawser](./services-homenode/hawser.md)
 - [newt](./services-homenode/newt.md)
 
-### *arr suite
+### Media management
+- [scryer](./services-homenode/scryer.md) — **active** unified media manager and request front door (movies / series / anime)
+- [prowlarr](./services-homenode/prowlarr.md) — **active** indexer manager; supplies Scryer's indexers
+
+### Torrent
+- [qbittorrent](./services-homenode/qbittorrent.md) — **active** download client
+
+### Media server
+- [plex](./services-homenode/plex.md) — **active**
+
+### Retired — rollback only (stopped 2026-11-07)
 - [sonarr](./services-homenode/sonarr.md)
 - [radarr](./services-homenode/radarr.md)
 - [bazarr](./services-homenode/bazarr.md)
-- [prowlarr](./services-homenode/prowlarr.md)
 - [profilarr](./services-homenode/profilarr.md)
 - [recyclarr](./services-homenode/recyclarr.md)
-
-### Torrent
-- [qbittorrent](./services-homenode/qbittorrent.md)
-
-- [flaresolverr](./services-homenode/flaresolverr.md)
-
-
-### Media
-- [plex](./services-homenode/plex.md)
 - [seerr](./services-homenode/seerr.md)
+- [flaresolverr](./services-homenode/flaresolverr.md)
 
 ### Observability
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)

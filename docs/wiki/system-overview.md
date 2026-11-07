@@ -96,23 +96,24 @@ There is no stack separation like on the CloudNode.
 - `hawser`
 - `newt`
 
-### *arr suite
+### Media management
+- `scryer` — active unified media manager and request front door
+- `prowlarr` — active; supplies Scryer's indexers
+
+### Torrent
+- `qbittorrent` — active download client
+
+### Media server
+- `plex` — active
+
+### Retired — rollback only (stopped 2026-11-07)
 - `sonarr`
 - `radarr`
 - `bazarr`
-- `prowlarr`
 - `profilarr`
 - `recyclarr`
-
-### Torrent
-- `qbittorrent`
-
-- `flaresolverr`
-
-
-### Media
-- `plex`
 - `seerr`
+- `flaresolverr`
 
 ### Observability
 - `dashdot`

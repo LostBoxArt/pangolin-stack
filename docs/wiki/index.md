@@ -87,19 +87,20 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 
 ## HomeNode Services
 - [`HomeNode Media Stack Audit — 2026-09-05`](./services-homenode/media-stack-audit-2026-09-05.md) — Live, interruption-free audit of media notifications, monitoring, profiles, hardlink state, and deferred maintenance work.
-- [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
+- [`scryer`](./services-homenode/scryer.md) — **Active** unified media manager and request front door (movies / series / anime). Replaced the Sonarr/Radarr/Bazarr/Profilarr/Recyclarr write path and Seerr on 2026-11-07.
+- [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image. **Retired 2026-11-07; rollback only.**
 - [`arr-mcp`](./services-homenode/arr-mcp.md) — Authenticated media-stack MCP service; loopback-only port 6060 on HomeNode, reached through a supervised SSH tunnel from the CloudNode.
 - [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](./services/dashdot.md)).
-- [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr and the *arr apps proxy indexer requests through it when hitting sites protected by Cloudflare's Under-Attack Mode / Turnstile.
+- [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. **Retired 2026-11-07; rollback only.**
 - [`hawser`](./services-homenode/hawser.md) — Dockhand's remote agent. The CloudNode Dockhand connects to this agent over TCP to manage HomeNode containers in the same UI as CloudNode containers.
 - [`newt`](./services-homenode/newt.md) — Fossorial Newt, the Pangolin site connector that establishes the outbound tunnel from HomeNode to the CloudNode so home services are reachable without opening inbound ports on the router.
 - [`plex`](./services-homenode/plex.md) — Plex Media Server. Host-networked; media uses a direct WAN `32400/tcp` forward, while Pangolin serves the web UI. Hardware transcoding enabled via `/dev/dri`.
-- [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality definitions, and naming schemes in sync across the *arr apps from a central spec.
-- [`prowlarr`](./services-homenode/prowlarr.md) — Indexer manager for the *arr suite — federates torrent/usenet indexers into one API that Sonarr/Radarr query.
+- [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr. **Retired 2026-11-07; rollback only.**
+- [`prowlarr`](./services-homenode/prowlarr.md) — **Active** indexer manager; federates torrent indexers into one API that Scryer queries.
 - [`qbittorrent`](./services-homenode/qbittorrent.md) — Torrent client. LinuxServer.io image. Serves web UI at `torrent.example.com` (Traefik-routed). **Runs with no VPN sidecar** — outbound swarm traffic exits on the ISP IP.
 
-- [`radarr`](./services-homenode/radarr.md) — Movie manager. LinuxServer.io image. Twin of Sonarr, with `/movies` instead of `/tv`.
-- [`recyclarr`](./services-homenode/recyclarr.md) — CLI + cron job that applies TRaSH-Guides recommended quality profiles and custom formats to Sonarr / Radarr. Runs on a schedule, not a long-lived server.
-- [`seerr`](./services-homenode/seerr.md) — Media request front-end for end users — they ask for a movie / show, it hands the request to Sonarr / Radarr for fulfilment.
-- [`sonarr`](./services-homenode/sonarr.md) — TV series manager. LinuxServer.io image.
+- [`radarr`](./services-homenode/radarr.md) — Movie manager. LinuxServer.io image. **Retired 2026-11-07; rollback only.**
+- [`recyclarr`](./services-homenode/recyclarr.md) — CLI + cron job applying TRaSH-Guides profiles to Sonarr / Radarr. **Retired 2026-11-07; rollback only.**
+- [`seerr`](./services-homenode/seerr.md) — Media request front-end. **Retired 2026-11-07; rollback only.** Scryer is the active request front door.
+- [`sonarr`](./services-homenode/sonarr.md) — TV series manager. LinuxServer.io image. **Retired 2026-11-07; rollback only.**
 - [`traefik (HomeNode)`](./services-homenode/traefik.md) — Home-LAN reverse proxy for all HomeNode services. Terminates TLS for `*.example.com` via Cloudflare DNS challenge. Distinct from the CloudNode Traefik.

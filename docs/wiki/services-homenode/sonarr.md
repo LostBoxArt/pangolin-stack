@@ -2,7 +2,7 @@
 title: "sonarr"
 slug: homenode-sonarr
 type: service
-status: active
+status: retired
 tags: ["homelab", "homenode", "service", "sonarr"]
 aliases: ["sonarr"]
 entities:
@@ -12,10 +12,17 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/sonarr/docker-compose.yml", "host-configs/homenode/sonarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-11-07
+last_lint: 2026-11-07
 ---
 # sonarr
+
+> **Migration notice (2026-11-07):** Scryer is the active media manager and request
+> front door at `request.example.com`. This service is **stopped and retained for
+> rollback only**. See [scryer](./scryer.md). Do not restart it except as part of a
+> deliberate, coordinated rollback — Scryer and the *arr apps must never acquire or
+> import into the same libraries at the same time.
+
 
 TV series manager. LinuxServer.io image.
 

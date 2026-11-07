@@ -1,0 +1,37 @@
+services:
+  scryer:
+    image: ghcr.io/scryer-media/scryer:0.21.24
+    container_name: scryer
+    restart: unless-stopped
+    init: true
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      - TZ=Asia/Jerusalem
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - SCRYER_PUBLIC_URL=https://request.example.com
+      - SCRYER_WEBAUTHN_RP_ID=request.example.com
+      - SCRYER_WEBAUTHN_RP_ORIGIN=https://request.example.com
+      - SCRYER_WEBAUTHN_RP_NAME=Scryer
+    ports:
+      - "127.0.0.1:8099:8080"
+    volumes:
+      - /volume1/docker/config/scryer:/config
+      - /volume1/media:/data
+    networks: [traefik_traefik]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scryer-main.rule=Host(`scryer-retired.example.com`)"
+      - "traefik.http.routers.scryer-main.entrypoints=websecure"
+      - "traefik.http.routers.scryer-main.tls.certresolver=cloudflare"
+      - "traefik.http.routers.scryer-main.service=scryer-svc"
+      - "traefik.http.routers.scryer-alt.rule=Host(`scryer.example.com`)"
+      - "traefik.http.routers.scryer-alt.entrypoints=websecure"
+      - "traefik.http.routers.scryer-alt.tls.certresolver=cloudflare"
+      - "traefik.http.routers.scryer-alt.service=scryer-svc"
+      - "traefik.http.services.scryer-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_traefik:
+    external: true

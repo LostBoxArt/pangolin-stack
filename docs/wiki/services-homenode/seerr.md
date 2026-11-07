@@ -2,7 +2,7 @@
 title: "seerr"
 slug: homenode-seerr
 type: service
-status: active
+status: retired
 tags: ["homelab", "homenode", "service", "seerr"]
 aliases: ["seerr"]
 entities:
@@ -12,10 +12,16 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/seerr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-31
-last_lint: 2026-10-31
+last_ingested: 2026-11-07
+last_lint: 2026-11-07
 ---
 # seerr
+
+> **Migration notice (2026-11-07):** Scryer is the active media manager and request
+> front door at `request.example.com`. Seerr is **retained for rollback only** and is
+> no longer the public request entry point. See [scryer](./scryer.md). Do not submit
+> requests through Seerr; they will not reach the active acquisition path.
+
 
 Seerr manages media requests and connects to Sonarr, Radarr, and the media server.
 The verified deployment uses `ghcr.io/seerr-team/seerr:v3.5.1`; this maintenance

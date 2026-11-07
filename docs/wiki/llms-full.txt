@@ -55,18 +55,15 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 - [traefik (HomeNode)](./services-homenode/traefik.md)
 - [hawser](./services-homenode/hawser.md)
 - [newt](./services-homenode/newt.md)
-- [sonarr](./services-homenode/sonarr.md)
-- [radarr](./services-homenode/radarr.md)
-- [bazarr](./services-homenode/bazarr.md)
-- [prowlarr](./services-homenode/prowlarr.md)
-- [profilarr](./services-homenode/profilarr.md)
-- [recyclarr](./services-homenode/recyclarr.md)
-- [qbittorrent](./services-homenode/qbittorrent.md)
+- [scryer](./services-homenode/scryer.md) — active media manager and request front door
+- [prowlarr](./services-homenode/prowlarr.md) — active indexer manager
+- [qbittorrent](./services-homenode/qbittorrent.md) — active download client
+- [plex](./services-homenode/plex.md) — active media server
 
-- [flaresolverr](./services-homenode/flaresolverr.md)
-
-- [plex](./services-homenode/plex.md)
-- [seerr](./services-homenode/seerr.md)
+Retired 2026-11-07, rollback only: [sonarr](./services-homenode/sonarr.md),
+[radarr](./services-homenode/radarr.md), [bazarr](./services-homenode/bazarr.md),
+[profilarr](./services-homenode/profilarr.md), [recyclarr](./services-homenode/recyclarr.md),
+[seerr](./services-homenode/seerr.md), [flaresolverr](./services-homenode/flaresolverr.md)
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
 
 ## Current security snapshot (verified 2026-10-23)
@@ -77,8 +74,8 @@ related homelab services as documented in `/home/jesus/pangolin-stack`.
 
 ## Critical Rules
 
-- Pangolin, Gerbil, Newt, Olm, Badger, and CrowdSec Web UI stay pinned.
-- If Gerbil is recreated, Traefik must be recreated too.
+- Current security state (2026-11-07): Pangolin `1.26.0` / Node `v24.22.1`; Badger upgraded to `v1.8.0`; see [Pangolin](./services/pangolin.md) and [Badger](./services/badger.md).
+- Scryer is the active media manager and request front door; Sonarr, Radarr, Bazarr, Profilarr, Recyclarr, Seerr and FlareSolverr are stopped and retained for rollback only.
 - Pocket-ID shared-data bug remains unfixed until the service page says
   otherwise.
 - HomeNode `NC1` and `NC2` are still open compromise-risk surfaces.

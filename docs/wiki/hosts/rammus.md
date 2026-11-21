@@ -49,7 +49,7 @@ configs, and `acme.json` are lost unless the nightly backup ran. See
 - [[../services-homenode/plex.md]] — host networking, `/dev/dri` hardware transcoding
 - [[../services-homenode/qbittorrent.md]] — WebUI `torrent.example.com`
 - [[../services-homenode/prowlarr.md]] — indexer manager
-- scryer — media acquisition manager, WebUI `request.example.com` (not yet a dedicated page)
+- [[../services-homenode/scryer.md]] — media acquisition manager, WebUI `request.example.com`
 - [[../services-homenode/arr-mcp.md]] — authenticated media MCP
 - [[../services-homenode/hawser.md]] — Dockhand agent, TCP 2375
 - `dashdot` — system dashboard at `dash.example.com`, published on

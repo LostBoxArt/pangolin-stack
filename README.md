@@ -21,7 +21,7 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | landing, termix | Landing page; Termix is an older template |
+| **apps** | landing | User applications |
 
 ## Repository Template Pins
 
@@ -32,15 +32,18 @@ Do not deploy an older template over that running installation. See the
 [maintenance record](docs/wiki/maintenance-2026-10-27.md) and synchronized
 host snapshots before a planned upgrade or recovery.
 
-- Pangolin: `fosrl/pangolin:1.17.0`
-- Gerbil: `fosrl/gerbil:1.3.1`
-- Traefik Badger plugin: `v1.4.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`
-- Newt (HomeNode): `fosrl/newt:1.11.0`
-- Olm (CloudNode systemd binary): verified `1.9.1` with `--override-dns=false` on 2026-10-27
+- Pangolin: `fosrl/pangolin:1.26.0` (Node runtime `v24.22.1`)
+- Gerbil: `fosrl/gerbil:1.6.0`
+- Traefik (CloudNode): compose pin `traefik:v3.7.17`; live `v3.7.19` verified 2026-11-21
+- Traefik Badger plugin: `github.com/fosrl/badger@v1.8.0`
+- Homarr: `ghcr.io/homarr-labs/homarr:v2.11.1`
+- Pocket-ID: `ghcr.io/pocket-id/pocket-id:v2.19.2`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.11.5`
+- Newt (rammus): `fosrl/newt:1.19.0`
+- Olm (CloudNode systemd binary): `1.10.1` since 2026-11-06, with `--override-dns=false` (previous binary kept as `/usr/local/bin/olm.1.9.1.rollback`)
 
-Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging, site provisioning keys, and the newer site provisioning flow.
-CrowdSec Web UI is pinned to `2026.3.1` because the moving `latest` tag pulled a broken image on March 30, 2026.
+The deployed Pangolin/Newt/Olm/Gerbil tuple was verified on 2026-10-23; see [`docs/wiki/services/pangolin.md`](docs/wiki/services/pangolin.md) for the security-update evidence and compatibility notes. Pangolin 1.25.3 requires Traefik 3.6+ for all load-balancing options; the current Traefik pin satisfies this. Keep Badger at `v1.7.0` until the upstream plugin-integrity issue with `v1.8.0` is fixed; see the [Pangolin 1.25.3 release notes](https://github.com/fosrl/pangolin/releases/tag/1.25.3).
+CrowdSec Web UI is pinned to `2026.10.10`; release `2026.10.3` introduced the `/app/data` persistent-state layout, which remains explicit in the deployment.
 Traefik shares Gerbil's network namespace. If `gerbil` is recreated during an upgrade, recreate `traefik` immediately afterward:
 
 ```bash
@@ -158,7 +161,7 @@ pangolin-stack/
 │   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
 │   ├── management/docker-compose.yml   # dockhand
 │   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
-│   └── apps/docker-compose.yml         # linkstack, termix
+│   └── apps/docker-compose.yml         # landing
 ├── config/                             # Service configs (traefik, crowdsec, pangolin)
 ├── data/                               # Runtime data (gitignored)
 ├── .env                                # Shared environment variables

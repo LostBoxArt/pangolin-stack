@@ -12,8 +12,8 @@ related: ["./system-overview.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-21
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # Pangolin Stack — Internal Wiki
 
@@ -47,10 +47,11 @@ Coverage spans **three hosts** (as of the 2026-11-21 migration):
   answer from, lint, and update this wiki.
 - [LLM Wiki Pattern](./llm-wiki-pattern.md) — design notes for how this wiki
   adopts current LLM-wiki and `llms.txt` best practices.
-- [Compose Review 2026-04-17](./compose-review-2026-04-17.md) — current latest
-  CloudNode audit; if a newer `compose-review-*.md` exists, use that instead.
-- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md) — current latest
-  HomeNode audit; if a newer `homenode-review-*.md` exists, use that instead.
+- [Compose Review 2026-04-17](./compose-review-2026-04-17.md) — latest dated
+  full CloudNode audit, not a live-state report; see current service pages and
+  `log.md` for newer deployment facts.
+- [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md) — latest dated
+  full HomeNode audit, not a live-state report; verify current state separately.
 - [Index](./index.md) — flat content catalog of the current wiki.
 - [Glossary](./glossary.md) — compact definitions for recurring homelab terms.
 - [Wiki Log](./log.md) — append-only maintenance log for wiki updates, audits,
@@ -112,8 +113,8 @@ Each page follows the same structure:
 ### Apps (`stacks/apps/docker-compose.yml`)
 
 - [landing](./services/landing.md)
-- [termix](./services/termix.md)
 
+> Historical: Termix was removed from the CloudNode Compose stack on 2026-10-16. Its Pangolin public-resource route remains pending authenticated cleanup; its data volume is retained temporarily.
 > Historical: [linkstack](./services/linkstack.md) was replaced by `landing` on 2026-04-21.
 
 ## Application services — rammus `/opt/docker/stacks/`
@@ -132,30 +133,31 @@ Read host paths and IPs in them as historical. See
 - [hawser](./services-homenode/hawser.md)
 - [newt](./services-homenode/newt.md)
 
-### *arr suite
+### Media management
+- [scryer](./services-homenode/scryer.md) — **active** unified media manager and request front door (movies / series / anime)
+- [prowlarr](./services-homenode/prowlarr.md) — **active** indexer manager; supplies Scryer's indexers
 - [arr-mcp](./services-homenode/arr-mcp.md)
+
+### Torrent
+- [qbittorrent](./services-homenode/qbittorrent.md) — **active** download client
+
+### Media server
+- [plex](./services-homenode/plex.md) — **active**
+
+### Retired — rollback only (stopped 2026-11-07)
 - [sonarr](./services-homenode/sonarr.md)
 - [radarr](./services-homenode/radarr.md)
 - [bazarr](./services-homenode/bazarr.md)
-- [prowlarr](./services-homenode/prowlarr.md)
 - [profilarr](./services-homenode/profilarr.md)
 - [recyclarr](./services-homenode/recyclarr.md)
-
-### Torrent
-- [qbittorrent](./services-homenode/qbittorrent.md)
-- [qui](./services-homenode/qui.md)
-- [flaresolverr](./services-homenode/flaresolverr.md)
-- [cleanuparr](./services-homenode/cleanuparr.md)
-
-### Media
-- [plex](./services-homenode/plex.md)
 - [seerr](./services-homenode/seerr.md)
+- [flaresolverr](./services-homenode/flaresolverr.md)
 
 ### Observability
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
 
 ### Application-specific operating notes
-- All rammus services share one external Docker network: `traefik_traefik`, subnet `172.19.0.0/16`.
+- All rammus services except Plex share one external Docker network: `traefik_traefik`, subnet `172.19.0.0/16`. Plex uses host networking.
 - `newt` and `plex` must each run on exactly one host. A duplicate `newt` flaps
   the tunnel; a duplicate `plex` shares `MachineIdentifier` and corrupts state.
 - Sync direction is **live host -> repo**, never repo -> live host.
@@ -201,3 +203,12 @@ Read host paths and IPs in them as historical. See
 - Hosts: `docs/wiki/hosts/*.md`
 - Networks: `docs/wiki/networks/*.md`
 - Runbooks: `docs/wiki/runbooks/*.md`
+
+
+## Verified maintenance references — 2026-10-31
+
+- [Current verified maintenance](./maintenance-2026-10-27.md)
+- [Plex host networking and direct media access](./maintenance-2026-10-31.md)
+- [Encrypted backup and recovery](./runbooks/backup-recovery.md)
+- [NAS configuration recovery](./runbooks/backup-nasus-config.md)
+- [arr-mcp](./services-homenode/arr-mcp.md)

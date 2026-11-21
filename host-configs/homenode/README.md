@@ -1,6 +1,9 @@
-These files are source-controlled copies of the current HomeNode host-side compose files.
+**Historical NASUS snapshots (last refreshed 2026-10-31/11-07). Not a deployment
+source.** Since 2026-11-21 every application runs on rammus under
+`/opt/docker/stacks/<service>/`; NASUS runs no containers. See
+`docs/wiki/hosts/rammus.md`.
 
-Live host paths:
+Former NASUS host paths:
 
 - `/volume1/docker/config/<service>/docker-compose.yml`
 - `/volume1/docker/traefik/docker-compose.yml`
@@ -10,7 +13,7 @@ Repo paths:
 - `host-configs/homenode/<service>/docker-compose.yml`
 - `host-configs/homenode/traefik/docker-compose.yml`
 
-Keep these copies in sync whenever HomeNode host-side compose files change.
+Do not deploy these copies to NASUS or over rammus.
 
 ## Verified snapshots, 2026-10-27
 
@@ -21,7 +24,8 @@ references; synchronize from the live host before editing or deploying.
 
 `arr-mcp` remains bound to NAS loopback `6060`; CloudNode reaches it through
 the supervised `arr-mcp-tunnel.service`, also bound to loopback `16060`.
-The running snapshots pin arr-mcp `1.44.5`, Recyclarr `8.8.0`, and Seerr `v3.5.1`.
+The 2026-10-27 snapshots pinned arr-mcp `1.44.5`, Recyclarr `8.8.0`, and Seerr `v3.5.1`;
+the 2026-10-31 refresh moved arr-mcp to `1.50.0` and Recyclarr to `8.8.1`.
 No service was upgraded to produce these copies.
 
 Newt's authoritative source is Dockhand's Git stack, not its historical NAS

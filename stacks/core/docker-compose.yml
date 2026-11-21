@@ -22,10 +22,10 @@ services:
         - -f
         - http://localhost:3001/api/v1/
       timeout: 3s
-    image: fosrl/pangolin:1.17.1
+    image: fosrl/pangolin:1.26.0
     restart: unless-stopped
     volumes:
-      - ../../config:/app/config
+      - /home/jesus/pangolin-stack/config:/app/config
 
   gerbil:
     cap_add:
@@ -42,33 +42,38 @@ services:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: fosrl/gerbil:1.3.1
+    image: fosrl/gerbil:1.6.0
     ports:
       - 51820:51820/udp
       - 21820:21820/udp
       - 443:443
       - 80:80
-      - 853:853
     restart: unless-stopped
     volumes:
-      - ../../config/:/var/config
+      - /home/jesus/pangolin-stack/config/:/var/config
 
   traefik:
     # Shares Gerbil's network namespace. If Gerbil is recreated, Traefik must be recreated too.
     command:
       - --configFile=/etc/traefik/traefik_config.yml
     container_name: traefik
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ping || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
       - wud.watch=false
     depends_on:
       pangolin:
         condition: service_healthy
-    image: traefik:latest
+    image: traefik:v3.7.17
     network_mode: service:gerbil
     restart: unless-stopped
     volumes:
-      - ../../config/traefik:/etc/traefik:ro
-      - ../../config/letsencrypt:/letsencrypt
-      - ../../config/traefik/logs:/var/log/traefik
-      - ../../config/traefik/rules:/rules
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/jesus/pangolin-stack/config/traefik:/etc/traefik:ro
+      - /home/jesus/pangolin-stack/config/letsencrypt:/letsencrypt
+      - /home/jesus/pangolin-stack/config/traefik/logs:/var/log/traefik
+      - /home/jesus/pangolin-stack/config/traefik/rules:/rules
+      - /var/run/docker.sock:/var/run/docker.sock:ro

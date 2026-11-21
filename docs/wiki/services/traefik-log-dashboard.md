@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/observability/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # traefik-log-dashboard (agent + UI)
 
@@ -21,8 +21,8 @@ Two services, one codebase: the **agent** tails Traefik's JSON access/error
 logs and exposes a parsed stream; the **dashboard** renders that stream in a
 React SPA with geolocation, status-code breakdowns, and service metrics.
 
-- **Agent image**: `hhftechnology/traefik-log-dashboard-agent:latest` ⚠️
-- **UI image**: `hhftechnology/traefik-log-dashboard:latest` ⚠️
+- **Agent image**: `hhftechnology/traefik-log-dashboard-agent:3.1.1`
+- **UI image**: `hhftechnology/traefik-log-dashboard:3.1.1`
 - **Compose file**: `stacks/observability/docker-compose.yml`
 - **Agent port**: `5000` (host)
 - **UI port**: `3457:3000` (host) → fronted by Traefik at
@@ -79,7 +79,7 @@ volumes:
 
 ```10:57:stacks/observability/docker-compose.yml
   traefik-agent:
-    image: hhftechnology/traefik-log-dashboard-agent:latest
+    image: hhftechnology/traefik-log-dashboard-agent:3.1.1
     container_name: traefik-agent
     networks:
       - pangolin
@@ -98,7 +98,7 @@ volumes:
       - PORT=5000
 
   traefik-dashboard:
-    image: hhftechnology/traefik-log-dashboard:latest
+    image: hhftechnology/traefik-log-dashboard:3.1.1
     container_name: traefik-dashboard
     networks:
       - pangolin
@@ -119,7 +119,7 @@ volumes:
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Image tags | `:dev-dashboard` | `:latest` | drift risk on both |
+| Image tags | `3.1.1` | `3.1.1` | both pinned to the same release |
 | Agent healthcheck interval | `2m` | `30s` | unnecessarily aggressive |
 | Dashboard env scheme | `AGENT_1_*` + `DASHBOARD_AGENTS_ENV_ONLY=true` | legacy `AGENT_API_URL/TOKEN` | ⚠️ unintentional drift |
 | GeoIP providers | `GEOIP_PROVIDER_URLS=...` | not set | ⚠️ unintentional; all IPs show "Unknown" |
@@ -144,10 +144,8 @@ The UI's geo-map and "Top Countries" widgets will all show "Unknown". Two
 free providers (ipwho.is, ip-api.com) are supplied by upstream defaults but
 only activate when the `GEOIP_PROVIDER_URLS` env is set explicitly.
 
-### F-TLD-4 — `:latest` image tag on both (`medium` / M10 scope)
-Both images are third-party. `dev-dashboard` is their recommended tag. The
-repo ships frequent schema changes between dashboard UI and agent; mismatched
-versions = stuck "Connecting…" UI. Use the same tag on both.
+### F-TLD-4 — images now pinned to 3.1.1 (resolved 2026-10-31)
+Both agent and dashboard images are pinned to the same `3.1.1` release.
 
 ### F-TLD-5 — aggressive healthcheck (`low`)
 `interval: 30s` on an agent that reads a file every few seconds is fine, but

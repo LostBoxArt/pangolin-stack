@@ -24,7 +24,7 @@ inventory before deployment.
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | landing | Static landing page (Termix remains an older template) |
+| **apps** | landing | Static landing page (Termix was removed on 2026-10-16) |
 | **homenode** | newt, hawser, traefik, arr-mcp, prowlarr, scryer, plex, qbittorrent, dashdot | Home tunnel, management, media and monitoring — **all now on rammus (`192.168.0.12`)** |
 
 The `homenode` stack is the historical name; its services run on rammus under
@@ -75,7 +75,7 @@ Dashboard:
 
 Apps:
 - Landing: nginx static page behind Traefik.
-- Termix is an older template; no live container was present on 2026-10-27.
+- Termix was removed from the apps stack on 2026-10-16; no live container exists.
 
 ## Public Endpoints
 - Pangolin: https://pangolin.example.com
@@ -102,17 +102,17 @@ Apps:
 
 ## Version and Upgrade Policy
 - Verified live on 2026-11-21: Pangolin `1.26.0`, Gerbil `1.6.0`, CloudNode
-  Traefik `v3.7.19`. On 2026-10-27 the same audit found Pangolin `1.25.3`,
-  Gerbil `1.5.2`, Traefik `v3.7.16`, CrowdSec Web UI `2026.10.10`, Newt `1.19.0`,
-  Olm `1.9.1` — the core images have since moved forward on their own, so treat
-  version numbers here as a snapshot, not a pin.
-  The older template pins below are not a safe deployment over that running
-  installation; reconcile source and read release/migration notes first.
-- Older core template pins: Pangolin `1.17.1`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
-- Older security template pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`, retained from the 2026-03-30 incident.
-- The current Newt snapshot pins `1.19.0`. Newt now runs on **rammus**.
+  Traefik `v3.7.19`. Treat version numbers here as a snapshot, not a pin.
+- Source pins after the 2026-11-06 sweep (`stacks/*/docker-compose.yml`): Pangolin
+  `1.26.0`, Gerbil `1.6.0`, Traefik `v3.7.17`, Badger plugin `v1.8.0`, Homarr
+  `v2.11.1`, Pocket-ID `v2.19.2`, CrowdSec Web UI `2026.11.5`. The CloudNode
+  Traefik compose pin (`v3.7.17`) lags the live `v3.7.19`; reconcile before redeploying.
+- CrowdSec Web UI persistent state uses `/app/data` (`state.db`) and the host service UID.
+- Newt runs on **rammus**; its current snapshot pins `1.19.0`.
 - rammus runs Traefik `3.7.17` (pinned) and Plex/qBittorrent/dashdot on `:latest`.
-- CloudNode Olm was verified at `1.9.1` on 2026-10-27, with `--override-dns=false`.
+- CloudNode Olm was upgraded `1.9.1` -> `1.10.1` on 2026-11-06, with
+  `--override-dns=false`; the previous binary is kept as `/usr/local/bin/olm.1.9.1.rollback`.
+- Recheck upstream compatibility notes (Pangolin/Traefik, Badger plugin integrity) before changing any pin.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`
@@ -173,7 +173,7 @@ pangolin-stack/
 │   ├── observability/docker-compose.yml # traefik-agent, traefik-dashboard, dashdot
 │   ├── management/docker-compose.yml   # dockhand
 │   ├── dashboard/docker-compose.yml    # homarr, qbit-proxy
-│   ├── apps/docker-compose.yml         # landing, termix
+│   ├── apps/docker-compose.yml         # landing
 ├── config/                             # service configs (pangolin, crowdsec, traefik)
 ├── config/db/                          # Pangolin database
 ├── config/traefik/rules/               # Traefik dynamic rules
@@ -248,11 +248,11 @@ From `.env` (all are referenced in compose):
   independently; this is not one atomic transaction across applications.
 
 ## Docker Volumes and External Data
-- External volumes: none (landing uses a bind-mounted `sites/` directory; termix
-  uses a named local volume `termix_data`).
+- Active stacks have no declared named volumes (landing uses a bind-mounted
+  `sites/` directory).
 - Homarr data is in `/opt/homarr/appdata` on the host.
 - Dockhand data is in `./data/dockhand`.
-- Docker socket is mounted for Traefik, Homarr, and Dockhand.
+- Docker socket is mounted for Traefik and Dockhand.
 
 ## AdGuard Home (DNS)
 - Web UI: https://dns.example.com
@@ -367,6 +367,21 @@ the Dockhand UI and can be deleted.
 | Trigger Webhook | GET/POST | `/api/git/stacks/{id}/webhook` |
 | Activity Log | GET | `/api/activity` |
 
+No Dockhand Git stacks are configured; the `/api/git/*` rows are API capability only.
+
 ## When Editing Docs
 - Keep `README.md` and `INFRASTRUCTURE.md` in sync with compose files.
 - If services move between stacks, update this file too.
+
+## Historical maintenance record — 2026-10-27
+
+Superseded by the 2026-11-21 move to rammus (`docs/wiki/hosts/rammus.md`).
+Still valid from that pass: FileFlows and its DV watcher are decommissioned (do
+not recreate them from old archives); Olm uses a root-only `CONFIG_FILE` with
+`UMask=0077` and its credential was rotated; backup archives, logs and the NAS
+recovery-kit PDF are owner-only; six CloudNode database snapshots, encrypted
+off-host copies in both directions and isolated native recovery were verified,
+with both off-host timers enabled under user lingering (see the recovery runbook).
+NASUS-era details in `docs/wiki/maintenance-2026-10-27.md` (NAS Traefik, Newt's
+Dockhand Git compose) no longer describe the live layout: Newt runs on rammus and
+Dockhand has no Git integration.

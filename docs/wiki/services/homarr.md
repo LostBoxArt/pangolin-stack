@@ -12,20 +12,20 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # homarr
 
 Personal landing / dashboard page at `home.example.com`. Embeds widgets for
 media services, torrents, system status, etc.
 
-- **Image**: `ghcr.io/homarr-labs/homarr:latest` ⚠️
+- **Image**: `ghcr.io/homarr-labs/homarr:v2.10.1` (live-verified 2026-10-31)
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
-- **Port**: `7575` (published on host, also Traefik-fronted)
+- **Port**: `127.0.0.1:7575` (loopback-only host publication; also Traefik-fronted)
 - **Data**: `/opt/homarr/appdata:/appdata` (host bind, **not** inside repo)
-- **Socket**: `/var/run/docker.sock` (for Docker integration widgets)
 - **TZ**: `Asia/Jerusalem`
+- **Env symlink**: `stacks/dashboard/.env` → `../../.env` (required — compose auto-load picks up `HOMARR_SECRET_KEY`)
 
 ## Upstream Sources
 
@@ -51,10 +51,10 @@ services:
 
 ## Our Compose (relevant slice)
 
-```22:46:stacks/dashboard/docker-compose.yml
+```22:36:stacks/dashboard/docker-compose.yml
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
+    image: ghcr.io/homarr-labs/homarr:v2.10.1
     networks:
       - pangolin
     restart: unless-stopped
@@ -62,21 +62,13 @@ services:
       - qbit-proxy
     volumes:
       - /opt/homarr/appdata:/appdata
-      - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 7575:7575
+      - 127.0.0.1:7575:7575
     environment:
       - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
       - TZ=Asia/Jerusalem
     extra_hosts:
-      - "torrent.example.com:192.168.1.10"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homarr.rule=Host(`home.example.com`)"
-      - "traefik.http.routers.homarr.entrypoints=websecure"
-      - "traefik.http.routers.homarr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.homarr.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+      - "torrent.example.com:192.168.0.12"
 ```
 
 ## Deviations
@@ -87,38 +79,55 @@ services:
 | `depends_on: qbit-proxy` | n/a | added | intentional — qBittorrent widget needs the proxy sidecar |
 | `extra_hosts` | n/a | added | intentional — resolves `torrent.example.com` to HomeNode directly |
 | Port publish | `7575:7575` | same | ✓ |
-| `:latest` tag | yes | yes | drift risk |
+| `:latest` tag | yes | no — pinned to `v2.8.0` | intentional (control over schema migrations) |
 | DB env | default (`better-sqlite3` + `/appdata/db/db.sqlite`) | default | ✓ |
 
 ## Findings
 
-### F-HOMARR-1 — `:latest` image tag (`medium` / M10 scope)
-Homarr ships a lot of schema migrations. A jump from, say, 1.58 to 1.60
-triggered on an unattended pull will auto-migrate the SQLite DB *forward*.
-If you later want to roll back, the old image won't understand the new
-schema.
+### F-HOMARR-1 — `:latest` image tag → resolved, now on stable `v2.8.0` (✓)
+Update 2026-05-09: Switched from `:latest` (main branch) to `v1.61.1-beta.1` (beta branch).
+The beta merged 3 Node processes into 1 (#5600) plus idle-memory reduction (#5637),
+cutting memory from ~595 MiB to ~181 MiB.
+
+Update 2026-10-10: Upgraded to the pinned v2 migration release `v2.4.1`. The
+SQLite database passed integrity verification after migration; the board and
+application inventory remained intact. The Docker socket remains intentionally
+absent.
+
+Update 2026-10-22: Upgraded to `v2.8.0`. SQLite `integrity_check` passed after
+the update, the local dashboard returned HTTP 200, and the container had zero
+restarts at verification.
+
+Update 2026-10-31: Upgraded to `v2.10.1`. Homarr v2 migrations rewrite the SQLite database in place, so rollback requires restoring the pre-upgrade `appdata` backup before starting the older image.
 
 ### F-HOMARR-2 — no healthcheck (`low` / L3)
 Homarr exposes a health endpoint; adding a check helps the UI to signal
 startup progress and lets `stackctl.sh status` turn green reliably.
 
-### F-HOMARR-3 — `docker.sock` is optional, still mounted
-Fine — we use docker-integration widgets. Just noted for clarity: if you
-ever decide to disable docker widgets, drop the socket mount for defense in
-depth.
+### F-HOMARR-3 — `docker.sock` mount removed (✓ resolved 2026-09-28)
+Update 2026-09-28: The socket mount was removed. Homarr's `integration` table
+contained only `dashDot`, `qBittorrent`, and `archiveTeamWarrior` — there was
+**no Docker integration configured**, so the mount granted root-equivalent
+access to any container-escape for no functional benefit. Note that mounting the
+socket `:ro` would not have helped; the Docker API accepts writes through the
+socket regardless of the file mode, so removal was the only meaningful fix.
+
+Re-add only if a Docker widget is actually configured, and prefer
+`docker-socket-proxy` over the raw socket if that day comes.
 
 ## Remediation
 
-### Fix F-HOMARR-1
+### Fix F-HOMARR-1 (resolved)
 
-Pin a release:
+`v2.10.1` uses the same stable channel; check releases before deliberate
+upgrades and retain the pre-upgrade `appdata` backup for rollback.
 
 ```yaml
-    image: ghcr.io/homarr-labs/homarr:1.59.1
+    image: ghcr.io/homarr-labs/homarr:v2.10.1
 ```
 
-Keep an eye on <https://homarr.dev/blog> for breaking-change notices before
-bumping.
+The beta is no longer needed. Bump deliberately and check
+<https://github.com/homarr-labs/homarr/releases> before doing so.
 
 ### Fix F-HOMARR-2
 
@@ -139,9 +148,16 @@ moved from `/api/healthcheck` to `/api/health` around 1.x.)
 - **qBittorrent widget quirk** (Homarr v0.15+ with qBittorrent v5.1.4+):
   the secure-cookie flag breaks the widget. We work around it with the
   `qbit-proxy` sidecar — see [qbit-proxy](./qbit-proxy.md).
+- **qbit-proxy Host header**: The proxy sends `Host: torrent.example.com` to
+  HomeNode's Traefik. If the Traefik route on HomeNode doesn't match (e.g.
+  expects the same host in its route), the integration returns 404. The `TARGET_HOST`
+  env var in `qbit-proxy` must match the Traefik route.
 - `SECRET_ENCRYPTION_KEY` is single-source-of-truth for encrypted
   credentials in Homarr's DB. **Do not rotate without exporting secrets
   first** — all saved service credentials become unreadable.
 - Host bind path `/opt/homarr/appdata` is excluded from `backup.sh` by
   default; confirm your backup policy includes it if you want dashboard
   customization backed up.
+- **Env file**: `stacks/dashboard/.env` is a symlink to `../../.env`.
+  Compose only auto-loads `.env` from the compose file's directory — the
+  symlink ensures `HOMARR_SECRET_KEY` resolves without `--env-file`.

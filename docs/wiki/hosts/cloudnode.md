@@ -39,7 +39,6 @@ Primary public edge and control-plane server.
 - [[../services/homarr.md]]
 - [[../services/qbit-proxy.md]]
 - [[../services/landing.md]]
-- [[../services/termix.md]]
 
 ## Archived services
 - [[../services/linkstack.md]] — archived on 2026-04-21 after `landing`
@@ -47,7 +46,7 @@ Primary public edge and control-plane server.
 
 ## Networks
 - Docker external network: [[../networks/pangolin.md]]
-- Tunnel route to HomeNode LAN: `192.168.1.0/24 dev olm`
+- Tunnel route to the home LAN: `192.168.0.0/24 dev olm`
 
 ## Access
 - Tunnel component: `olm` systemd service

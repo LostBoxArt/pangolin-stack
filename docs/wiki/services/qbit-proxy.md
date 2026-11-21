@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["stacks/dashboard/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-23
+last_lint: 2026-10-23
 ---
 # qbit-proxy
 
@@ -23,8 +23,9 @@ in-repo Dockerfile.
 - **Build context**: `./qbit-proxy/`
 - **Compose file**: `stacks/dashboard/docker-compose.yml`
 - **Internal port**: `8081`
+- **Build base**: `node:24-slim`; the running image reports Node `v24.22.1` (verified 2026-10-23)
 - **Target**: `torrent.example.com` (resolves via Homarr's `extra_hosts` to
-  `192.168.1.10`)
+  `192.168.0.12`)
 
 ## Purpose
 
@@ -62,8 +63,14 @@ the fix is still needed when bumping Homarr:
     restart: unless-stopped
     environment:
       - TARGET_HOST=torrent.example.com
-      - TARGET_IP=192.168.1.10
+      - TARGET_IP=192.168.0.12
 ```
+
+## Latest deployment verification — 2026-10-23
+
+The Dockerfile base was updated from `node:20-slim` to `node:24-slim` on
+2026-10-22. The running container reports Node `v24.22.1`; its internal HTTP
+probe and the routed torrent endpoint returned HTTP 200 after the rebuild.
 
 ## Deviations
 
@@ -78,6 +85,13 @@ more reliable with a healthcheck attached.
 ### F-QBP-2 — workaround may become obsolete
 Homarr upstream has an open issue for this. When that lands, this service
 can be removed along with the `extra_hosts` line in Homarr's compose.
+
+### F-QBP-3 — Host header must match HomeNode Traefik route (resolved 2026-05-09)
+The proxy sets `Host: <TARGET_HOST>` on forwarded requests. If this doesn't
+match a Traefik router rule on HomeNode, qBittorrent returns 404. Always
+verify `TARGET_HOST` matches the actual Traefik route on HomeNode (e.g.
+`torrent.example.com` in sanitized docs and the corresponding real
+configuration value on HomeNode.
 
 ## Remediation
 

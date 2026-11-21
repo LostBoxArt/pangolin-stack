@@ -8,7 +8,7 @@ accessLog:
         headers:
             defaultMode: drop
             names:
-                Authorization: redact
+                Authorization: drop
                 Content-Type: keep
                 Cookie: redact
                 User-Agent: keep
@@ -41,7 +41,12 @@ accessLog:
 
 api:
     dashboard: true
-    insecure: true
+    # Keep the API on the internal entrypoint; it must not be served
+    # unauthenticated on a published port.
+    insecure: false
+
+ping:
+    entryPoint: ping
 
 certificatesResolvers:
     letsencrypt:
@@ -54,6 +59,9 @@ certificatesResolvers:
             storage: /letsencrypt/acme.json
 
 entryPoints:
+    # Container healthchecks use this; it is not published to the host.
+    ping:
+        address: :8080
     web:
         address: :80
     websecure:

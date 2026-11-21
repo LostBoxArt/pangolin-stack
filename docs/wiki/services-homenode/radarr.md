@@ -12,12 +12,19 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/radarr/docker-compose.yml", "host-configs/homenode/radarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-11-07
+last_lint: 2026-11-07
 ---
 # radarr
 
 **Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
+
+> **Migration notice (2026-11-07):** Scryer is the active media manager and request
+> front door at `request.example.com`. This service is **stopped and retained for
+> rollback only**. See [scryer](./scryer.md). Do not restart it except as part of a
+> deliberate, coordinated rollback — Scryer and the *arr apps must never acquire or
+> import into the same libraries at the same time.
+
 
 Movie manager. LinuxServer.io image. Twin of [sonarr](./sonarr.md), with
 `/movies` instead of `/tv`.
@@ -31,6 +38,7 @@ Movie manager. LinuxServer.io image. Twin of [sonarr](./sonarr.md), with
   - `/volume1/docker/config/radarr:/config`
   - `/volume1/media/movies:/movies`
   - `/volume1/media/downloads:/downloads`
+  - `/volume1/media:/data`
 
 ## Upstream Sources
 
@@ -73,8 +81,25 @@ Pin the image from
 
 ## Operational Notes
 
-- **Quality profiles** should be managed centrally via
-  [profilarr](./profilarr.md) or [recyclarr](./recyclarr.md), not edited
-  by hand in Radarr's UI — your changes will get overwritten on next sync.
-- Root folder: `/movies` inside the container = `/volume1/media/movies` on
-  the host.
+- **Quality profiles** are managed centrally by [Recyclarr](./recyclarr.md),
+  not edited by hand in Radarr's UI. Profilarr is retained for repository
+  synchronization only and must not push overlapping settings.
+- Live profiles are `2160p Quality` (default conventional-movie profile),
+  `1080p Quality` (conventional 1080p target), and `Anime 1080p` (anime-aware
+  profile without a 4K requirement). Existing assignments were preserved;
+  previously unassigned movies were assigned to the 2160p default.
+- Future anime movies should be explicitly assigned to `Anime 1080p`; Radarr
+  does not infer that profile from genre automatically.
+
+Sources: [TRaSH Radarr profiles](https://trash-guides.info/Radarr/radarr-setup-quality-profiles/),
+[TRaSH Radarr anime profiles](https://trash-guides.info/Radarr/radarr-setup-quality-profiles-anime/),
+[Recyclarr templates](https://recyclarr.dev/guide/guide-configs/).
+- Root folder: `/data/movies` inside the container = `/volume1/media/movies`
+  on the host. The old `/movies` alias remains mounted for rollback and legacy
+  paths.
+- Hardlinks now pass the real cross-container test through the shared `/data`
+  namespace; no media files were moved.
+- **Download safety**: every configured indexer has `failDownloads=[0,1]`, which
+  enables Radarr's `Executables` and `Potentially Dangerous` checks. Arr rejects
+  these when processing completed downloads; qBittorrent may still receive
+  bytes before the completed contents can be inspected.

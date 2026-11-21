@@ -1,4 +1,4 @@
-# Sanitized live snapshot, 2026-10-27. Supply credentials privately.
+# Sanitized live snapshot, 2026-10-31. Supply credentials privately.
 # Hawser - Dockhand Remote Agent
 #
 # This replaces docker-socket-proxy for NAS-VPS Docker management.
@@ -14,7 +14,7 @@
 
 services:
   hawser:
-    image: ghcr.io/finsys/hawser:latest
+    image: ghcr.io/finsys/hawser:0.2.53
     container_name: hawser
     restart: unless-stopped
     volumes:

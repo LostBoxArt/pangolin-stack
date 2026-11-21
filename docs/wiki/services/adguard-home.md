@@ -18,16 +18,23 @@ last_lint: 2026-04-22
 
 # adguard-home (REMOVED)
 
-**Status:** Removed on 2026-04-21. Container stopped and stack removed from startup.
+**Status:** Removed on 2026-04-21. **Fully deleted 2026-09-28** — the
+`stacks/dns/` compose file and `config/adguard-home/` were moved out of the repo,
+and the `dns-tls` (853) Traefik entrypoint was removed.
 
 **Reason:** Only used for iPhone DNS filtering. Caused more issues than it was worth. iPhone now uses `1.1.1.1` directly. Local AdGuard copy remains on the home network if needed.
+
+**2026-09-28 follow-up:** The dead stack had still been referenced by
+`stacks/core/docker-compose.yml` (`853:853`) and the `dns-tls` Traefik entrypoint.
+Both are now cleaned up: the entrypoint is deleted and Gerbil no longer publishes
+853.
 
 **Historical endpoints (no longer active):**
 - DoH: `https://dns.example.com/dns-query`
 - DoT: `dns.example.com:853`
 - WebUI: `https://dns.example.com`
 
-**Config backup:** `./config/adguard-home/` still exists if ever needed for restoration.
+**Config backup:** moved to `.removed-20260928/config-adguard-home/` (recoverable, not deleted).
 
 ---
 

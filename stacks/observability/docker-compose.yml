@@ -17,8 +17,8 @@ services:
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
-      - ../../data/positions:/data
-      - ../../config/traefik/logs:/logs:ro
+      - /home/jesus/pangolin-stack/data/positions:/data
+      - /home/jesus/pangolin-stack/config/traefik/logs:/logs:ro
     environment:
       - TRAEFIK_LOG_DASHBOARD_ACCESS_PATH=/logs/access.log
       - TRAEFIK_LOG_DASHBOARD_ERROR_PATH=/logs/traefik.log
@@ -34,7 +34,7 @@ services:
       start_period: 10s
 
   traefik-dashboard:
-    image: hhftechnology/traefik-log-dashboard:latest
+    image: hhftechnology/traefik-log-dashboard:3.1.1
     container_name: traefik-dashboard
     networks:
       - pangolin
@@ -70,10 +70,3 @@ services:
       - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
     volumes:
       - /:/mnt/host:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashdot.rule=Host(`dash.example.com`)"
-      - "traefik.http.routers.dashdot.entrypoints=websecure"
-      - "traefik.http.routers.dashdot.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.dashdot.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.dashdot.loadbalancer.server.port=3001"

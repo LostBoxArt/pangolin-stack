@@ -1,7 +1,7 @@
 # Pangolin Stack Wiki
 
 > LLM-oriented manifest for the Pangolin stack and its
-related homelab services as documented in `/opt/homelab`.
+related homelab services as documented in `/home/jesus/pangolin-stack`.
 
 - Scope boundary: this repo and wiki are home-only homelab context. Keep work/HPC/enterprise guidance out of answers that are grounded in this wiki unless a page explicitly says otherwise.
 
@@ -29,6 +29,8 @@ related homelab services as documented in `/opt/homelab`.
 - [Wiki Log](./log.md): append-only structural maintenance log
 - [Compose Review 2026-04-17](./compose-review-2026-04-17.md): latest CloudNode audit
 - [HomeNode Review 2026-04-17](./homenode-review-2026-04-17.md): latest HomeNode audit
+- [Verified maintenance 2026-10-27](./maintenance-2026-10-27.md): current verified maintenance notes
+- [Verified maintenance 2026-10-31](./maintenance-2026-10-31.md): Plex host networking and direct WAN media access
 
 ## Service Pages
 
@@ -48,30 +50,32 @@ related homelab services as documented in `/opt/homelab`.
 - [qbit-proxy](./services/qbit-proxy.md)
 - [landing](./services/landing.md)
 - [linkstack](./services/linkstack.md) (archived)
-- [termix](./services/termix.md)
 
 ### HomeNode services
 - [traefik (HomeNode)](./services-homenode/traefik.md)
 - [hawser](./services-homenode/hawser.md)
 - [newt](./services-homenode/newt.md)
-- [sonarr](./services-homenode/sonarr.md)
-- [radarr](./services-homenode/radarr.md)
-- [bazarr](./services-homenode/bazarr.md)
-- [prowlarr](./services-homenode/prowlarr.md)
-- [profilarr](./services-homenode/profilarr.md)
-- [recyclarr](./services-homenode/recyclarr.md)
-- [qbittorrent](./services-homenode/qbittorrent.md)
-- [qui](./services-homenode/qui.md)
-- [flaresolverr](./services-homenode/flaresolverr.md)
-- [cleanuparr](./services-homenode/cleanuparr.md)
-- [plex](./services-homenode/plex.md)
-- [seerr](./services-homenode/seerr.md)
+- [scryer](./services-homenode/scryer.md) — active media manager and request front door
+- [prowlarr](./services-homenode/prowlarr.md) — active indexer manager
+- [qbittorrent](./services-homenode/qbittorrent.md) — active download client
+- [plex](./services-homenode/plex.md) — active media server
+
+Retired 2026-11-07, rollback only: [sonarr](./services-homenode/sonarr.md),
+[radarr](./services-homenode/radarr.md), [bazarr](./services-homenode/bazarr.md),
+[profilarr](./services-homenode/profilarr.md), [recyclarr](./services-homenode/recyclarr.md),
+[seerr](./services-homenode/seerr.md), [flaresolverr](./services-homenode/flaresolverr.md)
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
+
+## Current security snapshot (verified 2026-10-23)
+
+- Pangolin `1.25.3` runs Node `v24.22.1`, resolving the Node2Shell advisory; current Traefik is `v3.7.16` and Badger remains `v1.7.0` because upstream reports `v1.8.0` fails Traefik's plugin integrity check.
+- HomeNode Newt `1.19.0`, CloudNode Olm `1.9.1`, Gerbil `1.5.2`, Homarr `v2.8.0`, Pocket-ID `v2.19.1`, and CrowdSec Web UI `2026.10.9` were verified in the current deployment. See the service pages for evidence and sources.
+- qbit-proxy runs Node `v24.22.1` on the `node:24-slim` base; internal and routed HTTP probes returned 200 after the rebuild.
 
 ## Critical Rules
 
-- Pangolin, Gerbil, Newt, Olm, Badger, and CrowdSec Web UI stay pinned.
-- If Gerbil is recreated, Traefik must be recreated too.
+- Current security state (2026-11-07): Pangolin `1.26.0` / Node `v24.22.1`; Badger upgraded to `v1.8.0`; see [Pangolin](./services/pangolin.md) and [Badger](./services/badger.md).
+- Scryer is the active media manager and request front door; Sonarr, Radarr, Bazarr, Profilarr, Recyclarr, Seerr and FlareSolverr are stopped and retained for rollback only.
 - Pocket-ID shared-data bug remains unfixed until the service page says
   otherwise.
 - HomeNode `NC1` and `NC2` are still open compromise-risk surfaces.
@@ -100,7 +104,7 @@ related homelab services as documented in `/opt/homelab`.
 - [HomeNode Host](./hosts/homenode.md)
 - [pangolin network](./networks/pangolin.md)
 - [traefik_traefik network](./networks/traefik-traefik.md)
-- [Runbooks](./runbooks/recreate-traefik-after-gerbil.md), [Pocket-ID data fix](./runbooks/fix-pocket-id-shared-data.md), [Olm reachability](./runbooks/check-homenode-reachability-via-olm.md), [All sites return 403](./runbooks/403-all-sites.md)
+- [Runbooks](./runbooks/recreate-traefik-after-gerbil.md), [Pocket-ID data fix](./runbooks/fix-pocket-id-shared-data.md), [Olm reachability](./runbooks/check-homenode-reachability-via-olm.md), [All sites return 403](./runbooks/403-all-sites.md), [Tunnel down + all HomeNode down](./runbooks/tunnel-down-all-homenode-down.md)
 
 ## Lint Surface
 

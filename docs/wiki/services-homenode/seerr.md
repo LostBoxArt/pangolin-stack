@@ -12,23 +12,28 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/seerr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-11-07
+last_lint: 2026-11-07
 ---
 # seerr
 
 **Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
+> **Migration notice (2026-11-07):** Scryer is the active media manager and request
+> front door at `request.example.com`. Seerr is **retained for rollback only** and is
+> no longer the public request entry point. See [scryer](./scryer.md). Do not submit
+> requests through Seerr; they will not reach the active acquisition path.
+
+
 Seerr manages media requests and connects to Sonarr, Radarr, and the media server.
 The verified deployment uses `ghcr.io/seerr-team/seerr:v3.5.1`; this maintenance
 performed no Seerr upgrade or migration.
 
-## Current source (2026-10-27)
+## Current source (2026-10-31)
 
-The live definition is `/volume1/docker/config/seerr/docker-compose.yml` and its
-sanitized copy is `host-configs/homenode/seerr/docker-compose.yml`. It retains
+The live definition is `/volume1/docker/config/seerr/docker-compose.yml`. The tracked copy at `host-configs/homenode/seerr/docker-compose.yml`  The live deployment retains
 UID/GID 1000, `init`, `no-new-privileges`, memory limits, the existing status
-healthcheck, and `traefik_traefik` connectivity.
+healthcheck, and `traefik_traefik` connectivity; `LOG_LEVEL` is `info`.
 
 The data bind remains `/volume1/docker/config/jellyseerr:/app/config`.
 That historical directory name is not an unused installation: it contains the

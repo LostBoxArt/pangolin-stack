@@ -37,7 +37,12 @@ set -e
 
 # Configuration
 BACKUP_DIR="/opt/homelab/backups"
-STACK_DIR="/opt/homelab"
+STACK_DIR="/home/jesus/pangolin-stack"
+
+# Pinned helper image used to archive private data without host tar privileges.
+# --pull=never keeps backups offline; ensure_tool_image restores the image if
+# a docker image prune removed it.
+TOOL_IMAGE="alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a"
 LOG_FILE="${BACKUP_DIR}/backup.log"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 RETAIN_DAYS=${RETAIN_DAYS:-7}  # Default retention: 7 days
@@ -281,7 +286,7 @@ copy_private_tree() {
     local target="$2"
     shift 2
     mkdir -p "${target}"
-    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL --cap-add DAC_OVERRIDE --security-opt no-new-privileges --mount "type=bind,source=${source},target=/source,readonly" --entrypoint /bin/tar alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a "$@" -C /source -cf - . | tar -xf - -C "${target}/"); then
+    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL --cap-add DAC_OVERRIDE --security-opt no-new-privileges --mount "type=bind,source=${source},target=/source,readonly" --entrypoint /bin/tar "${TOOL_IMAGE}" "$@" -C /source -cf - . | tar -xf - -C "${target}/"); then
         log ERROR "Private data export failed: ${source}"
         return 1
     fi
@@ -313,7 +318,7 @@ databases = {}
 for service, source, archived in [
     ("pangolin", stack / "config/db/db.sqlite", "config/db/db.sqlite"),
     ("crowdsec", stack / "config/crowdsec/db/crowdsec.db", "config/crowdsec/db/crowdsec.db"),
-    ("crowdsec-web-ui", stack / "config/crowdsec-web-ui/crowdsec.db", "config/crowdsec-web-ui/crowdsec.db"),
+    ("crowdsec-web-ui", stack / "config/crowdsec-web-ui/state.db", "config/crowdsec-web-ui/state.db"),
     ("pocket-id", stack / "data/pocket-id/pocket-id.db", "data/pocket-id/pocket-id.db"),
     ("dockhand", stack / "data/dockhand/db/dockhand.db", "data/dockhand/db/dockhand.db"),
     ("homarr", pathlib.Path("/opt/homarr/appdata/db/db.sqlite"), "homarr/db/db.sqlite"),
@@ -364,13 +369,25 @@ export_host_recovery() {
         --mount "type=bind,source=/etc/systemd/system/crowdsec-firewall-bouncer.service,target=/export/etc/systemd/system/crowdsec-firewall-bouncer.service,readonly"
     )
     mkdir -p "${target}"
-    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL "${mounts[@]}" --entrypoint /bin/tar alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a -C /export -cf - . | tar -xf - -C "${target}/"); then
+    if ! (set -o pipefail; docker run --rm --pull=never --network none --read-only --cap-drop ALL "${mounts[@]}" --entrypoint /bin/tar "${TOOL_IMAGE}" -C /export -cf - . | tar -xf - -C "${target}/"); then
         log ERROR "Host recovery export failed"
         return 1
     fi
 }
 
+ensure_tool_image() {
+    if docker image inspect "${TOOL_IMAGE}" >/dev/null 2>&1; then
+        return 0
+    fi
+    log WARN "Helper image ${TOOL_IMAGE} missing (docker image prune removes it); pulling by digest"
+    if ! docker pull "${TOOL_IMAGE}" >/dev/null 2>&1; then
+        log ERROR "Cannot pull helper image ${TOOL_IMAGE}"
+        return 1
+    fi
+}
+
 do_backup() {
+    ensure_tool_image || return 1
     umask 077
     if [ -f "${LOG_FILE}" ]; then
         chmod 600 "${LOG_FILE}"
@@ -427,8 +444,8 @@ do_backup() {
     fi
 
     snapshot_sqlite_db "${STACK_DIR}/config/crowdsec/db/crowdsec.db" "${BACKUP_PATH}/config/crowdsec/db/crowdsec.db"
-    copy_private_tree "${STACK_DIR}/config/crowdsec-web-ui" "${BACKUP_PATH}/config/crowdsec-web-ui" --exclude=./crowdsec.db --exclude=./crowdsec.db-wal --exclude=./crowdsec.db-shm
-    snapshot_sqlite_db "${STACK_DIR}/config/crowdsec-web-ui/crowdsec.db" "${BACKUP_PATH}/config/crowdsec-web-ui/crowdsec.db"
+    copy_private_tree "${STACK_DIR}/config/crowdsec-web-ui" "${BACKUP_PATH}/config/crowdsec-web-ui" --exclude=./state.db --exclude=./state.db-wal --exclude=./state.db-shm --exclude=./cache.db --exclude=./cache.db-wal --exclude=./cache.db-shm --exclude=./crowdsec.db --exclude=./crowdsec.db-wal --exclude=./crowdsec.db-shm
+    snapshot_sqlite_db "${STACK_DIR}/config/crowdsec-web-ui/state.db" "${BACKUP_PATH}/config/crowdsec-web-ui/state.db"
 
     # 6. Gerbil key
     echo -e "${YELLOW}[6/9] Gerbil WireGuard key...${NC}"
@@ -474,9 +491,9 @@ do_backup() {
     fi
 
     # Documentation
-    cp "${STACK_DIR}/AGENTS.md" "${BACKUP_PATH}/"
     cp "${STACK_DIR}/README.md" "${BACKUP_PATH}/" 2>/dev/null || true
     cp "${STACK_DIR}/INFRASTRUCTURE.md" "${BACKUP_PATH}/" 2>/dev/null || true
+    cp "${STACK_DIR}/AGENTS.md" "${BACKUP_PATH}/"
     cp "${STACK_DIR}/.gitignore" "${BACKUP_PATH}/" 2>/dev/null || true
 
     # Preserve private runtime settings and the exact allowlisted host recovery files.
@@ -580,7 +597,8 @@ databases = []
 for service, relative in [
     ("pangolin", "config/db/db.sqlite"),
     ("crowdsec", "config/crowdsec/db/crowdsec.db"),
-    ("crowdsec-web-ui", "config/crowdsec-web-ui/crowdsec.db"),
+    ("crowdsec-web-ui", "config/crowdsec-web-ui/state.db"),
+    ("crowdsec-web-ui-legacy", "config/crowdsec-web-ui/crowdsec.db"),
     ("pocket-id", "data/pocket-id/pocket-id.db"),
     ("dockhand", "data/dockhand/db/dockhand.db"),
     ("homarr", "homarr/db/db.sqlite"),
@@ -635,6 +653,7 @@ do_restore() {
         echo "Restore requires root to preserve application ownership; run sudo ./backup.sh restore <archive>" >&2
         return 1
     fi
+    ensure_tool_image || return 1
     ARCHIVE="$1"
 
     if [ -z "$ARCHIVE" ]; then

@@ -8,7 +8,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=exec
 User=admin
-ExecStart=/usr/bin/ssh -N -T -o BatchMode=yes -o ConnectTimeout=10 -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=yes -L 127.0.0.1:16060:127.0.0.1:6060 admin@192.168.1.10
+ExecStart=/usr/bin/ssh -N -T -o BatchMode=yes -o ConnectTimeout=10 -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=yes -L 127.0.0.1:16060:127.0.0.1:6060 jesus@192.168.0.12
 Restart=always
 RestartSec=10
 TimeoutStopSec=10

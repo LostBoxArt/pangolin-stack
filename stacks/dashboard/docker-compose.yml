@@ -13,15 +13,15 @@ services:
     networks:
       - pangolin
     build:
-      context: ../../qbit-proxy
+      context: /home/jesus/pangolin-stack/qbit-proxy
     restart: unless-stopped
     environment:
       - TARGET_HOST=torrent.example.com
-      - TARGET_IP=192.168.1.10
+      - TARGET_IP=192.168.0.12
 
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
+    image: ghcr.io/homarr-labs/homarr:v2.11.1
     networks:
       - pangolin
     restart: unless-stopped
@@ -29,18 +29,19 @@ services:
       - qbit-proxy
     volumes:
       - /opt/homarr/appdata:/appdata
-      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "127.0.0.1:7575:7575"
     environment:
       - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
       - TZ=Asia/Jerusalem
     extra_hosts:
-      - "torrent.example.com:192.168.1.10"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homarr.rule=Host(`home.example.com`)"
-      - "traefik.http.routers.homarr.entrypoints=websecure"
-      - "traefik.http.routers.homarr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.homarr.middlewares=geoblock@file,security-headers@file"
-      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+      - "torrent.example.com:192.168.0.12"
+      - "sonarr.example.com:192.168.0.12"
+      - "radarr.example.com:192.168.0.12"
+      - "bazarr.example.com:192.168.0.12"
+      - "prowlarr.example.com:192.168.0.12"
+      - "profilarr.example.com:192.168.0.12"
+      - "nasus.example.com:192.168.0.12"
+      - "adguard.example.com:192.168.0.12"
+      - "plex.example.com:192.168.0.12"
+      - "request.example.com:192.168.0.12"

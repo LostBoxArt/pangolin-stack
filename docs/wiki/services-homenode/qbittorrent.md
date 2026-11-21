@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/qbittorrent/docker-compose.yml", "host-configs/homenode/qbittorrent/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # qbittorrent
 
@@ -25,12 +25,18 @@ outbound swarm traffic exits on the ISP IP.
 
 - **Image**: `linuxserver/qbittorrent:latest` ⚠️
 - **Compose file**: `/volume1/docker/config/qbittorrent/docker-compose.yml`
-- **Tracked copy**: `host-configs/homenode/qbittorrent/docker-compose.yml` ✓
-- **Port (internal)**: `8080` (WEBUI_PORT)
+- **Tracked copy**: `host-configs/homenode/qbittorrent/docker-compose.yml` (sanitized live snapshot, 2026-10-31, including the 6881 publications)
+- **Ports**: `6881:6881/tcp` and `6881:6881/udp` published for peer traffic; both WAN-forwarded by the router
+- **Web UI port (internal)**: `8080` (WEBUI_PORT)
 - **Router**: `torrent.example.com`
 - **Volumes**:
   - `/volume1/docker/config/qbittorrent:/config`
   - `/volume1/media/downloads:/downloads`
+  - `/volume1/media:/data`
+
+qBittorrent's CSRF protection, host-header validation, and reverse-proxy
+support were already correct; the audit only addressed connectivity. The WAN
+forward exposes the peer port, not the Web UI, which remains Traefik-routed.
 
 ## Upstream Sources
 
@@ -53,6 +59,7 @@ services:
     volumes:
       - /volume1/docker/config/qbittorrent:/config
       - /volume1/media/downloads:/downloads
+    # Current deployment also publishes qBittorrent peer traffic on 6881/tcp and 6881/udp.
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080 >/dev/null || exit 1"]
       interval: 30s
@@ -129,12 +136,33 @@ Not a compose change. Runbook:
    password.
 4. Restart qBit to apply.
 
+## TorrentLeech seeding policy
+
+- TorrentLeech requires either a 1:1 ratio or minimum total seeding time; the official minimum is 10 days for Registered, then 8/7/6/4 days for Power/Super/Extreme/TL God classes.
+- Global share limit: `ShareLimitAction=RemoveWithContent` with both `max_seeding_time` and
+  `max_inactive_seeding_time` set to 30 days (`43200` minutes). Torrents older than 30 days
+  are removed together with their download files.
+- Deleting a download copy never touches `movies/` or `tv/`: imported items are hardlinked
+  (`nlink=2`, deleting the download link frees no space) and unimported ones are separate
+  files. Verified 2026-11-01 before enabling.
+- Per-torrent `seeding_time_limit=-1` overrides the global rule. Flash-imported torrents
+  carried that value; they were normalised to `-2` (use global) with
+  `POST /api/v2/torrents/setShareLimits`.
+- Sonarr and Radarr use the post-import category `seeding`; Arr will not remove completed torrents in that category.
+- The `seeding` qBittorrent category exists for imported torrents. Existing torrents are not moved automatically.
+
 ## Operational Notes
 
-- `/downloads` shared with Sonarr + Radarr for hardlink imports.
+- `/downloads` remains mounted for existing torrent paths. The default and
+  temporary download paths now use `/data/downloads`; existing torrents were
+  not moved and all 128 torrents remained present after the change.
+- The shared `/data` namespace now passes the real cross-container hardlink
+  test. No media files were physically moved.
 - **Homarr widget from the CloudNode** uses the `qbit-proxy` sidecar on the CloudNode
   (see CloudNode [qbit-proxy](../services/qbit-proxy.md)) because of the
   `Secure` cookie issue introduced in qBit 5.1.4. Do NOT point Homarr
   directly at `https://torrent.example.com`.
-- Cross-seed / autobrr: the companion [qui](./qui.md) service provides a
-  nicer torrent-management UI that talks to qBit's API.
+- **I/O limits (2026-11-01)**: queueing on, max 15 active uploads / 60 torrents,
+  upload capped at 10 MiB/s. Without the cap, seeding 274 torrents random-reads
+  the RAID5 into 100 % util and starves the other containers' health checks.
+  Raise the cap only after checking `iostat -x` and `/proc/pressure/io`.

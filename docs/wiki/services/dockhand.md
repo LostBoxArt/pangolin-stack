@@ -56,7 +56,7 @@ volumes:
 
 ## Our Compose (relevant slice)
 
-```10:36:stacks/management/docker-compose.yml
+```11:26:stacks/management/docker-compose.yml
   dockhand:
     image: fnsys/dockhand:latest
     container_name: dockhand
@@ -72,16 +72,6 @@ volumes:
       - /opt/homelab/stacks:/opt/homelab/stacks
     environment:
       - TZ=UTC
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dockhand-redirect.rule=Host(`dockhand.example.com`)"
-      - "traefik.http.routers.dockhand-redirect.entrypoints=web"
-      - "traefik.http.routers.dockhand-redirect.middlewares=redirect-to-https@file"
-      - "traefik.http.routers.dockhand.rule=Host(`dockhand.example.com`)"
-      - "traefik.http.routers.dockhand.entrypoints=websecure"
-      - "traefik.http.routers.dockhand.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.dockhand.middlewares=security-headers@file"
-      - "traefik.http.services.dockhand.loadbalancer.server.port=3000"
 ```
 
 ## Deviations
@@ -135,8 +125,9 @@ pattern for git-stack deploys.
 - Public API: `https://dockhand.example.com/api/` — but for automation go
   through the container's internal IP on the CloudNode
   (`docker inspect -f '{{...}}' dockhand`) to skip Pocket-ID.
-- Remote host **HomeNode** is registered with env `env=2`, host `192.168.1.10`,
-  TCP port `2375`, Hawser token in `.env`.
-- Git stacks: deploy with `POST /api/git/stacks/{id}/deploy`; headless via
-  webhook URL from the UI.
+- Remote host **Rammus** is registered with env `env=3`, host `192.168.0.12`,
+  TCP port `2375`, Hawser token in `.env`. `env=2` (`Nasus`, `192.168.0.10`) is
+  stale and no longer answers.
+- No Git integration is configured; rammus stacks are managed from
+  `/opt/docker/stacks/<service>/` on the host.
 - Activity audit: `GET /api/activity`.

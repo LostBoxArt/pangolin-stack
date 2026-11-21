@@ -12,8 +12,8 @@ related: ["../system-overview.md", "../services/traefik.md", "../services-homeno
 sources: ["AGENTS.md", "docs/wiki/system-overview.md", "docs/wiki/compose-review-2026-04-17.md", "docs/wiki/homenode-review-2026-04-17.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-04-17
+last_ingested: 2026-11-21
+last_lint: 2026-11-21
 ---
 # Port Matrix
 
@@ -37,8 +37,7 @@ This page is the quickest view of which host or service owns which important por
 | 6060/tcp | CrowdSec | host loopback | metrics | `127.0.0.1:6060:6060` |
 | 8080/tcp | CrowdSec | host loopback | LAPI | host firewall bouncer uses `127.0.0.1:8080`; container clients use `crowdsec:8080` |
 | 3000/tcp | Dockhand | internal, fronted by Traefik | container management | exposed at `dockhand.example.com` |
-| 7575/tcp | Homarr | host loopback, fronted by Traefik | dashboard UI | Pangolin targets `homarr:7575` on the shared network |
-| 8080/tcp | Termix | internal, fronted by Traefik | web terminal | exposed at `termix.example.com` |
+| 7575/tcp | Homarr | host loopback, fronted by Traefik | dashboard UI | exposed at `home.example.com`; Pangolin targets `homarr:7575` on the shared network |
 | 1411/tcp | Pocket-ID | internal, fronted by Traefik | identity provider | passkey/OIDC |
 
 ## Application edge and app ports (rammus)
@@ -62,6 +61,8 @@ NASUS (`192.168.0.10`) exposes only SSH, the ADM UI on 9980, and NFS.
 | 2049/tcp | NASUS NFS | LAN | NFSv3 exports | consumed by rammus at `/mnt/nasus/*` |
 
 ## How it applies here
+- CrowdSec AppSec `7422/tcp` is internal-only and not published.
+- Traefik ping health endpoints on CloudNode `8080/tcp` and HomeNode `8082/tcp` are internal and not published.
 - CloudNode uses Traefik behind Gerbil's namespace-sharing model.
 - rammus runs its own Traefik on a flat `traefik_traefik` network (subnet `172.19.0.0/16`). NASUS runs no Traefik.
 - LAN name resolution is AdGuard Home on OPNsense, which rewrites each service name explicitly to `192.168.0.12`. There is no wildcard record.

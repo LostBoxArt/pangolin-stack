@@ -12,13 +12,64 @@ related: ["./README.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-11-21
+last_lint: 2026-11-21
 ---
 # Wiki Log
 
 Append-only record of structural wiki changes, maintenance passes, and review
 artifacts.
+
+## [2026-10-31] maintenance | full container audit and remediation
+- Recorded the 2026-10-31 audit and updated active service pages to current deployed state: CloudNode Traefik 3.7.17 hardening, CrowdSec AppSec listener, Homarr 2.10.1 migration rollback requirement, and current security/UI pins; HomeNode image pins, qBittorrent WAN peer ports, Newt environment credentials, Traefik hardening, and service settings.
+- Added internal-only CrowdSec AppSec and Traefik ping endpoints to the port matrix and linked the audit from the index. The audit also documents the Profilarr fork/security fix, qBittorrent settings already in place, and the Newt stale Compose credential discovery.
+- Verified changes with `python3 scripts/wiki_lint.py`; all wiki checks passed. No live infrastructure was changed in this documentation update.
+
+## [2026-10-31] maintenance | Plex host networking and direct 32400
+- Moved Plex from Docker bridge networking to host networking, fixing client-IP masking and the roughly 80 Mbps throughput cap. Moved its database to the `/volume2/plex-db` SSD bind mount.
+- Added a HomeNode Traefik file-provider route for `plex.example.com` and a direct WAN `32400/tcp` router forward to the NAS; Pangolin/Newt remains for the web UI and no longer carries media.
+- Measured 82 Mbps for one remote stream and about 92 Mbps aggregate across eight streams, against roughly 190 Mbps home upload.
+
+## [2026-10-23] security + upgrade | Pangolin 1.25.3
+- Updated Pangolin from `1.24.0` to `1.25.3`; verified the live Node runtime is `v24.22.1`, the container is healthy, and the local API returns HTTP 200. The upstream release identifies the Node2Shell fix; details and source links are in `services/pangolin.md`.
+- Tested the migration on an isolated database copy, verified production database integrity and foreign keys, and preserved the post-upgrade route set (22 routers / 11 services). Gerbil and Traefik were not restarted.
+- Kept Traefik at `v3.7.16` (above Pangolin's `3.6+` requirement) and Badger at `v1.7.0` because upstream reports the `v1.8.0` plugin-integrity failure.
+- Live-verified Newt `1.19.0`, Olm `1.9.1`, and Gerbil `1.5.2`. Removed the temporary four-hour Pangolin image watcher after verifying the fixed runtime.
+- Updated the active version/compatibility references and LLM entry points. Historical dated records remain unchanged.
+
+## [2026-10-22] stack refresh | dashboard, identity, security UI, and proxy runtime
+- Upgraded Homarr to `v2.8.0`; the SQLite integrity check passed, the local dashboard returned HTTP 200, and the container had zero restarts at verification.
+- Rebuilt qbit-proxy on `node:24-slim`; the running runtime reported Node `v24.22.1`, and both internal and routed HTTP probes returned 200.
+- Updated Pocket-ID to `v2.19.1` and CrowdSec Web UI to `2026.10.9`; both current containers were healthy with zero restarts when rechecked on 2026-10-23.
+- Refreshed current-state references while preserving dated historical version notes.
+
+## [2026-10-16] decommission | Termix removed from CloudNode apps stack
+- Removed the Termix Compose service and its named-volume declaration; `docker compose ... up -d --remove-orphans` removed the container. The apps stack now contains only `landing`.
+- Retained the detached `pangolin-apps_termix_data` volume as a reversible rollback copy.
+- Removed Termix from the active Hermes watchdog URL list and cleared its stale failure counter. Updated the active service inventory, endpoint lists, port matrix, and runbook probes.
+- Pangolin resource-route deletion was pending on 2026-10-16. A read-only check on 2026-10-23 still found `21-termix-router` and `21-termix-service` in the live provider configuration (22 routers / 11 services); the Termix container is absent. Route cleanup remains open and was not performed as part of this documentation update.
+
+## [2026-07-18] incident + runbook | tunnel down, all HomeNode sites unreachable
+- **Symptom**: All HomeNode-backed `*.example.com` sites returned 502/timeout. Pangolin showed site `homelab` as `online=0`. Watchdog false-alarmed on all 7 HomeNode SSH services.
+- **Root cause**: Docker's embedded DNS proxy (127.0.0.11) died inside the `dockerd` process on HomeNode. Newt could not resolve `pangolin.example.com` to fetch its auth token, so the tunnel dropped and could not reconnect. The DNS proxy death is a runtime failure of dockerd's internal DNS forwarder, not a config issue.
+- **Contributing factor**: Home ISP NAT rebinding (endpoint port changing every 2-10 min) caused the initial WebSocket disconnect. Newt could not reconnect due to the DNS proxy being dead.
+- **Secondary issue**: The Asustor GUI Docker restart (used to restart dockerd) clobbered `/usr/local/bin/docker` — replaced the wrapper script with a plain symlink, breaking non-interactive docker access for the `jesus` user. The sudoers rule survived; the wrapper was restored manually.
+- **Fix**: Restarted `dockerd` (via Asustor GUI and via CLI). All 16 containers came back via `restart: unless-stopped`. Restored the Docker wrapper script. Tunnel reconnected; all sites recovered.
+- **New runbook**: `docs/wiki/runbooks/tunnel-down-all-homenode-down.md` — comprehensive troubleshooting guide covering Docker DNS proxy death, newt reconnection failures, NAT rebinding churn, Docker wrapper clobbering, SSH penalty table blocks, container-level diagnosis, and a decision flowchart.
+- **Updated**: `docs/wiki/index.md` — added the new runbook to the Runbooks section.
+- **Lessons**: (1) Search session history before re-deriving a fix. (2) Do not restart CloudNode Traefik during debugging. (3) Do not tinker with DNS config when the real issue is a dead dockerd DNS proxy. (4) Verify the Docker wrapper after any Asustor GUI Docker restart. (5) Avoid rapid SSH retry loops (triggers penalty table). (6) Pangolin `online=1` does not guarantee the data path works.
+
+## [2026-05-09] homarr | memory-optimized beta + qbit-proxy fix
+- **Homarr**: Pinned from `:latest` (main branch, ~595 MiB) to `v1.61.1-beta.1`
+  (~181 MiB). Beta tag merges 3 Node processes into 1 (#5600) plus idle-memory
+  reduction (#5637). Updated `services/homarr.md` — version, findings,
+  remediation, operational notes. Added `.env` symlink:
+  `stacks/dashboard/.env` → `../../.env` to fix compose env resolution.
+- **qbit-proxy**: Fixed `TARGET_IP` from `192.168.1.10` (unreachable subnet) to
+  `<homenode-lan-ip>` (routed through the tunnel). Fixed `TARGET_HOST` to match
+  HomeNode's Traefik route. Updated `qbit-proxy/index.js` defaults to match.
+  Added F-QBP-3 to `services/qbit-proxy.md`.
+- Updated `services/homarr.md` and `services/qbit-proxy.md`.
 
 ## [2026-04-17] bootstrap | initial service audit
 - Added the first dated compose review at
@@ -157,7 +208,19 @@ artifacts.
 - Fixed malformed code block line in `AGENTS.md` (`||` leak in file tree diagram).
 - Updated `last_lint` timestamps in `README.md` and `index.md` to 2026-04-21.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
-- Flagged `pangolin-stack-wiki-maintenance` skill for manual update: it still uses deprecated "VPS/NASUS" terminology and references `nasus-review-*.md`, `services-nasus/`, and `host-configs/nasus/` which were renamed to CloudNode/HomeNode on 2026-04-21. Security scan blocked automated skill patching this session.
+
+## [2026-04-26] design | landing page field-notes redesign
+- Delivered the field-notes redesign (branch `codex/landing-field-notes-redesign`,
+  commit `deb6eb9`): replaced the operations console systems card grid with
+  journal-style numbered note rows (01 Work, 02 Home, 03 AI/agents, 04 Signals).
+- Restored rotating gold ring around the portrait using `@property --ring-angle`
+  for GPU-friendly conic-gradient animation (commit `b47661c`).
+- Moved secondary links (X, Steam) from a card into the footer.
+- Switched focus tags into a pill-layout section within the Signals note.
+- Updated `docs/wiki/services/landing.md` and `sites/dennisb-landing/DESIGN.md`
+  to reflect the current design.
+- Cache buster bumped to `style.css?v=12`.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean. Flagged `pangolin-stack-wiki-maintenance` skill for manual update: it still uses deprecated "VPS/NASUS" terminology and references `nasus-review-*.md`, `services-nasus/`, and `host-configs/nasus/` which were renamed to CloudNode/HomeNode on 2026-04-21. Security scan blocked automated skill patching this session.
 
 ## [2026-04-21] service | landing page redesigned and deployed
 - Complete visual redesign of `example.com` landing page following Anthropic's
@@ -235,6 +298,34 @@ artifacts.
 - Updated `last_lint` timestamps on modified pages.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-04-24] service | landing page redesigned as operations console
+- Complete visual redesign of `example.com` landing page (commit `4172993`).
+- Shifted from dark editorial aesthetic to an **operations console** concept
+  that frames Dennis as an infrastructure/operator profile.
+- Hero copy rewritten: research compute at work, homelab tinkering at home,
+  Linux boxes, private tunnels, local models, agents, dashboards, automations.
+- New identity section: "Cloud / Lab / Home" eyebrow, Playfair Display name,
+  position paragraph, primary action buttons (Email, GitHub, LinkedIn).
+- New ops panel: infrastructure-map style portrait frame with Cloud/HPC/Home
+  node labels, telemetry rows for Base, Role, and Stack.
+- Systems section reorganized into six numbered cards:
+  01 Operating Principle, 02 Day Work, 03 Night Work, 04 Focus, 05 Elsewhere,
+  06 Current Focus.
+- Current Focus card explicitly calls out AI hobbies: local models,
+  tool-using agents, coding assistants, and agent workflows.
+- Typography: IBM Plex Mono (labels/telemetry), Outfit (body), Playfair
+  Display (name). Old Cormorant Garamond + helix canvas removed.
+- Palette: near-black `#0d0f0d` with warm gold `#c9a96e` accents and a
+  green status dot. Old copper accents, rotating amber ring, pulsing glow,
+  film-grain overlay, and aurora orbs removed.
+- Cache buster bumped to `style.css?v=9`.
+- `logo.png` optimized from ~2.1 MB to ~119 KB.
+- `sites/dennisb-landing/` removed from `.gitignore`; all site files and
+  assets now tracked in git (`index.html`, `style.css`, `avatar.jpg`,
+  `logo.png`, `DESIGN.md`).
+- Updated `docs/wiki/services/landing.md` to reflect the new design.
+- Re-ran `scripts/wiki_lint.py` — all files pass clean.
+
 ## [2026-04-22] maintenance | runbook leaks and memory compression
 - Fixed `docs/wiki/runbooks/403-all-sites.md`: replaced remaining real domain, real IP, and stale internal IP with generic examples; updated "VPS" references to "CloudNode".
 - Fixed `docs/wiki/services/adguard-home.md`: replaced historical endpoint domain leak with `dns.example.com`.
@@ -270,20 +361,109 @@ artifacts.
 - Re-ran `scripts/wiki_lint.py` — all 55 files pass clean.
 
 ## [2026-04-22] maintenance | autonomous memory and skill hygiene pass
-- Fixed `~/.hermes/memories/MEMORY.md`: corrected stale HomeNode IP from `192.168.0.10` to `192.168.1.10`, updated deprecated `VPS/NASUS` terminology to `CloudNode/HomeNode`, and fixed network range from `192.168.0.0/24` to `192.168.1.0/24`.
+- Fixed `~/.hermes/memories/MEMORY.md`: corrected the stale HomeNode address, updated deprecated `VPS/NASUS` terminology to `CloudNode/HomeNode`, and fixed the documented network range.
 - Removed stale LinkStack replacement preference from `~/.hermes/memories/USER.md` (completed 2026-04-21).
-- Sanitized remaining real data leaks in `docs/wiki/log.md`: removed real ISP IP, fixed `192.168.0.10` → `192.168.1.10` in incident entries, replaced `dennisb.xyz` with `example.com` in service descriptions, and updated `VPS` → `CloudNode` in incident narrative.
+- Sanitized remaining real data leaks in `docs/wiki/log.md`: removed real ISP and
+  LAN addresses, replaced real domains with `example.com` in service descriptions,
+  and updated `VPS` → `CloudNode` in incident narrative.
 - Patched 7 skills for deprecated terminology and wrong IPs:
   - `home/homelab-automation`: `VPS/Nasus` → `CloudNode/HomeNode`
   - `home/pangolin-networking`: `VPS` → `CloudNode`
   - `home/traefik-routing`: `VPS stack` → `CloudNode stack`
-  - `home/seerr-media-requests`: `192.168.0.10` → `192.168.1.10` (3×)
-  - `devops/dockhand-hawser-monitoring`: `NASUS` → `HomeNode`, `192.168.0.10` → `192.168.1.10`, `NAS host` → `HomeNode host`
+  - `home/seerr-media-requests`: `<homenode-lan-ip>` in place of the private LAN address (3×)
+  - `devops/dockhand-hawser-monitoring`: `NASUS` → `HomeNode`, private LAN address → `<homenode-lan-ip>`, `NAS host` → `HomeNode host`
   - `devops/pangolin-service-swap`: `NASUS` → `HomeNode`
   - `software-development/hermes-gateway-live-session-guardrails`: `VPS` → `CloudNode`
 - Removed unused one-time research artifact `~/.hermes/skills/ai-pricing-research.md`.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-09-05] maintenance | Seerr deployment recovery
+- Restored a reproducible Compose definition for Seerr from verified live runtime state.
+- Preserved the existing `jellyseerr` data directory and added a pinned `v3.4.1` image.
+- Verified the backup, healthcheck, internal route, and unchanged application data after recreation.
+
+## [2026-09-05] maintenance | Arr download safety
+- Enabled Sonarr and Radarr `failDownloads=[0,1]` on all seven configured indexers in each app through their supported APIs.
+- Verified the settings by read-back, confirmed no active qBittorrent torrent has an executable content path, and documented that Arr detects these files after download inspection rather than preventing qBittorrent from receiving initial bytes.
+
+## [2026-09-06] maintenance | Media path follow-up
+- Seerr's live Sonarr/Radarr routing defaults were still `/tv` and `/movies`; changed them through the supported API to `/data/tv` and `/data/movies` and verified by read-back.
+- Corrected the two affected Arr records through their editor APIs with `moveFiles=false` and `deleteFiles=false`; no media was moved and Plex was not restarted.
+- Dark Matter and Mayday remain visible in Plex. Their earlier imports were copies rather than hardlinks because they used the legacy aliases; the next normal request is the clean Radarr hardlink canary.
+- Full verification passed: all seven relevant containers healthy with restart count 0; qBittorrent 134 torrents / 133 complete / 0 active downloads; zero dangerous-extension files in Arr download directories.
+
+## [2026-09-06] maintenance | Safe obsolete-data cleanup
+- Removed only the older duplicate migration backup `20260905T105403Z` (203.3 MB) after verifying the retained `20260905T105556Z` backup with its SHA-256 manifest.
+- Kept all media, qBittorrent torrents, the active `vuetorrent` WebUI assets, and two qBittorrent-tracked `.parts` files. Kept legacy aliases because existing torrent records still reference `/downloads`.
+- Post-cleanup migration verification passed with no service restart; NAS free space is 7.3 TB.
+
+## [2026-09-07] Quality profile policy
+- Researched the current TRaSH Guides and Recyclarr guide-backed templates for conventional media and anime. The anime guidance explicitly supports lower-resolution availability and does not require 4K.
+- Made Recyclarr the effective single writer for quality profiles and custom formats. Profilarr remains running for repository synchronization only.
+- Synced `2160p Quality`, `1080p Quality`, and `Anime 1080p` into Sonarr and Radarr. Anime Sonarr series use the anime profile; ordinary non-4K series use the 1080p profile; existing 2160p assignments were preserved.
+- Updated Seerr's ordinary-TV and anime defaults to the new Sonarr profiles. Radarr remains defaulted to the 2160p profile.
+- Verified an idempotent Recyclarr preview, healthy Arr/Seerr/Plex containers, zero restarts, and Plex identity HTTP 200. No media, torrents, databases, or Plex configuration changed.
+
+## [2026-09-07] Prowlarr and arr-mcp remediation
+- Removed the broken Prowlarr indexers `1337x` (Cloudflare 403/error 1006) and `BitSearch` (missing indexer definition) through Prowlarr's supported API; no torrents, media, or databases were touched.
+- Set Prowlarr allowed hosts to the verified internal and routed hostnames; read-back passed.
+- Verified Prowlarr now has 6 working indexers, and Sonarr/Radarr now have 5 synchronized indexers each.
+- arr-mcp stack health returned zero failures and zero degraded services after remediation; all adapters remain read-only and private.
+- The Radarr natural hardlink canary remains deferred because no post-migration Radarr import has occurred. The stable Prowlarr image is currently older than the running `develop` build, so switching channels was not performed without an authorized maintenance/source-of-truth update.
+
+
+## [2026-09-28] maintenance | WebUI removal, DNS stack deletion, and security cleanup
+- Removed `hermes-webui` entirely: compose service, `hermi.example.com` Pangolin resource, DB rows (`targets`, `roleResources`, 1896 `requestAuditLog` rows, its auto-created `resourcePolicies` row), container, and the `9119` publish. The container mounted `/home/jesus/.hermes` plus `docker.sock`, and a cron job (`ensure-hermes-dashboard.sh`) recreated it on boot and every 5 minutes — that cron entry and script were removed so it cannot come back. The separate `hermes-gateway` systemd platform is untouched and still active.
+- Deleted the dead `dns` stack: `stacks/dns/`, `config/adguard-home/`, and the `dns-tls` (853) entrypoint in `config/traefik/traefik_config.yml`. `dns` was dropped from the `stackctl.sh` stack list. The VPS AdGuard was never actually deployed, so no running container was lost. Discovered F-GERBIL-3 as a result: Gerbil still publishes `853:853`, but nothing listens behind it now.
+- Removed the six vestigial `*.example.com` Traefik labels from `stacks/{apps,dashboard,management,observability,security}/docker-compose.yml`. They duplicated Pangolin-owned routes and were causing **45 failed Let's Encrypt orders per day** (`rejectedIdentifier: "forbidden by policy"`), burning ACME rate-limit budget that real certs need. Post-change ACME failures: zero.
+- Security cleanup: `.env` and `config/pangolin/config.yml` locked from `644` to `600`; the five dead `ADGUARD_*` sync vars removed from `.env`; Homarr's unused `docker.sock` mount removed (no Docker integration was configured); CrowdSec `ForwardedHeadersTrustedIPs` narrowed from `0.0.0.0/0` to loopback + internal + the exact Cloudflare edge ranges so clients can no longer forge their source IP.
+- Updated `AGENTS.md` (6 stacks, not 7), `docs/wiki/index.md`, `docs/wiki/system-overview.md`, `docs/wiki/services/adguard-home.md`, `docs/wiki/services/gerbil.md`, and `docs/wiki/services/homarr.md`.
+- Verified after each step: all 12 remaining hostnames answer correctly, the HomeNode tunnel still serves `plex`, `hermes-gateway` stayed active, and `scripts/wiki_lint.py` passes clean.
+- Removed content is recoverable, not destroyed: `/home/jesus/pangolin-stack/.removed-20260928/` and `/home/jesus/.hermes/.removed-webui-20260928/`, plus `.bak-<timestamp>` copies beside each edited config.
+
+## [2026-09-28] maintenance | Version and path drift correction across all docs
+- Found and fixed widespread stale version pins and a wrong repo path that predated this session. Every value below was re-verified against the running stack, not inferred.
+- Version pins corrected everywhere (`AGENTS.md`, `README.md`, `INFRASTRUCTURE.md`, and the affected wiki service pages):
+  - Pangolin `1.17.1` / `1.17.0` / `1.18.1` → `1.23.0`
+  - Gerbil `1.3.1` → `1.5.2`
+  - Badger plugin `v1.4.0` → `v1.7.0`
+  - CrowdSec Web UI `2026.3.1` → `2026.8.3`
+  - Newt `1.11.0` / `1.12.3` → `1.17.0`
+  - Olm `1.4.4` → `1.5.0`
+  - Homarr `v1.61.1-beta.1` → stable `v1.77.2` (the memory work that justified the beta pin has landed in stable; `F-HOMARR-1b` deleted as obsolete)
+  - Lockstep triplets rewritten to match: Pangolin 1.23.x ↔ Newt 1.17.x ↔ Olm 1.5.0.
+- Corrected the repo path claim. `llms.txt`, `llms-full.txt`, and two runbooks claimed the repo lives at `/opt/homelab`, which broke the runbooks as written (`cd /opt/homelab` then `docker compose -f stacks/...` finds nothing). Real repo path is `/home/jesus/pangolin-stack`. `INFRASTRUCTURE.md` also documented the blocklist cron as `/opt/homelab/scripts/blocklist-import.sh`; the live crontab uses `/home/jesus/pangolin-stack/scripts/blocklist-import.sh`.
+- Deliberately kept the `/opt/homelab/stacks` references in `services/dockhand.md`: that is a real bind mount in the Dockhand compose, distinct from the repo path.
+- Re-verified the two gerbil deviations that older docs asserted for gerbil 1.3.1: `reachableAt` still uses port `3003` on 1.5.2 (`3003` answers, `3004` refuses), so the note now says "verified still correct on gerbil 1.5.2" instead of tying it to the old version.
+- Left in place, correctly: the dated review files `compose-review-2026-04-17.md` and `homenode-review-2026-04-17.md` are append-only, and their historical version references describe the stack as it was on that date.
+- `scripts/wiki_lint.py` passes clean after the changes.
+
+## [2026-09-28] maintenance | Three component upgrades applied and verified
+- Upgraded three components after checking each project's own upgrade docs first and confirming no undocumented manual steps were required:
+  - **Pocket-ID** `v2.15.0` → `v2.16.0`. Docs: <https://pocket-id.org/docs/setup/upgrading> — Docker upgrade is `pull` + `up -d`; no manual steps between these versions. Migrations ran automatically (`05-workflow-labels.sql`, `06-terminal-jobs.sql`). Verified: 2 users and 3 OIDC clients intact, `integrity_check=ok`, OIDC discovery/JWKS/login all 200.
+  - **CrowdSec Web UI** `2026.8.3` → `2026.9.2`. Confirmed 2026.8.3 had already migrated from `config.json` to `config.yaml`, so there was no config-format break to handle. Verified: healthy, LAPI `isConnected: true`, alerts API 200, 27 tables intact.
+  - **Olm** `1.5.0` → `1.9.1` (CloudNode systemd binary, not a container). Verified the 1.9.1 binary still accepts `--override-dns` so `ExecStart` is unchanged. Verified: `active`, `NRestarts=0`, WireGuard CONNECTED to site 1 at 127ms RTT, 0 errors from the new PID, tunnel reachable.
+- Backups taken before each change using the SQLite online-backup API, not `cp` (both Pocket-ID and CrowdSec Web UI run WAL-mode SQLite): `/tmp/pid-20260928-123257.db` and `/tmp/csw-20260928-123459.db`, both `integrity_check=ok`. Olm rollback copies at `/usr/local/bin/olm.1.5.0.rollback` and `/tmp/olm-1.5.0-current`.
+- Investigated and dismissed a suspected SSO regression: `dash.example.com` and `fileflows.example.com` appeared to flip 200→401 after the Pocket-ID upgrade. Rotated access logs show `dash` has been `{401:413, 302:276}` continuously since 2026-09-24 and `fileflows` `{401:37, 302:23, 403:5}` since 2026-09-25 — neither ever served 200 unauthenticated. SSO is enforcing correctly (unauthenticated 401; browser 302 → `pangolin.example.com/auth/resource/...`). No regression.
+- Corrected stale facts found while verifying: `services/pocket-id.md` documented the image as the floating `:v2` tag; the real pin is `v2.16.0` (now documented as exact-minor, `F-POCKETID-3`). `services/crowdsec-web-ui.md` claimed the UI was "not behind Traefik"; it is in fact fronted by Pangolin with SSO enforced, and only host port 3458 is filtered.
+- New findings recorded: `F-POCKETID-3` (floating major tag, resolved), `F-POCKETID-4` (WAL-mode DB, naive copies are not backups), `F-CSWUI-3` (application auth disabled), `F-CSWUI-4` (1.8 GB state dir with permissive modes).
+- Everything else was already current and needed no action: Pangolin 1.23.0, Gerbil 1.5.2, Newt 1.17.0, Badger v1.7.0, Traefik 3.7.13, CrowdSec v1.8.1, Homarr v1.77.2, Termix 2.8.0, Dashdot 6.3.4.
+- `scripts/wiki_lint.py` passes clean after the changes.
+
+## [2026-09-28] maintenance | Pocket-ID isolation, Traefik pin, and Gerbil cleanup
+- Migrated Pocket-ID state from the shared repo-wide `data/` mount into the dedicated `data/pocket-id/` path.
+- Created a rollback snapshot with SQLite online backup before the move; verified the live database afterward with `integrity_check=ok`, 2 users, and 3 OIDC clients.
+- Pinned Traefik from the mutable `latest` tag to `v3.7.13`; the tag resolves to the same verified running digest.
+- Removed Gerbil's dead `853/tcp` publish and recreated Gerbil followed by Traefik; public routing and the HomeNode tunnel remained healthy.
+- Tightened CrowdSec Web UI state permissions to `0700`/`0600`. Application-level auth remains disabled pending an operator-supplied admin credential or OIDC configuration; no unsafe credential was invented.
+- Verified all six Compose files, the public endpoints, core container state, Pocket-ID database integrity, and CrowdSec Web UI health.
+
+## [2026-10-10] maintenance | Stack version documentation and stale media metadata
+- Updated current version references to the live CloudNode pins: Pangolin 1.24.0, Traefik v3.7.14, Homarr v2.4.1, Pocket-ID v2.18.0, and CrowdSec Web UI 2026.10.3.
+- Updated current HomeNode references to Newt 1.18.1, Seerr v3.5.0, Recyclarr 8.7.3, and FileFlows 26.10 with its verified digest in the tracked Compose copy.
+- Preserved dated historical audit references as historical rather than rewriting them into current-state claims.
+- Removed a stale Sonarr record for *The Grand Tour (2026)* with `deleteFiles=false`; the six existing files and Plex/Jellyfin library entry remain intact. The current TVDB record remains marked deleted, so the series is not re-added to Sonarr until a valid metadata mapping exists.
+- Sanitized credential-like values from documentation examples before publication; real values remain in private runtime configuration only.
 ## [2026-10-27] maintenance | FileFlows removal and initial hardening
 
 - Removed FileFlows and its DV watcher from HomeNode: containers, dedicated network, images, application data, test media and dynamic route. Removed the CloudNode public resource, pending update, deployment copies, watchdog entries, active inventories, obsolete guidance and vault entry. Shared infrastructure, historical records and private rollback copies were preserved.
@@ -614,3 +794,13 @@ tested.
 - **The qBittorrent API probe timeout was raised 15 s → 30 s.** A single SSH
   round trip under load produced a false `qBittorrent API unavailable`; the
   direct check returned `v5.3.0` both times it fired.
+
+## [2026-11-21] merge | origin/main reconciled into the rammus migration branch
+
+- Folded in CloudNode-side work from `main`: backup helper-image re-pull,
+  CrowdSec Web UI `state.db` snapshots, offsite units, AppSec acquisition, the
+  2026-11-06 version sweep, Olm `1.10.1` (2026-11-06) and the 2026-11-07 Scryer
+  cutover page.
+- Host facts stay on the 2026-11-21 layout: NASUS is storage-only, every
+  application runs on rammus (`192.168.0.12`). Homarr `extra_hosts` and the
+  `qbit-proxy` target in `stacks/dashboard/docker-compose.yml` now point at `.12`.

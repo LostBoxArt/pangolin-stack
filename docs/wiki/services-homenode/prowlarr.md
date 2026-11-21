@@ -12,8 +12,8 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/prowlarr/docker-compose.yml", "host-configs/homenode/prowlarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-10-31
+last_lint: 2026-10-31
 ---
 # prowlarr
 
@@ -22,9 +22,9 @@ last_lint: 2026-04-17
 Indexer manager for the *arr suite — federates torrent/usenet indexers
 into one API that Sonarr/Radarr query.
 
-- **Image**: `ghcr.io/linuxserver/prowlarr:develop` ⚠️ **unstable channel**
+- **Image**: `ghcr.io/linuxserver/prowlarr:2.7.0` (stable pin; the former `:develop` channel finding is resolved)
 - **Compose file**: `/volume1/docker/config/prowlarr/docker-compose.yml`
-- **Tracked copy**: `host-configs/homenode/prowlarr/docker-compose.yml` ✓
+- **Tracked copy**: `host-configs/homenode/prowlarr/docker-compose.yml` (sanitized live snapshot, 2026-10-31)
 - **Port (internal)**: `9696`
 - **Router**: `prowlarr.example.com`
 - **Volume**: `/volume1/docker/config/prowlarr:/config`
@@ -40,7 +40,7 @@ into one API that Sonarr/Radarr query.
 ```yaml
 services:
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:develop
+    image: ghcr.io/linuxserver/prowlarr:2.7.0
     container_name: prowlarr
     restart: unless-stopped
     environment: [PUID=1000, PGID=1000, TZ=Asia/Jerusalem]
@@ -60,11 +60,7 @@ services:
 
 ## Findings
 
-### F-N-PROWLARR-1 — unstable tag `:develop` (`high` / NH4)
-`:develop` pulls the nightly channel. Unless you're actively chasing a
-specific fix, use `:latest` (stable) or a pinned version tag. Nightlies
-can break indexer definitions, auth flows, or the DB schema without a
-release note — and there's no downgrade path if the DB gets migrated.
+The former `:develop` finding is resolved: the deployed image is now pinned to `ghcr.io/linuxserver/prowlarr:2.7.0`.
 
 ### F-N-PROWLARR-2 — shared with LSIO apps
 Same `:latest` / `:develop` pin-policy family as the other LSIO apps.
@@ -72,23 +68,7 @@ Fix together.
 
 ## Remediation
 
-### Fix F-N-PROWLARR-1
-
-Switch to the stable tag:
-
-```yaml
-    image: linuxserver/prowlarr:latest
-```
-
-Or better, a concrete release from
-<https://github.com/linuxserver/docker-prowlarr/pkgs/container/prowlarr>:
-
-```yaml
-    image: linuxserver/prowlarr:1.x.x.xxxx-ls145
-```
-
-If the current install actually depends on a `:develop` feature, leave it
-but add a comment saying WHY and linking to the upstream issue.
+The former `:develop` remediation is resolved by the deployed `2.7.0` pin. Retain the exact pin and review the upstream release before changing it.
 
 ## Operational Notes
 

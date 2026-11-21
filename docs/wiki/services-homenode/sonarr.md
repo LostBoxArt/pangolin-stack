@@ -12,12 +12,19 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/sonarr/docker-compose.yml", "host-configs/homenode/sonarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-17
+last_ingested: 2026-11-07
+last_lint: 2026-11-07
 ---
 # sonarr
 
 **Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
+
+> **Migration notice (2026-11-07):** Scryer is the active media manager and request
+> front door at `request.example.com`. This service is **stopped and retained for
+> rollback only**. See [scryer](./scryer.md). Do not restart it except as part of a
+> deliberate, coordinated rollback — Scryer and the *arr apps must never acquire or
+> import into the same libraries at the same time.
+
 
 TV series manager. LinuxServer.io image.
 
@@ -30,6 +37,7 @@ TV series manager. LinuxServer.io image.
   - `/volume1/docker/config/sonarr:/config`
   - `/volume1/media/tv:/tv`
   - `/volume1/media/downloads:/downloads`
+  - `/volume1/media:/data`
 - **Env**: `PUID=1000`, `PGID=1000`, `TZ=Asia/Jerusalem`
 
 ## Upstream Sources
@@ -77,10 +85,30 @@ read all four as a group. Common items:
   LSIO images rebuild against upstream Sonarr releases; `:latest` follows
   the default channel. Pinning keeps your upgrade cadence intentional.
 - **Healthcheck is good**: `/ping` is the canonical endpoint.
-- **Media paths are correct**: `/tv` for library, `/downloads` for inbox.
-  Matches qBit's `/volume1/media/downloads` bind so the downloaded file's
-  path inside qBit == the path Sonarr sees (critical for hardlinks /
-  atomic moves).
+- **Current hardlink state is repaired**: the live container now has the shared
+  `/data` mount, all 61 series use `/data/tv`, and the real cross-container
+  hardlink canary passes. Legacy `/tv` and `/downloads` aliases remain mounted
+  for existing paths and rollback; no host-side media move was required.
+
+## Quality profiles (live policy — 2026-09-07)
+
+Recyclarr is the single profile/custom-format writer. Profilarr remains
+installed for repository synchronization only; it must not push overlapping
+Arr settings.
+
+- **2160p Quality**: conventional TV where 4K is desired.
+- **1080p Quality**: conventional TV where 1080p is the practical target,
+  with guide-backed upgrades.
+- **Anime 1080p**: anime scoring with 480p/576p/720p/1080p-capable fallbacks;
+  it does not require 4K.
+
+Anime series use `Anime 1080p`; ordinary series previously on broad or old
+720p/1080p profiles use `1080p Quality`; existing 2160p assignments remain.
+Seerr's ordinary-TV and anime defaults are aligned with these profile IDs.
+
+Sources: [TRaSH Sonarr anime profiles](https://trash-guides.info/Sonarr/sonarr-setup-quality-profiles-anime/),
+[TRaSH Sonarr profiles](https://trash-guides.info/Sonarr/sonarr-setup-quality-profiles/),
+[Recyclarr templates](https://recyclarr.dev/guide/guide-configs/).
 
 ## Remediation
 
@@ -94,10 +122,14 @@ Pick the current tag from <https://github.com/linuxserver/docker-sonarr/pkgs/con
 
 ## Operational Notes
 
-- **Hardlinks**: both `/tv` (library) and `/downloads` (inbox) live on
-  `/volume1/media/` on the host, same filesystem → Sonarr uses hardlinks
-  for imports (zero-copy, zero-seed-loss). Verify with `ls -li` showing
-  matching inode counts after a test import.
+- **Hardlinks**: verified working after the shared `/data` migration. Sonarr
+  stores its library under `/data/tv`; `/downloads` remains mounted as a
+  compatibility alias for existing torrent paths. No host-side media move was
+  performed.
+- **Download safety**: every configured indexer has `failDownloads=[0,1]`, which
+  enables Sonarr's `Executables` and `Potentially Dangerous` checks. Arr rejects
+  these when processing completed downloads; qBittorrent may still receive
+  bytes before the completed contents can be inspected.
 - API key is persisted in `/config/config.xml` — needed by qBit cross-seed
   scripts and Prowlarr sync.
 - Sonarr v4 has a different DB schema than v3; downgrades require restoring

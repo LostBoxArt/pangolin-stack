@@ -18,7 +18,7 @@ CONFIG = HOME / ".config/homelab-backups"
 STATE = HOME / ".local/state/homelab-backups"
 CACHE = HOME / ".cache/homelab-restic"
 BACKUPS = Path("/opt/homelab/backups")
-NAS = os.environ.get("HOMELAB_BACKUP_NAS", "admin@192.168.1.10")
+NAS = os.environ.get("HOMELAB_BACKUP_NAS", "admin@192.168.0.10")
 PROXY = shlex.join(["python3", str(HOME / ".local/lib/homelab-backups/ssh-bind-olm.py"), "%h", "%p"])
 SSH_OPTIONS = ["-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes", "-o", "ConnectTimeout=15", "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4", "-o", "ProxyCommand=" + PROXY]
 SFTP_OPTIONS = "sftp.args=" + shlex.join(SSH_OPTIONS)

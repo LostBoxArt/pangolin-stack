@@ -12,19 +12,19 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./system-overview.md
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-27
-last_lint: 2026-10-27
+last_ingested: 2026-11-06
+last_lint: 2026-11-06
 ---
 
 # olm
 
 Fossorial Olm — WireGuard endpoint on the CloudNode that provides reachability
-to the HomeNode LAN (`192.168.1.0/24`). This is a **systemd service**, not a
+to the home LAN (`192.168.0.0/24`). This is a **systemd service**, not a
 Docker container.
 
 - **Type**: systemd service (not a container)
 - **Binary**: `/usr/local/bin/olm`
-- **Version**: `1.9.1` (live verification, 2026-10-27)
+- **Version**: `1.10.1` (upgraded from `1.9.1` on 2026-11-06; rollback binary `/usr/local/bin/olm.1.9.1.rollback`)
 - **Runtime flag**: `--override-dns=false`
 - **Credential file**: `/root/.config/olm-client/config.json`, root-owned `0600`
   inside a `0700` directory. The unit sets `CONFIG_FILE` and `UMask=0077`;
@@ -54,7 +54,7 @@ Use the safe-wrapper helpers instead of raw `sudo systemctl`:
 Expected route on the CloudNode:
 
 ```bash
-ip route | grep '192.168.1.0/24 dev olm'
+ip route | grep '192.168.0.0/24 dev olm'
 ```
 
 If the route is missing, inspect Olm service state and logs, then restart if
@@ -70,7 +70,7 @@ needed. See `docs/wiki/runbooks/check-homenode-reachability-via-olm.md`.
 
 | Aspect | Upstream | Ours | Intent |
 |---|---|---|---|
-| Version | latest | installed `1.9.1` | preserve the tested live binary during this maintenance |
+| Version | latest | installed `1.10.1` (2026-11-06) | `1.9.1` rollback binary retained |
 | DNS override | default | `--override-dns=false` | prevents resolver drift inside Olm |
 | Credential loading | CLI/env/config supported | root-only config file | avoids a credential in argv or the unit |
 
@@ -94,11 +94,11 @@ and process arguments contained no new secret.
 
 - Pin `pangolin.example.com` to `203.0.113.1` in `/etc/hosts` on the CloudNode.
   This avoids resolver drift inside Olm and keeps the UDP hole-punch path stable.
-- If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`,
-  first check for `192.168.1.0/24 dev olm`. If it is missing, inspect Olm logs
+- If Dockhand on the CloudNode cannot reach rammus at `192.168.0.12:2375`,
+  first check for `192.168.0.0/24 dev olm`. If it is missing, inspect Olm logs
   and restart the service.
-- Addresses above are repository examples. The verified deployment uses
-  `192.168.0.0/24` and NAS `192.168.0.10`; use the actual deployment values.
+- The LAN is `192.168.0.0/24`; applications (and Hawser) are on rammus
+  `192.168.0.12`. NASUS `192.168.0.10` is storage only.
 - A credential rotation invalidates the secret in older backups. Restoring an
   old config alone will not restore access; use the current encrypted backup
   or regenerate through independently reachable Pangolin administration.
@@ -113,11 +113,11 @@ Olm route plus a successful ordinary request does not prove Olm is working.
 Use the actual NAS address for these checks (example address below):
 
 ```bash
-ip route get 192.168.1.10
-ip route get 192.168.1.10 oif olm
+ip route get 192.168.0.12
+ip route get 192.168.0.12 oif olm
 curl --noproxy '*' --interface olm --fail --silent --show-error --max-time 10 \
   -o /dev/null -w 'HTTP %{http_code} source=%{local_ip}\n' \
-  http://192.168.1.10:2375/_hawser/health
+  http://192.168.0.12:2375/_hawser/health
 ```
 
 The forced-interface probe returned HTTP `200` from the Olm source address after

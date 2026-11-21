@@ -89,7 +89,7 @@ Stacks are organized in `stacks/<stack>/docker-compose.yml`:
 | `observability` | Monitoring & logs | traefik-agent, traefik-dashboard, dashdot |
 | `management` | Container orchestration | dockhand |
 | `dashboard` | User dashboards | homarr, qbit-proxy |
-| `apps` | User applications | linkstack, termix |
+| `apps` | User applications | landing |
 
 Use `./stackctl.sh status` to view all stacks or `./startup.sh` to start everything.
 
@@ -101,15 +101,19 @@ found Pangolin `1.25.3`, Gerbil `1.5.2`, Traefik `v3.7.16`, CrowdSec Web UI
 [maintenance record](docs/wiki/maintenance-2026-10-27.md) for current observed
 state; do not use these older templates as an in-place deployment plan.
 
-- Pangolin: `fosrl/pangolin:1.17.0`
-- Gerbil: `fosrl/gerbil:1.3.1`
-- Traefik Badger plugin: `github.com/fosrl/badger@v1.4.0`
-- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`
+- Pangolin: `fosrl/pangolin:1.26.0` (Node runtime `v24.22.1`)
+- Gerbil: `fosrl/gerbil:1.6.0`
+- Traefik (CloudNode): compose pin `traefik:v3.7.17`; live `v3.7.19` verified 2026-11-21
+- Traefik Badger plugin: `github.com/fosrl/badger@v1.8.0`
+- Homarr: `ghcr.io/homarr-labs/homarr:v2.11.1`
+- Pocket-ID: `ghcr.io/pocket-id/pocket-id:v2.19.2`
+- CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.11.5`
 - Newt (rammus): `fosrl/newt:1.19.0`
-- Olm (CloudNode systemd binary): verified `1.9.1` with `--override-dns=false` on 2026-10-27
+- Olm (CloudNode systemd binary): `1.10.1` since 2026-11-06, with `--override-dns=false` (previous binary kept as `/usr/local/bin/olm.1.9.1.rollback`)
 
-Compatibility note: Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging and the newer provisioning-key site onboarding flow.
-Operational note: CrowdSec Web UI is pinned to `2026.3.1` because the `latest` tag pulled a broken image on March 30, 2026.
+Compatibility note (verified 2026-11-06): Pangolin `1.26.0`, Gerbil `1.6.0`, Newt `1.20.0`, Olm `1.10.1`, and Traefik `v3.7.17` are the deployed set. Pangolin 1.26.0 requires Traefik 3.6+ for all load-balancing options; the 1.26 migration moved Badger to `v1.8.0` after upstream fixed the registry pull failure on 2026-11-03, and Traefik loaded the plugin cleanly. See the [Pangolin 1.26.0 release notes](https://github.com/fosrl/pangolin/releases/tag/1.26.0).
+Operational note: CrowdSec Web UI `2026.11.5` retains the `/app/data` layout introduced in `2026.10.3` and runs as the host service UID in this deployment. Pangolin `1.26.0` also dropped `Authorization` from the Traefik access-log headers (`defaultMode: drop`), so auth headers are no longer recorded.
+Termix was removed from the CloudNode apps stack on 2026-10-16; the container and Compose service are gone. Its Pangolin resource route cleanup is still open — see the 2026-10-16 log entry.
 
 Upgrade policy: read official Pangolin docs plus release notes for Pangolin, Gerbil, Newt, Olm, and Badger before applying image or binary changes.
 
@@ -320,7 +324,7 @@ The stack implements defense-in-depth geo-blocking using both CrowdSec and Traef
 
 2. **Traefik GeoBlock Middleware** (`config/traefik/rules/geoblock-middleware.yml`)
    - Immediate edge blocking using GeoJS API
-   - Applied to: LinkStack, Termix, Homarr, Dashdot
+   - Applied to: Landing, Homarr, Dashdot
    - Not applied to: PocketID (has own MaxMind), Pangolin, CrowdSec, Dockhand
 
 ### Management
@@ -362,7 +366,7 @@ Add to crontab for daily refresh at 4 AM:
 ```bash
 crontab -e
 # Add this line:
-0 4 * * * /opt/homelab/scripts/blocklist-import.sh
+0 4 * * * /home/jesus/pangolin-stack/scripts/blocklist-import.sh
 ```
 
 ### View Imported Decisions

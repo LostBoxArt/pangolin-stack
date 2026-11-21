@@ -30,6 +30,11 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`Glossary`](./glossary.md) — Short definitions for recurring Pangolin homelab terms.
 - [`Wiki Log`](./log.md) — Append-only record of structural wiki changes, maintenance passes, and review artifacts.
 
+## Verified maintenance
+- [`2026-10-27 maintenance`](./maintenance-2026-10-27.md)
+- [`2026-10-31 container audit and remediation`](./maintenance-2026-10-31-container-audit.md)
+- [`2026-10-31 Plex host networking and direct media access`](./maintenance-2026-10-31.md)
+
 ## Reviews
 - [`Compose-File Review — 2026-04-17`](./compose-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `stacks/` against upstream documentation and reference compose files. Findings, severities, and remediation steps are collected there, with per-service detail in `docs/wiki/services/`.
 - [`HomeNode Compose-File Review — 2026-04-17`](./homenode-review-2026-04-17.md) — Full audit of every `docker-compose.yml` under `/volume1/docker/` on HomeNode (`192.168.1.10`) against upstream references. Findings, severities, and remediation follow the same conventions as the CloudNode review.
@@ -54,6 +59,7 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 ## Runbooks
 - [Backup recovery and off-host copies](./runbooks/backup-recovery.md) — private recovery artifacts, exact-image startup, retention guards and verification.
 - [NAS configuration backup and recovery](./runbooks/backup-nasus-config.md) — online database snapshots, encrypted repository, exact exclusions and safe restore layout.
+- [`Tunnel down + all HomeNode services unreachable`](./runbooks/tunnel-down-all-homenode-down.md) — When every HomeNode-backed `*.example.com` site returns 502/timeout/offline simultaneously. Covers Docker DNS proxy death, newt reconnection failures, NAT rebinding churn, Docker wrapper clobbering, SSH penalty table blocks, and container-level diagnosis. Includes a decision flowchart.
 - [`All sites return 403`](./runbooks/403-all-sites.md) — When every Cloudflare-fronted site returns 403 simultaneously. Covers CrowdSec container exit, Cloudflare false leads, and origin health checks.
 - [`Check HomeNode reachability via Olm`](./runbooks/check-homenode-reachability-via-olm.md) — Use this when the CloudNode cannot reach rammus services, especially when Dockhand on the CloudNode cannot talk to rammus Docker at `192.168.0.12:2375`.
 - [`Add a new service on rammus`](./runbooks/add-rammus-service.md) — the five places that must agree: compose, AdGuard rewrite, CloudNode `/etc/hosts`, Homarr `extra_hosts`, and the Pangolin target.
@@ -67,46 +73,47 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`dockhand`](./services/dockhand.md) — Modern replacement for Portainer — container + compose-stack management, both for the CloudNode (local docker.sock) and HomeNode (remote Hawser agent over TCP). Fronted at `dockhand.example.com`.
 - [`gerbil`](./services/gerbil.md) — Fossorial Gerbil — WireGuard relay between the CloudNode and remote sites. Also owns the public HTTP/HTTPS ports (80/443); Traefik shares its network namespace via `network_mode: service:gerbil`.
 - [`homarr`](./services/homarr.md) — Personal landing / dashboard page at `home.example.com`. Embeds widgets for media services, torrents, system status, etc.
-- [`landing`](./services/landing.md) — Custom-built static landing page at the apex `example.com`. Replaced LinkStack with a single HTML+CSS page served by nginx.
+- [`landing`](./services/landing.md) — Custom-built static landing page at the apex `example.com`. Operations console concept with infrastructure-map portrait, telemetry rows, and numbered systems cards. Replaced LinkStack on 2026-04-21; redesigned as operations console on 2026-04-24.
 - [`pangolin`](./services/pangolin.md) — Fossorial Pangolin — control plane, dashboard, API, and database for the whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read config from it.
 - [`pocket-id`](./services/pocket-id.md) — OIDC / passkey-first identity provider. Used as the SSO gateway behind Traefik for admin UIs (`auth.example.com`).
 - [`qbit-proxy`](./services/qbit-proxy.md) — Local reverse-proxy sidecar for Homarr's qBittorrent widget. Built from in-repo Dockerfile.
 - [`traefik-log-dashboard (agent + UI)`](./services/traefik-log-dashboard.md) — Two services, one codebase: the **agent** tails Traefik's JSON access/error logs and exposes a parsed stream; the **dashboard** renders that stream in a React SPA with geolocation, status-code breakdowns, and service metrics.
 - [`traefik`](./services/traefik.md) — Edge reverse-proxy and TLS terminator for everything exposed behind `*.example.com`. Shares Gerbil's network namespace.
-- [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.4.0`). Not a container; runs inside Traefik.
-- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.9.1` verified 2026-10-27), with a root-only credential file.
+- [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.8.0` since the 2026-11-06 sweep). Not a container; runs inside Traefik.
+- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.10.1` since 2026-11-06), with a root-only credential file.
 
 ## CloudNode Services (Archived)
 - [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
 - [`termix`](./services/termix.md) — absent from the 2026-10-27 live inventory; its existing recovery volume is retained.
 
 ## CloudNode Services (Removed)
-- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21**. iPhone now uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
+
+- [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21, stack + config deleted 2026-09-28**. iPhone now uses `1.1.1.1` directly. Files recoverable at `.removed-20260928/`.
 
 ## Application Services (all running on rammus)
 
-These pages were written for the pre-2026-11-21 NASUS layout. Every service in
+These pages were written for the pre-2026-11-21 NASUS layout. Every active service in
 this section now runs on [rammus](./hosts/rammus.md) under
 `/opt/docker/stacks/<service>/`, with appdata at `/opt/docker/config/<service>`.
 Read host paths and IPs in these pages as historical.
 
-`scryer` (media acquisition manager, WebUI `request.example.com`) runs on rammus
-but has no dedicated page yet.
-
+- [`HomeNode Media Stack Audit — 2026-09-05`](./services-homenode/media-stack-audit-2026-09-05.md) — Historical audit of the pre-Scryer NASUS media stack.
+- [`scryer`](./services-homenode/scryer.md) — **Active** unified media manager and request front door (movies / series / anime). Replaced the Sonarr/Radarr/Bazarr/Profilarr/Recyclarr write path and Seerr on 2026-11-07.
 - [`arr-mcp`](./services-homenode/arr-mcp.md) — authenticated media MCP on loopback, reached from CloudNode through supervised SSH.
-- [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
+- [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image. **Retired 2026-11-07; rollback only.**
 - [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](./services/dashdot.md)).
-- [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr and the *arr apps proxy indexer requests through it when hitting sites protected by Cloudflare's Under-Attack Mode / Turnstile.
+- [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. **Retired 2026-11-07; rollback only.**
 - [`hawser`](./services-homenode/hawser.md) — Dockhand's remote agent. The CloudNode Dockhand connects to this agent over TCP to manage HomeNode containers in the same UI as CloudNode containers.
 - [`newt`](./services-homenode/newt.md) — Fossorial Newt, the Pangolin site connector that establishes the outbound tunnel from HomeNode to the CloudNode so home services are reachable without opening inbound ports on the router.
-- [`plex`](./services-homenode/plex.md) — Plex Media Server. Serves `plex.example.com` (Traefik-routed) and direct LAN clients. Hardware transcoding enabled via `/dev/dri`.
-- [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality definitions, and naming schemes in sync across the *arr apps from a central spec.
-- [`prowlarr`](./services-homenode/prowlarr.md) — Indexer manager for the *arr suite — federates torrent/usenet indexers into one API that Sonarr/Radarr query.
+- [`plex`](./services-homenode/plex.md) — Plex Media Server. Host-networked; media uses a direct WAN `32400/tcp` forward, while Pangolin serves the web UI. Hardware transcoding enabled via `/dev/dri`.
+- [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr. **Retired 2026-11-07; rollback only.**
+- [`prowlarr`](./services-homenode/prowlarr.md) — **Active** indexer manager; federates torrent indexers into one API that Scryer queries.
 - [`qbittorrent`](./services-homenode/qbittorrent.md) — Torrent client. LinuxServer.io image. Serves web UI at `torrent.example.com` (Traefik-routed). **Runs with no VPN sidecar** — outbound swarm traffic exits on the ISP IP.
-- [`radarr`](./services-homenode/radarr.md) — Movie manager. LinuxServer.io image. Twin of Sonarr, with `/movies` instead of `/tv`.
-- [`recyclarr`](./services-homenode/recyclarr.md) — CLI + cron job that applies TRaSH-Guides recommended quality profiles and custom formats to Sonarr / Radarr. Runs on a schedule, not a long-lived server.
-- [`seerr`](./services-homenode/seerr.md) — Media request front-end for end users — they ask for a movie / show, it hands the request to Sonarr / Radarr for fulfilment.
-- [`sonarr`](./services-homenode/sonarr.md) — TV series manager. LinuxServer.io image.
+
+- [`radarr`](./services-homenode/radarr.md) — Movie manager. LinuxServer.io image. **Retired 2026-11-07; rollback only.**
+- [`recyclarr`](./services-homenode/recyclarr.md) — CLI + cron job applying TRaSH-Guides profiles to Sonarr / Radarr. **Retired 2026-11-07; rollback only.**
+- [`seerr`](./services-homenode/seerr.md) — Media request front-end. **Retired 2026-11-07; rollback only.** Scryer is the active request front door.
+- [`sonarr`](./services-homenode/sonarr.md) — TV series manager. LinuxServer.io image. **Retired 2026-11-07; rollback only.**
 - [`traefik (HomeNode)`](./services-homenode/traefik.md) — Home-LAN reverse proxy for all HomeNode services. Terminates TLS for `*.example.com` via Cloudflare DNS challenge. Distinct from the CloudNode Traefik.
 
 ## HomeNode Services (Archived)

@@ -62,6 +62,9 @@ config/traefik/*.bak.*
 config/traefik/rules/*.back
 config/traefik/rules/*.bak
 
+# Disabled file-provider rules carry real hostnames and tunnel addresses
+config/traefik/rules/*.disabled
+
 # CrowdSec hub (auto-downloaded)
 config/crowdsec/hub/
 config/crowdsec/collections/

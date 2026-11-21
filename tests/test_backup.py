@@ -83,7 +83,7 @@ def run(case, mutate=None):
     db.execute("CREATE TABLE proof(value TEXT)")
     db.execute("INSERT INTO proof VALUES ('committed-in-wal')")
     db.commit()
-    extra_paths = [stack / "config/crowdsec/db/crowdsec.db", stack / "config/crowdsec-web-ui/crowdsec.db", stack / "data/pocket-id/pocket-id.db", stack / "data/dockhand/db/dockhand.db", root / "homarr/appdata/db/db.sqlite"]
+    extra_paths = [stack / "config/crowdsec/db/crowdsec.db", stack / "config/crowdsec-web-ui/state.db", stack / "data/pocket-id/pocket-id.db", stack / "data/dockhand/db/dockhand.db", root / "homarr/appdata/db/db.sqlite"]
     writers = []
     for path in extra_paths:
         writer = sqlite3.connect(path)
@@ -125,7 +125,7 @@ def run(case, mutate=None):
             local_image = private["local_images"][0]
             assert by_name[local_image["archive_path"]].mode & 0o777 == 0o600
             assert len(local_image["sha256"]) == 64
-            database_paths = ["config/db/db.sqlite", "config/crowdsec/db/crowdsec.db", "config/crowdsec-web-ui/crowdsec.db", "data/pocket-id/pocket-id.db", "data/dockhand/db/dockhand.db", "homarr/db/db.sqlite"]
+            database_paths = ["config/db/db.sqlite", "config/crowdsec/db/crowdsec.db", "config/crowdsec-web-ui/state.db", "data/pocket-id/pocket-id.db", "data/dockhand/db/dockhand.db", "homarr/db/db.sqlite"]
             for number, name in enumerate(database_paths):
                 assert all(name + suffix not in by_name for suffix in ["-wal", "-shm", "-journal"])
                 saved_db = root / f"restored-{number}.sqlite"
@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
     run("missing-active-Pangolin-config", lambda root, stack, env: (stack / "config/config.yml").unlink())
     run("private-data-export-failure", lambda root, stack, env: env.update(FAIL_PRIVATE_EXPORT="1"))
-    run("invalid-webui-database", lambda root, stack, env: (stack / "config/crowdsec-web-ui/crowdsec.db").write_text("invalid sqlite"))
+    run("invalid-webui-database", lambda root, stack, env: (stack / "config/crowdsec-web-ui/state.db").write_text("invalid sqlite"))
 
     run("runtime-capture-failure", lambda root, stack, env: env.update(FAIL_RUNTIME_CAPTURE="1"))
     run("host-recovery-export-failure", lambda root, stack, env: env.update(FAIL_HOST_EXPORT="1"))

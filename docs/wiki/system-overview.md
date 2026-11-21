@@ -85,11 +85,13 @@ Control and tunnel flow:
 
 ### Apps
 - `landing`
-- `termix`
 
 ### Historical note
+- `termix` was removed from the CloudNode apps stack on 2026-10-16. Its Pangolin public-resource route still requires authenticated deletion; the detached data volume is retained temporarily.
 - `adguard-home` was removed from the CloudNode on 2026-04-21 and is not part
-  of the active stack layout.
+  of the active stack layout. The dead `stacks/dns/` compose file, the
+  `dns-tls` (853) Traefik entrypoint, and `config/adguard-home/` were finally
+  deleted on 2026-09-28. The home router runs its own AdGuard and is unaffected.
 
 ## Rammus Service Layout
 
@@ -101,16 +103,16 @@ All rammus services share one external Docker network: `traefik_traefik`
 - `newt` — the only tunnel for `192.168.0.0/24`
 - `hawser` — Dockhand agent, token required
 
-### *arr / acquisition
-- `prowlarr`
-- `scryer`
+### Media management
+- `scryer` — active unified media manager and request front door
+- `prowlarr` — active; supplies Scryer's indexers
 - `arr-mcp`
 
 ### Torrent
-- `qbittorrent`
+- `qbittorrent` — active download client
 
-### Media
-- `plex`
+### Media server
+- `plex` — active
 
 ### Observability
 - `dashdot` (`dash.example.com`, port 3003)
@@ -138,7 +140,6 @@ All non-core stacks use the external `pangolin` Docker network.
 - `https://home.example.com`
 - `https://dash.example.com`
 - `https://traefik-logs.example.com`
-- `https://termix.example.com`
 - `https://example.com`
 
 ## Critical Operational Rules
@@ -180,9 +181,9 @@ All non-core stacks use the external `pangolin` Docker network.
 ## Current High-Priority Findings
 
 ### CloudNode
-- `C1` / `F-POCKETID-1`: Pocket-ID mounts the shared repo `data/` directory.
-- `H1` / `F-TRAEFIK-1`: Traefik image is still `:latest` instead of pinned.
-- `H2`: CrowdSec Traefik log mount should be read-only.
+- `F-CSWUI-3`: CrowdSec Web UI application authentication remains disabled; enabling it requires an operator-supplied initial admin credential or OIDC setup.
+- `F-CSWUI-4`: CrowdSec Web UI state permissions were tightened to `0700`/`0600`; monitor the WAL files after future upgrades.
+- `F-TRAEFIK-2`: Traefik still mounts the Docker socket read-write; socket-proxy hardening remains future work.
 
 ### HomeNode (historical, mostly resolved by the 2026-11-21 migration)
 - `NC1` / `F-N-TRAEFIK-1`: the old NASUS Traefik exposed its dashboard on

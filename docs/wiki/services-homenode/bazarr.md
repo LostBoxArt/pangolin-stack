@@ -12,12 +12,19 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/bazarr/docker-compose.yml", "host-configs/homenode/bazarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-10-16
-last_lint: 2026-04-17
+last_ingested: 2026-11-07
+last_lint: 2026-11-07
 ---
 # bazarr
 
 **Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
+
+> **Migration notice (2026-11-07):** Scryer is the active media manager and request
+> front door at `request.example.com`. This service is **stopped and retained for
+> rollback only**. See [scryer](./scryer.md). Do not restart it except as part of a
+> deliberate, coordinated rollback — Scryer and the *arr apps must never acquire or
+> import into the same libraries at the same time.
+
 
 Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
 
@@ -30,6 +37,7 @@ Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
   - `/volume1/docker/config/bazarr:/config`
   - `/volume1/media/movies:/movies`
   - `/volume1/media/tv:/tv`
+  - `/volume1/media:/data`
 
 ## Upstream Sources
 
@@ -64,14 +72,11 @@ services:
 ## Deviations / Findings
 
 - **`:latest` image** (`medium` / NM2).
-- **Healthcheck**: validate the JSON `status: OK` response from
-  `/api/system/ping`. The old `/system/status` path could return the web
-  frontend and incorrectly pass while authenticated API requests timed out.
-  This ping checks API availability; use authenticated status and MCP checks
-  separately to verify Sonarr/Radarr integration.
-- **Volumes match Sonarr/Radarr**: Bazarr sees `/movies` and `/tv` at the
-  same paths those apps use, which is what Bazarr's
-  "path mappings" config expects. No extra path mapping needed in the UI.
+- **Healthcheck**: validate JSON `status: OK` from `/api/system/ping`. The old `/system/status` path could return the frontend and falsely pass. Check authenticated APIs separately for upstream integration health.
+- **Volumes match Sonarr/Radarr**: Bazarr retains `/movies` and `/tv` as
+  compatibility aliases and also has `/data` available. Its stored paths remain
+  on the legacy aliases intentionally until the observation period is complete;
+  no subtitle files or library paths were moved.
 
 ## Remediation
 

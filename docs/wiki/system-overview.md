@@ -12,8 +12,8 @@ related: ["./README.md", "./compose-review-2026-04-17.md", "./homenode-review-20
 sources: ["AGENTS.md", "docs/wiki/compose-review-2026-04-17.md", "docs/wiki/homenode-review-2026-04-17.md"]
 confidence: medium
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-21
+last_ingested: 2026-11-21
+last_lint: 2026-11-21
 ---
 # System Overview
 
@@ -29,14 +29,21 @@ service pages under `docs/wiki/services/`.
 - Role: public edge and control plane
 - Source of truth in this repo: compose files under `stacks/`
 
-### HomeNode
-- LAN IP: `192.168.1.10`
-- Role: home-lab applications and media stack
-- Live compose files: `/volume1/docker/config/*/docker-compose.yml` plus
-  `/volume1/docker/traefik/docker-compose.yml`
-- Source-controlled backup copies: `host-configs/homenode/`
-- This wiki now has dedicated HomeNode service pages under
-  `docs/wiki/services-homenode/`.
+### Rammus
+- LAN IP: `192.168.0.12`
+- Role: **every** application workload (media, torrent, *arr, tunnel, edge proxy)
+- Live compose files: `/opt/docker/stacks/<service>/docker-compose.yml`
+- Appdata: `/opt/docker/config/<service>`, always on local SSD
+- Dedicated page: `docs/wiki/hosts/rammus.md`
+- This host is a single point of failure: one SSD, no RAID.
+
+### HomeNode (NASUS)
+- LAN IP: `192.168.0.10`
+- Role: NFS storage only — **zero Docker containers** since 2026-11-21
+- Exports `/volume1/{media,storage,backups}` and `/volume2/fast` over NFSv3
+- Dedicated page: `docs/wiki/hosts/homenode.md`
+- Service pages under `docs/wiki/services-homenode/` now describe the layout as
+  it ran before the move; treat them as history.
 
 ## Architecture
 
@@ -47,7 +54,7 @@ Traffic flow:
 Control and tunnel flow:
 - Pangolin is the control plane.
 - Gerbil is the WireGuard relay on the CloudNode.
-- Olm on the CloudNode and Newt at home provide reachability to `192.168.1.0/24`.
+- Olm on the CloudNode and Newt on rammus provide reachability to `192.168.0.0/24`.
 - Traefik runs with `network_mode: service:gerbil`, so 80/443 live in the
   Gerbil container namespace.
 
@@ -84,36 +91,35 @@ Control and tunnel flow:
 - `adguard-home` was removed from the CloudNode on 2026-04-21 and is not part
   of the active stack layout.
 
-## HomeNode Service Layout
+## Rammus Service Layout
 
-All HomeNode services share one external Docker network: `traefik_traefik`.
-There is no stack separation like on the CloudNode.
+All rammus services share one external Docker network: `traefik_traefik`
+(subnet `172.19.0.0/16`). There is no stack separation like on the CloudNode.
 
 ### Edge / Tunnel
-- `traefik`
-- `hawser`
-- `newt`
+- `traefik` — public 80/443, `traefik:3.7.17` pinned
+- `newt` — the only tunnel for `192.168.0.0/24`
+- `hawser` — Dockhand agent, token required
 
-### *arr suite
-- `sonarr`
-- `radarr`
-- `bazarr`
+### *arr / acquisition
 - `prowlarr`
-- `profilarr`
-- `recyclarr`
+- `scryer`
+- `arr-mcp`
 
 ### Torrent
 - `qbittorrent`
-- `qui`
-- `flaresolverr`
-- `cleanuparr`
 
 ### Media
 - `plex`
-- `seerr`
 
 ### Observability
-- `dashdot`
+- `dashdot` (`dash.example.com`, port 3003)
+
+### DNS
+LAN name resolution is not on rammus. AdGuard Home runs as a plugin on the
+OPNsense router and holds explicit rewrites for each service name, all pointing
+at `192.168.0.12`. There is no wildcard, so a new service needs both a Traefik
+route and an AdGuard rewrite.
 
 ## Startup Order
 
@@ -155,13 +161,17 @@ All non-core stacks use the external `pangolin` Docker network.
    For covered services, use the relevant service page before re-researching.
    The deviations table explains why the compose differs from upstream.
 
-5. **HomeNode changes flow live host first.**
-   For HomeNode, update the live file on HomeNode first, then sync the repo copy under
-   `host-configs/homenode/`, then update the matching `services-homenode` wiki page.
+5. **Live host first, then repo.**
+   Application changes go to rammus (`/opt/docker/stacks/`) first, then the repo
+   copy, then the matching wiki page. NASUS changes should be avoided entirely
+   unless they concern NFS exports or ADM itself.
 
-6. **Known HomeNode compromise-risk surfaces stay visible until fixed.**
-   `NC1` is the open Traefik dashboard on `:9080`. `NC2` is Hawser's empty-token
-   fallback. See `docs/wiki/homenode-review-2026-04-17.md`.
+6. **Two-host rules that must not be broken.**
+   `newt` may run on only one host: a duplicate client on the same site
+   credentials flaps the tunnel and causes intermittent 502s. `plex` may run on
+   only one host, because both instances would share `MachineIdentifier` and
+   corrupt library state. Both are enforced today by `restart=no` on the stopped
+   NASUS copies.
 
 7. **Keep an audit trail.**
    New review sessions should create a new dated review file instead of editing
@@ -174,11 +184,20 @@ All non-core stacks use the external `pangolin` Docker network.
 - `H1` / `F-TRAEFIK-1`: Traefik image is still `:latest` instead of pinned.
 - `H2`: CrowdSec Traefik log mount should be read-only.
 
-### HomeNode
-- `NC1` / `F-N-TRAEFIK-1`: HomeNode Traefik dashboard is exposed on `:9080` with `--api.insecure=true`.
-- `NC2` / `F-N-HAWSER-1`: Hawser can fall back to an empty token while publishing its Docker API proxy.
-- `NH2` / `F-N-TRAEFIK-2`: HomeNode Traefik is still `:latest` instead of pinned.
-- `NM1`: `host-configs/homenode/` tracks only 8 of 16 live HomeNode compose files.
+### HomeNode (historical, mostly resolved by the 2026-11-21 migration)
+- `NC1` / `F-N-TRAEFIK-1`: the old NASUS Traefik exposed its dashboard on
+  `:9080` with `--api.insecure=true`. That Traefik is stopped; rammus publishes
+  only 80/443.
+- `NC2` / `F-N-HAWSER-1`: Hawser could fall back to an empty token while
+  publishing its Docker API proxy. On rammus the token is set, the port is bound
+  to `192.168.0.12` only, and unauthenticated requests return `401`.
+- `NH2` / `F-N-TRAEFIK-2`: Traefik was `:latest`. It is now pinned to
+  `traefik:3.7.17`.
+- `NM1`: `host-configs/homenode/` tracks only a subset of the live compose
+  files. The authoritative copies are now `/opt/docker/stacks/*` on rammus.
+- **New gap:** no availability or certificate-expiry alerting exists. Nothing
+  notifies anyone if rammus goes down, a disk fills, the NFS mount disappears, or
+  ACME renewal starts failing.
 
 See `docs/wiki/compose-review-2026-04-17.md` and `docs/wiki/homenode-review-2026-04-17.md` for remediation order.
 

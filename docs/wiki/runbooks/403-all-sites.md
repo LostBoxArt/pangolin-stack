@@ -107,7 +107,7 @@ before handshake" while direct CloudNode SSH works:
 
 ```bash
 # From CloudNode, test through tunnel
-ssh -vvv -o ConnectTimeout=5 jesus@192.168.1.10 echo test 2>&1 | \
+ssh -vvv -o ConnectTimeout=5 jesus@192.168.0.12 echo test 2>&1 | \
   grep -E "kex_exchange|banner|Connection closed"
 ```
 

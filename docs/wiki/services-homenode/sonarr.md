@@ -2,7 +2,7 @@
 title: "sonarr"
 slug: homenode-sonarr
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "sonarr"]
 aliases: ["sonarr"]
 entities:
@@ -16,6 +16,8 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # sonarr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 TV series manager. LinuxServer.io image.
 

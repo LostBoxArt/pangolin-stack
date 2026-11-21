@@ -2,7 +2,7 @@
 title: "radarr"
 slug: homenode-radarr
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "radarr"]
 aliases: ["radarr"]
 entities:
@@ -16,6 +16,8 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # radarr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Movie manager. LinuxServer.io image. Twin of [sonarr](./sonarr.md), with
 `/movies` instead of `/tv`.

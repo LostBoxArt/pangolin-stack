@@ -3,31 +3,45 @@
 This file is the one-stop overview for agents working in this repo. It captures architecture, services, critical files, operational flows, and troubleshooting without requiring you to read the other docs first.
 
 ## High-Level Architecture
-- Traffic flow: Internet -> Cloudflare -> CloudNode (203.0.113.1) -> Traefik -> Services.
+- Traffic flow: Internet -> Cloudflare -> CloudNode (203.0.113.1) -> Pangolin -> Olm tunnel -> Newt on rammus -> Traefik on rammus -> services.
 - Pangolin is the control plane and issues configuration to Gerbil.
 - Gerbil is the WireGuard relay between the CloudNode and remote sites.
-- Home network (192.168.1.0/24) is reachable via Olm on the CloudNode and Newt at home.
-- Traefik runs with `network_mode: service:gerbil`, so 80/443 are bound by Gerbil and shared.
+- LAN `192.168.0.0/24` is reachable via Olm on the CloudNode and Newt on **rammus** (`192.168.0.12`).
+- CloudNode Traefik runs with `network_mode: service:gerbil`, so 80/443 are bound by Gerbil and shared. A **separate** Traefik on rammus owns 80/443 on the LAN.
+- **Host split since 2026-11-21:** rammus runs every application. NASUS
+  (`192.168.0.10`) is pure NFS storage and runs **zero containers**.
 
 ## Stack Organization
 
-Services are organized into 7 stacks under `stacks/`:
+The current CloudNode deployment uses six stacks under `stacks/`. Older
+template/archived definitions remain in this checkout; use the dated live
+inventory before deployment.
 
 | Stack | Services | Purpose |
 |-------|----------|---------|
 | **core** | pangolin, gerbil, traefik | Infrastructure (starts first, creates `pangolin` network) |
 | **security** | crowdsec, crowdsec-web-ui, pocket-id | Protection & auth |
-| **dns** | adguard-home | DNS-over-HTTPS & filtering |
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | landing, termix | User applications |
-| **homenode-core** | olm, gerbil, pangolin | Tunnel, relay, control plane |
-| **homenode-apps** | newt, prowlarr, profilarr, recyclarr, seerr, sonarr, radarr, bazarr, qui, cleanuparr, flaresolverr, plex, qbittorrent, dashdot | Monitoring, storage, auth, torrent, media, DNS, apps |
+| **apps** | landing | Static landing page (Termix remains an older template) |
+| **homenode** | newt, hawser, traefik, arr-mcp, prowlarr, scryer, plex, qbittorrent, dashdot | Home tunnel, management, media and monitoring — **all now on rammus (`192.168.0.12`)** |
+
+The `homenode` stack is the historical name; its services run on rammus under
+`/opt/docker/stacks/<service>/`. `sonarr`, `radarr`, `bazarr`, `profilarr`,
+`recyclarr`, `seerr`, `flaresolverr`, `qui`, and `cleanuparr` were already
+stopped before the migration and are not running.
+
+CloudNode also runs Hermes-managed SearXNG/Valkey outside these stacks.
+AdGuard Home, qui, cleanuparr, and FileFlows are absent from the verified live
+container inventory. AdGuard Home **does** run as a plugin on the OPNsense router
+and serves all LAN DNS. Preserve historical docs without treating them as active
+services. See `docs/wiki/maintenance-2026-10-27.md` and
+`docs/wiki/hosts/rammus.md`.
 
 ### Startup Order
 1. **core** (creates network, must start first)
-2. **security**, **management**, **dns** (can start in parallel)
+2. **security**, **management** (can start in parallel)
 3. **observability**, **dashboard**, **apps** (can start in parallel)
 
 All stacks except core use `networks.pangolin: external: true`.
@@ -43,8 +57,9 @@ Security:
 - CrowdSec Web UI: admin UI for CrowdSec, 3458 (mapped to 3000 in container).
 - Pocket ID: auth provider, 1411 (behind Traefik).
 
-DNS:
-- AdGuard Home: DNS-over-HTTPS/DoT, 3000/53/853 (behind Traefik for UI).
+Historical DNS:
+- CloudNode AdGuard Home is retired. The separate router-hosted NAS backend
+  remains active; do not remove its NAS Traefik route as stale.
 
 Observability:
 - Traefik Agent: log dashboard agent, 5000.
@@ -59,8 +74,8 @@ Dashboard:
 - qbit-proxy: local proxy for qBittorrent widget, 8081 (internal).
 
 Apps:
-- LinkStack: landing page, 80 (behind Traefik).
-- Termix: web SSH, 8080 (behind Traefik).
+- Landing: nginx static page behind Traefik.
+- Termix is an older template; no live container was present on 2026-10-27.
 
 ## Public Endpoints
 - Pangolin: https://pangolin.example.com
@@ -69,23 +84,35 @@ Apps:
 - Pocket ID: https://auth.example.com
 - Homarr: https://home.example.com
 - Dashdot: https://dash.example.com
-- Termix: https://termix.example.com
-- LinkStack: https://example.com
-- CrowdSec Web UI: http://<cloudnode-ip>:3458
+- Landing: https://example.com
+- CrowdSec Web UI: use the protected CrowdSec endpoint; host port 3458 is loopback-only.
 - Dockhand: https://dockhand.example.com
-- AdGuard Home: https://dns.example.com
 
 ## Startup and Health
 - Use `./startup.sh` to pull images and start all stacks in phased order.
 - Use `./stackctl.sh` to manage individual stacks.
 - Health waits for container status to be running and healthchecks to be healthy.
+- **rammus NFS gate:** `plex` and `qbittorrent` run with `restart: "no"` and are
+  started by `nasus-media-apps.timer` → `nasus-media-apps.service`, which refuses
+  to start them unless `/mnt/nasus/media` is a real mountpoint. This exists so a
+  slow NASUS at boot cannot bring them up against an empty local directory. Run
+  `sudo systemctl stop nasus-media-apps.timer` before deliberately stopping
+  either container, and re-enable it after. Do not "fix" this by restoring
+  `restart: unless-stopped`; that reintroduces the empty-directory failure.
 
 ## Version and Upgrade Policy
-- Core pins: Pangolin `1.17.1`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
-- Security pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1` because the moving `latest` tag pulled a broken image on 2026-03-30.
-- HomeNode Newt is pinned to `1.11.0`.
-- CloudNode Olm runs as systemd binary `1.4.4` with `--override-dns=false`.
-- Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging and provisioning-key site creation.
+- Verified live on 2026-11-21: Pangolin `1.26.0`, Gerbil `1.6.0`, CloudNode
+  Traefik `v3.7.19`. On 2026-10-27 the same audit found Pangolin `1.25.3`,
+  Gerbil `1.5.2`, Traefik `v3.7.16`, CrowdSec Web UI `2026.10.10`, Newt `1.19.0`,
+  Olm `1.9.1` — the core images have since moved forward on their own, so treat
+  version numbers here as a snapshot, not a pin.
+  The older template pins below are not a safe deployment over that running
+  installation; reconcile source and read release/migration notes first.
+- Older core template pins: Pangolin `1.17.1`, Gerbil `1.3.1`, Traefik Badger plugin `v1.4.0`.
+- Older security template pin: CrowdSec Web UI `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`, retained from the 2026-03-30 incident.
+- The current Newt snapshot pins `1.19.0`. Newt now runs on **rammus**.
+- rammus runs Traefik `3.7.17` (pinned) and Plex/qBittorrent/dashdot on `:latest`.
+- CloudNode Olm was verified at `1.9.1` on 2026-10-27, with `--override-dns=false`.
 - Before upgrades, read:
   - `https://docs.pangolin.net/self-host/how-to-update`
   - `https://github.com/fosrl/pangolin/releases`
@@ -96,29 +123,46 @@ Apps:
 
 ## Home Network Tunnel (Olm)
 - Olm is a systemd service on the CloudNode (not a container).
+- Its unit uses `CONFIG_FILE=/root/.config/olm-client/config.json` and `UMask=0077`.
+  Keep that config root-owned `0600`, its directory `0700`, and credentials out
+  of `ExecStart`. The sanitized unit is in `host-configs/cloudnode/systemd/`.
 - Pin `pangolin.example.com` to `203.0.113.1` in `/etc/hosts` on the CloudNode. This avoids resolver drift inside Olm and keeps the UDP hole-punch path stable.
 - Commands:
   - `/usr/local/sbin/hermes-safe-service status olm`
   - `/usr/local/sbin/hermes-safe-logs olm --since 30m`
   - `/usr/local/sbin/hermes-safe-service restart olm`
   - `/usr/local/sbin/hermes-safe-service status olm-watchdog.timer`
-- Tunnel route used: 192.168.1.0/24.
+- Tunnel route used: 192.168.0.0/24.
 
 ### Tunnel Watchdogs
 - CloudNode: `/usr/local/sbin/olm-watchdog.sh` + `olm-watchdog.timer` (systemd, every minute).
-- HomeNode: `/usr/local/bin/newt-watchdog.sh` (root crontab every minute).
-- If Dockhand on the CloudNode cannot reach HomeNode at `192.168.1.10:2375`, first check for `192.168.1.0/24 dev olm`. If it is missing, inspect `/usr/local/sbin/hermes-safe-logs olm --since 30m` and restart `olm` with `/usr/local/sbin/hermes-safe-service restart olm`.
-- HomeNode Docker healthchecks currently exist for `sonarr`, `radarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr`, `plex`, `traefik`, `qui`, `seerr`, `hawser`, `newt`, `badger`, `olm`, and `cleanuparr`.
-- Those compose files are live on HomeNode under `/volume1/docker/config/*/docker-compose.yml` plus `/volume1/docker/traefik/docker-compose.yml`.
-- Source-controlled backup copies live in this repo under `host-configs/homenode/`.
+- rammus: `/usr/local/bin/newt-watchdog.sh` + `/etc/cron.d/newt-watchdog` (every minute). It starts `newt` if it is down and restarts it on tunnel-interface failure.
+- **Do not recreate the old NASUS copy.** A leftover `newt-watchdog` cron on NASUS kept resurrecting a second `newt` with the same site credentials, which flapped the tunnel and caused intermittent 502s. It was removed on 2026-11-21.
+- If Dockhand on the CloudNode cannot reach rammus at `192.168.0.12:2375`, first check for `192.168.0.0/24 dev olm`. If it is missing, inspect `/usr/local/sbin/hermes-safe-logs olm --since 30m` and restart `olm` with `/usr/local/sbin/hermes-safe-service restart olm`.
+- Rammus has no native `newt` healthcheck; the watchdog is the availability check.
+- rammus compose files live under `/opt/docker/stacks/<service>/docker-compose.yml`
+  with appdata at `/opt/docker/config/<service>`. NASUS has no live compose files
+  now; its old `/volume1/docker/config/*` trees are rollback and history only.
+- Source-controlled backup copies live in this repo under `host-configs/homenode/`
+  and are stale relative to rammus.
+- FileFlows and `fileflows-dv-watcher` were decommissioned on 2026-10-27. Do not recreate their containers, routes, watcher jobs or service registrations from historical backups.
 
 ## qBittorrent Widget Fix
 Homarr v0.15+ has issues with qBittorrent v5.1.4+ HTTPS secure cookies.
 - Use `qbit-proxy` for widgets:
   - Widget URL: `http://qbit-proxy:8081`
   - Target host: `torrent.example.com`
-  - Target IP: `192.168.1.10`
+  - Target IP: `192.168.0.12`
 - The proxy strips the Secure cookie flag and sets the correct Host header.
+- The proxy uses Node 24 with upstream certificate verification and a 10-second request deadline.
+- Its Docker healthcheck requires HTTP 200 and a qBittorrent version body through the proxy; tunnel or upstream failures can make it unhealthy.
+- **`AuthSubnetWhitelist` must contain rammus's Docker subnet `172.19.0.0/16`.** The old config only listed `172.18.0.0/16` (NASUS), so peer containers got `403 Forbidden` and scryer's download client silently failed. Verify with `curl -s -o /dev/null -w '%{http_code}' http://172.19.0.3:8080/api/v2/app/version`.
+- **scryer and `qbit-proxy` do not authenticate to qBittorrent at all.** No `/auth/login`, no `SID` cookie, no `Authorization` header — they work *only* because `AuthSubnetWhitelistEnabled=true`. Turning the whitelist off returns `403` on every call from both, and breaks them. Do not "harden" that setting without first giving scryer real credentials and testing a whitelist narrowing separately.
+- **A fixed cause does not immediately clear the symptom.** On a `403` scryer escalates a back-off (`download_client_status.escalation_level`, `disabled_until`) and then skips the client entirely, logging `no download client answered` for roughly 15–25 more minutes. Wait out the timer before concluding a fix failed, or read the table:
+  `sudo sqlite3 /opt/docker/config/scryer/scryer.db "SELECT escalation_level, disabled_until FROM download_client_status;"`
+- **Container addresses on `traefik_traefik` are not stable, and misreading them causes wrong conclusions.** At 2026-11-21: `traefik .2`, `qbittorrent .3`, `prowlarr .4`, `arr-mcp .5`, `scryer .6`. A capture on `.2 → .3:8080` is Traefik relaying a browser, not scryer. Always confirm with
+  `docker network inspect traefik_traefik --format '{{range .Containers}}{{.Name}} {{.IPv4Address}}{{"\n"}}{{end}}'`.
+- **Known security debt:** the whitelist currently bypasses qBittorrent auth for `192.168.0.0/24`, `172.17.0.0/16`, `172.18.0.0/16`, `172.19.0.0/16`, `10.0.0.0/8`, and `100.90.0.0/16`. `172.18.0.0/16` no longer exists on rammus and can be removed. The safe end state is real credentials in scryer plus a `/32` whitelist pinned with a static container IP.
 
 ## File Layout
 ```
@@ -141,10 +185,18 @@ pangolin-stack/
 ├── startup.sh                          # start all stacks in order
 ├── stackctl.sh                         # stack management utility
 ├── backup.sh                           # backup/restore script
+├── docs/wiki/hosts/rammus.md           # compute host that runs every app
+├── docs/wiki/hosts/homenode.md         # NASUS, storage only
+├── docs/wiki/hosts/cloudnode.md        # public edge and control plane
 ├── README.md                           # quick start
 ├── INFRASTRUCTURE.md                   # detailed architecture
 └── AGENTS.md                           # this file
 ```
+
+Live application compose files are **not** in this repo. They run on rammus under
+`/opt/docker/stacks/<service>/docker-compose.yml`, with appdata at
+`/opt/docker/config/<service>`. The `host-configs/homenode/` tree is a stale
+snapshot and must not be deployed over the live host.
 
 ## Key Environment Variables
 From `.env` (all are referenced in compose):
@@ -185,8 +237,15 @@ From `.env` (all are referenced in compose):
 `./backup.sh` handles full backup/restore and daily timers.
 - Backup includes compose files, `.env`, configs, db, certs, volumes, docs.
 - Uses `/opt/homelab/backups` and logs to `backups/backup.log`.
-- Install daily timer: `sudo ./backup.sh install-timer` (runs at 03:00).
+- The existing live daily timer runs at 03:00. Inspect it with `systemctl status
+  pangolin-backup.timer`; do not replace it with the older template installer
+  without adapting its account and installation paths.
 - Restore stops services, restores files, and re-imports volumes.
+- New archives use private permissions and include landing sites, the proxy build context and the full CrowdSec configuration tree.
+- Pangolin, CrowdSec, CrowdSec Web UI, Pocket ID, Dockhand and Homarr use validated
+  online SQLite snapshots. Runtime metadata and allowlisted host recovery files
+  are private recovery content, not Git source. Each database is consistent
+  independently; this is not one atomic transaction across applications.
 
 ## Docker Volumes and External Data
 - External volumes: none (landing uses a bind-mounted `sites/` directory; termix
@@ -199,13 +258,33 @@ From `.env` (all are referenced in compose):
 - Web UI: https://dns.example.com
 - DoH Endpoint: `https://dns.example.com/dns-query`
 - DoT Endpoint: `dns.example.com:853`
-- Manage blocklists and upstream DNS via the web UI.
+- AdGuard Home runs as a plugin on the **OPNsense router** (`os-adguardhome-maxit`)
+  and listens on `:53`. Unbound is on `:53530` and dnsmasq on `:53053`; neither
+  serves LAN clients.
+- Every service name is an explicit rewrite pointing at `192.168.0.12`. There is
+  no wildcard, so a new service needs both a Traefik route and an AdGuard rewrite.
+- Editing `/usr/local/AdGuardHome/AdGuardHome.yaml` by hand is risky: a malformed
+  edit took DNS down for about three minutes. Back up first and edit whole blocks
+  (`perl -0777`), never with `awk` range deletes.
 
 ## Known Operational Assumptions
 - Cloudflare DNS points `*.example.com` to the CloudNode IP with proxy enabled.
 - `auth.example.com` (Pocket ID) is routed via Traefik labels.
 - `home.example.com` is routed to Homarr via Traefik labels.
-- `torrent.example.com` resolves via `extra_hosts` in Homarr to 192.168.1.10.
+- **Two independent `.10` pins existed on the CloudNode and both had to be
+  updated for the 2026-11-21 move:** `/etc/hosts` (4 names: `nasus`, `prowlarr`,
+  `torrent`, `adguard`) and the six `extra_hosts` entries in
+  `stacks/dashboard/docker-compose.yml` (those four plus `request` and `plex`).
+  The second list lands in the Homarr container's own `/etc/hosts`, so it
+  overrides DNS *and* the host file.
+  If a Homarr tile is red while the service answers directly, check the
+  container: `docker exec homarr getent hosts <name>`. It should return
+  `192.168.0.12`.
+- **`dash.example.com` now resolves to rammus from both directions.** The
+  Pangolin `dash` target was retargeted on 2026-11-21 from the CloudNode's
+  `dashdot:3001` to site `homelab`, `192.168.0.12:3003`, matching the AdGuard
+  rewrite. The CloudNode's own dashdot still runs but binds `127.0.0.1:3001`
+  only and now has no consumer; it is no longer monitored.
 
 ## Common Commands
 
@@ -242,8 +321,13 @@ Dockhand replaced Portainer for container management.
   - Successful login sets the `dockhand_session` cookie.
   - Reuse that cookie in a `Cookie: dockhand_session=<token>` header for later API calls.
 - **Remote Hosts**:
-  - **HomeNode** (Home): Connected via Hawser agent in TCP mode.
-  - Host: `192.168.1.10`, Port: `2375`, Token: Secured in `.env` and Dockhand UI.
+  - **Rammus** (Home): Connected via Hawser agent in TCP mode.
+  - Host: `192.168.0.12`, Port: `2375`, Token: Secured in `.env` and Dockhand UI.
+  - Hawser binds `192.168.0.12:2375` only, and unauthenticated requests return
+    `401`. Do not widen the bind: UFW does not filter published container ports
+    because Docker's own iptables chains run first.
+  - Dockhand's environment list still contains a stale `Nasus` entry pointing at
+    `192.168.0.10:2375`, which no longer answers. It can be removed from the UI.
 
 ### Verified CLI Login Flow
 ```bash
@@ -259,12 +343,17 @@ curl -skD /tmp/dockhand.headers \
 
 TOKEN=$(awk '/dockhand_session/ {print $7}' /tmp/dockhand.cookie)
 curl -sk -H "Cookie: dockhand_session=${TOKEN}" \
-  "http://${DOCKHAND_IP}:3000/api/stacks?env=2"
+  "http://${DOCKHAND_IP}:3000/api/stacks?env=3"
 ```
 
 ### Environment IDs
 - `env=1`: CloudNode
-- `env=2`: HomeNode
+- `env=2`: Nasus (`192.168.0.10`) — **stale and dead**; no Hawser runs there since 2026-11-21
+- `env=3`: Rammus (`192.168.0.12`) — the live home environment
+
+Use `env=3` for anything on the home side. A request with `env=2` fails or returns
+empty, which is not evidence that rammus is down. The `Nasus` entry still exists in
+the Dockhand UI and can be deleted.
 
 ### Common API Endpoints
 | Action | Method | Endpoint |

@@ -21,16 +21,23 @@ Internet → Cloudflare → CloudNode (203.0.113.1) → Traefik → Services
 | **observability** | traefik-agent, traefik-dashboard, dashdot | Monitoring & logs |
 | **management** | dockhand | Container management |
 | **dashboard** | homarr, qbit-proxy | User dashboards |
-| **apps** | linkstack, termix | User applications |
+| **apps** | landing, termix | Landing page; Termix is an older template |
 
-## Version Pins
+## Repository Template Pins
+
+These older template values are not the current deployment inventory. The
+2026-10-27 live audit found Pangolin `1.25.3`, Gerbil `1.5.2`, Traefik
+`v3.7.16`, CrowdSec Web UI `2026.10.10`, Newt `1.19.0`, and Olm `1.9.1`.
+Do not deploy an older template over that running installation. See the
+[maintenance record](docs/wiki/maintenance-2026-10-27.md) and synchronized
+host snapshots before a planned upgrade or recovery.
 
 - Pangolin: `fosrl/pangolin:1.17.0`
 - Gerbil: `fosrl/gerbil:1.3.1`
 - Traefik Badger plugin: `v1.4.0`
 - CrowdSec Web UI: `ghcr.io/theduffman85/crowdsec-web-ui:2026.3.1`
 - Newt (HomeNode): `fosrl/newt:1.11.0`
-- Olm (CloudNode systemd binary): `1.4.4` with `--override-dns=false`
+- Olm (CloudNode systemd binary): verified `1.9.1` with `--override-dns=false` on 2026-10-27
 
 Newt `1.11.x` aligns with Pangolin `1.17.x` for private resource connection logging, site provisioning keys, and the newer site provisioning flow.
 CrowdSec Web UI is pinned to `2026.3.1` because the moving `latest` tag pulled a broken image on March 30, 2026.
@@ -102,39 +109,44 @@ curl -sk -c /tmp/dockhand.cookie \
 
 TOKEN=$(awk "/dockhand_session/ {print \$7}" /tmp/dockhand.cookie)
 curl -sk -H "Cookie: dockhand_session=${TOKEN}" \
-  "http://${DOCKHAND_IP}:3000/api/stacks?env=2"
+  "http://${DOCKHAND_IP}:3000/api/stacks?env=3"
 '
 ```
 
 Environment IDs:
 - `1` = CloudNode
-- `2` = HomeNode
+- `2` = Nasus (`192.168.0.10`) — stale, no Hawser there since 2026-11-21
+- `3` = Rammus (`192.168.0.12`) — the live home environment
 
-## HomeNode Healthchecks
+## Application Healthchecks (rammus)
 
-The repo now keeps source-controlled copies of the current HomeNode host-side compose files under `host-configs/homenode/`. Current live Docker healthchecks exist for:
+Since 2026-11-21 every application runs on **rammus** (`192.168.0.12`). NASUS
+(`192.168.0.10`) is pure NFS storage and runs zero containers.
 
-- `sonarr`
-- `radarr`
-- `prowlarr`
-- `bazarr`
-- `qbittorrent`
-- `flaresolverr`
-- `plex`
+Live healthchecks exist for:
+
 - `traefik`
-- `qui`
-- `seerr`
+- `plex`
+- `prowlarr`
+- `scryer`
+- `arr-mcp`
 - `hawser`
 
-Live host paths:
+`newt`, `qbittorrent`, and `dashdot` have no native Docker healthcheck; process
+availability is a weaker signal (for `newt`, the watchdog is the real check).
+`sonarr`, `radarr`, `bazarr`, `profilarr`, `recyclarr`, `seerr`, `flaresolverr`,
+`qui`, and `cleanuparr` were stopped before the migration and are not running.
 
-- `/volume1/docker/config/<service>/docker-compose.yml`
-- `/volume1/docker/traefik/docker-compose.yml`
+FileFlows and its Dolby Vision watcher were decommissioned on 2026-10-27. Their containers, deployment files, dedicated data and active integrations have been removed; historical backups are not deployment sources.
 
-Repo backup paths:
+Live host paths (rammus):
+
+- `/opt/docker/stacks/<service>/docker-compose.yml`
+- `/opt/docker/config/<service>` (appdata, always local SSD)
+
+Repo backup paths (stale, do not deploy):
 
 - `host-configs/homenode/<service>/docker-compose.yml`
-- `host-configs/homenode/traefik/docker-compose.yml`
 
 ## File Structure
 
@@ -162,12 +174,17 @@ Olm runs as a **systemd service** on the host (not Docker):
 ```bash
 sudo journalctl -u olm -f       # Check logs
 ip addr show olm                # Verify interface
-ping 192.168.1.10               # Test connectivity
+ping 192.168.0.12               # Test connectivity to rammus
 sudo systemctl restart olm      # Restart tunnel
 sudo systemctl status olm-watchdog.timer  # Watchdog timer status
 ```
 
 `olm` is pinned to run with `--override-dns=false` to prevent DNS lockout during tunnel flaps.
+
+Credentials load from root-only `/root/.config/olm-client/config.json` (`0600`,
+parent `0700`) through `CONFIG_FILE`; the unit uses `UMask=0077` and contains no
+secret in its command. See [Olm operations](docs/wiki/services/olm.md) and the
+sanitized unit in `host-configs/cloudnode/systemd/olm.service`.
 
 ## Access Points
 
@@ -180,14 +197,34 @@ sudo systemctl status olm-watchdog.timer  # Watchdog timer status
 | Homarr | https://home.example.com |
 | Dashdot | https://dash.example.com |
 | Dockhand | https://dockhand.example.com |
-| LinkStack | https://example.com |
-| Termix | https://termix.example.com |
-| CrowdSec Web UI | http://<cloudnode-ip>:3458 |
+| Landing | https://example.com |
+| CrowdSec Web UI | Protected CrowdSec endpoint; host port 3458 is loopback-only |
 
 ## Troubleshooting
 
 ### qBittorrent Authorization Errors
 Use the **qbit-proxy** sidecar in the dashboard stack. Set widget URL to `http://qbit-proxy:8081`.
+
+The proxy uses Node 24, verifies the upstream TLS certificate and aborts requests after 10 seconds. Its Docker healthcheck requires a successful qBittorrent version response through the proxy; an upstream or tunnel failure can make it unhealthy.
+
+### Backup Validation
+
+`backup.sh` creates private archives with validated online SQLite snapshots of
+Pangolin, CrowdSec, CrowdSec Web UI, Pocket ID, Dockhand and Homarr. It includes
+landing sites, the proxy build context, full CrowdSec configuration, and private
+runtime/host recovery metadata. Database consistency is independent per database.
+The live script targets the verified deployed layout; reconcile older templates
+before deploying or restoring them. See the
+[maintenance record](docs/wiki/maintenance-2026-10-27.md) for restore and off-host
+verification evidence.
+
+Run the isolated regression checks without contacting production:
+
+```bash
+bash -n backup.sh
+python3 tests/test_backup.py
+node --test qbit-proxy/index.test.js
+```
 
 ## Security Features
 

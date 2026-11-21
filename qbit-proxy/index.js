@@ -19,7 +19,8 @@ http.createServer((req, res) => {
             ...req.headers,
             host: TARGET_HOST
         },
-        rejectUnauthorized: false
+        rejectUnauthorized: true,
+        signal: AbortSignal.timeout(10000)
     };
 
     const proxyReq = https.request(options, (proxyRes) => {
@@ -31,6 +32,7 @@ http.createServer((req, res) => {
         }
 
         res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        proxyRes.on('error', (e) => res.destroy(e));
         proxyRes.pipe(res);
     });
 
@@ -38,7 +40,11 @@ http.createServer((req, res) => {
 
     proxyReq.on('error', (e) => {
         console.error(`Proxy Error: ${e.message}`);
-        res.statusCode = 502;
-        res.end();
+        if (res.headersSent) {
+            res.destroy(e);
+        } else {
+            res.statusCode = e.name === 'AbortError' ? 504 : 502;
+            res.end();
+        }
     });
 }).listen(LISTEN_PORT, '0.0.0.0');

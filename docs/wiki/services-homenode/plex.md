@@ -2,7 +2,7 @@
 title: "plex"
 slug: homenode-plex
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "plex"]
 aliases: ["plex"]
 entities:
@@ -16,6 +16,8 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # plex
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Plex Media Server. Serves `plex.example.com` (Traefik-routed) and direct
 LAN clients. Hardware transcoding enabled via `/dev/dri`.

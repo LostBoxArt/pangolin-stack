@@ -1,0 +1,12 @@
+[Unit]
+Description=Snapshot NAS configuration and copy encrypted repository to CloudNode
+
+[Service]
+Type=oneshot
+UMask=0077
+EnvironmentFile=%h/.config/homelab-backups/offsite.env
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=8h
+ExecStart=%h/.local/bin/offsite-backup nas
+ExecStartPost=%h/.local/bin/offsite-backup vps --full-check

@@ -24,19 +24,23 @@ The goal of this wiki is to be **one click away from the right upstream
 source** for every service we run, and to record any deviation we've made so
 future agents (or future-you) don't have to rediscover the reasoning.
 
-Coverage spans **two hosts**:
+Coverage spans **three hosts** (as of the 2026-11-21 migration):
 
 - **CloudNode** (`203.0.113.1`) — public edge: Pangolin, Traefik, CrowdSec, etc.
   Compose files live in this repo under `stacks/`.
-- **HomeNode** (`192.168.1.10`) — home lab: *arr stack, Plex, torrent client,
-  etc. Compose files live on HomeNode at `/volume1/docker/config/*/` and
-  `/volume1/docker/{traefik,hawser}/`. Source-controlled copies live in
-  `host-configs/homenode/` (currently incomplete — see the HomeNode audit).
+- **Rammus** (`192.168.0.12`) — **every** application workload: *arr stack, Plex,
+  torrent client, tunnel, LAN reverse proxy. Live compose files are on rammus at
+  `/opt/docker/stacks/<service>/`, appdata at `/opt/docker/config/<service>`.
+  See [Rammus](./hosts/rammus.md).
+- **NASUS** (`192.168.0.10`) — pure NFS storage, **zero containers**. See
+  [HomeNode host](./hosts/homenode.md).
 
 ---
 
 ## Start Here
 
+- [Maintenance 2026-10-27](./maintenance-2026-10-27.md) — current verified live
+  inventory, applied changes and disposition of the deep-sweep recommendations.
 - [System Overview](./system-overview.md) — high-level architecture, startup
   order, public endpoints, critical operational rules, and repo layout.
 - [Maintenance Workflow](./maintenance-workflow.md) — how agents should ingest,
@@ -71,7 +75,7 @@ Each page follows the same structure:
 
 - [Index](./index.md) — flat catalog of all current wiki pages.
 - [Glossary](./glossary.md) — recurring homelab terms and shorthand.
-- [Hosts](./hosts/cloudnode.md) / [HomeNode host](./hosts/homenode.md) — host-level summaries.
+- [Hosts](./hosts/cloudnode.md) / [Rammus](./hosts/rammus.md) / [NASUS](./hosts/homenode.md) — host-level summaries.
 - [Networks](./networks/pangolin.md) and [traefik_traefik](./networks/traefik-traefik.md) — current network model.
 - [Runbooks](./runbooks/recreate-traefik-after-gerbil.md) and peers — operator procedures grounded in existing wiki facts.
 
@@ -112,19 +116,24 @@ Each page follows the same structure:
 
 > Historical: [linkstack](./services/linkstack.md) was replaced by `landing` on 2026-04-21.
 
-## HomeNode — `/volume1/docker/`
+## Application services — rammus `/opt/docker/stacks/`
 
-Live compose files on HomeNode are under `/volume1/docker/config/<service>/`,
-`/volume1/docker/traefik/`, and `/volume1/docker/hawser/`. Source-controlled
-copies live under `host-configs/homenode/`, but coverage is still incomplete. See
-`docs/wiki/homenode-review-2026-04-17.md` finding `NM1`.
+Every application moved off NASUS to rammus (`192.168.0.12`) on 2026-11-21.
+Live compose files are at `/opt/docker/stacks/<service>/`, appdata at
+`/opt/docker/config/<service>`. Source-controlled copies under
+`host-configs/homenode/` are **stale** and are not a deployment source.
+
+The pages in this section were written against the pre-migration NASUS layout.
+Read host paths and IPs in them as historical. See
+[Rammus](./hosts/rammus.md) for current state.
 
 ### Edge / Tunnel
-- [traefik (HomeNode)](./services-homenode/traefik.md)
+- [traefik (rammus)](./services-homenode/traefik.md)
 - [hawser](./services-homenode/hawser.md)
 - [newt](./services-homenode/newt.md)
 
 ### *arr suite
+- [arr-mcp](./services-homenode/arr-mcp.md)
 - [sonarr](./services-homenode/sonarr.md)
 - [radarr](./services-homenode/radarr.md)
 - [bazarr](./services-homenode/bazarr.md)
@@ -145,12 +154,13 @@ copies live under `host-configs/homenode/`, but coverage is still incomplete. Se
 ### Observability
 - [dashdot (HomeNode)](./services-homenode/dashdot.md)
 
-### HomeNode-specific operating notes
-- HomeNode services all share one external Docker network: `traefik_traefik`.
-- Sync direction is **HomeNode -> repo**, never repo -> HomeNode.
-- When touching a HomeNode service, update the live HomeNode file,
-  `host-configs/homenode/<service>/docker-compose.yml`, and the matching
-  `docs/wiki/services-homenode/<service>.md` together.
+### Application-specific operating notes
+- All rammus services share one external Docker network: `traefik_traefik`, subnet `172.19.0.0/16`.
+- `newt` and `plex` must each run on exactly one host. A duplicate `newt` flaps
+  the tunnel; a duplicate `plex` shares `MachineIdentifier` and corrupts state.
+- Sync direction is **live host -> repo**, never repo -> live host.
+- When touching an application service, update the live file on rammus, the
+  repo copy, and the matching `docs/wiki/services-homenode/<service>.md` together.
 
 ---
 

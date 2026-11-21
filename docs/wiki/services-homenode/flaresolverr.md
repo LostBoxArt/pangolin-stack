@@ -2,7 +2,7 @@
 title: "flaresolverr"
 slug: homenode-flaresolverr
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "flaresolverr"]
 aliases: ["flaresolverr"]
 entities:
@@ -16,6 +16,8 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # flaresolverr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr
 and the *arr apps proxy indexer requests through it when hitting sites

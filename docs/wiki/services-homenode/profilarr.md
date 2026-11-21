@@ -2,7 +2,7 @@
 title: "profilarr"
 slug: homenode-profilarr
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "profilarr"]
 aliases: ["profilarr"]
 entities:
@@ -12,10 +12,12 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/profilarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
+last_ingested: 2026-10-27
 last_lint: 2026-04-17
 ---
 # profilarr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality
 definitions, and naming schemes in sync across the *arr apps from a central
@@ -23,7 +25,7 @@ spec.
 
 - **Image**: `santiagosayshey/profilarr:latest` ⚠️
 - **Compose file**: `/volume1/docker/config/profilarr/docker-compose.yml`
-- **Tracked copy**: **not tracked** (finding NM1)
+- **Tracked copy**: `host-configs/homenode/profilarr/docker-compose.yml` (sanitized live snapshot, 2026-10-27)
 - **Port (internal)**: `6868`
 - **Router**: `profilarr.example.com`
 - **Volume**: `/volume1/docker/config/profilarr:/config`
@@ -74,7 +76,10 @@ Profilarr serves a web UI on 6868. Simple probe:
       start_period: 30s
 ```
 
-### F-N-PROFILARR-3 — not tracked in repo (`high` / NM1)
+### F-N-PROFILARR-3 — source tracking (resolved 2026-10-27)
+The sanitized source is now tracked. Runtime image, profile definitions and sync
+behavior were preserved. Earlier suggested image/healthcheck changes below were
+not applied by this maintenance.
 
 ## Remediation
 

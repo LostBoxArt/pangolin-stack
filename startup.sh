@@ -46,6 +46,9 @@ start_stack() {
     echo -e "${YELLOW}Starting $stack stack...${NC}"
     docker compose -f "$compose_file" --env-file .env pull
     docker compose -f "$compose_file" --env-file .env up -d --remove-orphans
+    if [ "$stack" = core ]; then
+        "$SCRIPT_DIR/scripts/ensure-traefik-netns.sh"
+    fi
 }
 
 wait_for_healthy() {

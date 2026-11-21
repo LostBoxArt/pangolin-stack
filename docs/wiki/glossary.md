@@ -42,10 +42,18 @@ Behavior-based security engine that consumes logs and applies blocking decisions
 Container-management service used to monitor and manage Docker hosts.
 
 ## Hawser
-Remote Docker API agent used for HomeNode management through Dockhand.
+Remote Docker API agent used for rammus management through Dockhand. Binds
+`192.168.0.12:2375` only and requires a token.
 
-## HomeNode
-The home server at `192.168.1.10` hosting the media, torrent, and *arr services.
+## HomeNode / NASUS
+Two names for the same box: the ASUSTOR NAS at `192.168.0.10`. Since 2026-11-21
+it is **storage only** — it exports NFS and runs **zero containers**.
+
+## Rammus
+The compute host at `192.168.0.12` (ASUS PN62, formerly named `pn62`). Since
+2026-11-21 it runs **every** application: media, torrent, *arr, the tunnel, and
+the LAN reverse proxy. Its old name in the docs is `HomeNode` — that usage is
+historical and now refers to NASUS.
 
 ## CloudNode
 The public server at `203.0.113.1` hosting Pangolin, Traefik, CrowdSec, and related edge services.

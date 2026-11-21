@@ -12,8 +12,8 @@ related: ["./README.md", "./maintenance-workflow.md", "./index.md"]
 sources: ["AGENTS.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-22
+last_ingested: 2026-10-27
+last_lint: 2026-10-27
 ---
 # Wiki Log
 
@@ -284,3 +284,333 @@ artifacts.
 - Removed unused one-time research artifact `~/.hermes/skills/ai-pricing-research.md`.
 - Re-ran `scripts/wiki_lint.py` — all files pass clean.
 
+## [2026-10-27] maintenance | FileFlows removal and initial hardening
+
+- Removed FileFlows and its DV watcher from HomeNode: containers, dedicated network, images, application data, test media and dynamic route. Removed the CloudNode public resource, pending update, deployment copies, watchdog entries, active inventories, obsolete guidance and vault entry. Shared infrastructure, historical records and private rollback copies were preserved.
+- Fixed the Hermes service-check bootstrap; read-only checks and the authenticated 39-tool MCP connection pass.
+- Hardened qbit-proxy on Node 24 with upstream TLS verification, a 10-second request deadline and an end-to-end version healthcheck. Regression checks cover current qBittorrent port-specific cookies and 204 responses. API checks pass from Homarr's network; full browser widget rendering was not tested.
+- Made backup outputs private, added missing site/proxy/CrowdSec content, and replaced Pangolin's live database copy with a validated online snapshot. Existing archives were retained. Other live database snapshots and a full application restore drill remain outstanding.
+- Restricted the NAS recovery-kit PDF and the user-owned Olm credential copy to mode 0600 without changing their contents. Olm's service configuration and credential rotation remain outstanding. Added isolated backup and proxy regression checks; preserved pre-existing Bazarr edits and documentation changes.
+
+## [2026-10-27] maintenance | supported fixes and recovery verification
+
+- Installed Ponytail and I-have-ADHD at Codex user scope, with global standing
+  defaults and fresh cross-project skill-catalog checks.
+- Completed the earlier Olm work and rotated the exposed Newt credential;
+  canonical Newt Git source uses private Dockhand variables. Repaired CrowdSec
+  SSH protection, management bindings, Homarr targeting, conditional namespace
+  recovery, NAS dashboard access and host mounting, and duplicate routing.
+- Supervised the loopback MCP tunnel with systemd, fixed watchdog coverage and
+  timing, and resumed the release checker as a local read-only job. Authenticated
+  MCP exposes 39 tools and all 38 watchdog checks pass.
+- Completed independent database snapshots, encrypted cross-host copies, recovery
+  key verification, six NAS application cold starts with 16 durable table checks,
+  and the private VPS application rehearsal. Fixed restore quiescence, ownership,
+  SQLite sidecars, current-tool preservation, image recovery and retention guards.
+- Diagnosed nested Tailscale-over-Olm packet loss and installed a tested
+  per-backup SSH relay, preserving global routing and MTUs. Added sanitized
+  sources and current runbooks; retained pre-existing user edits. See the
+  [dated maintenance record](./maintenance-2026-10-27.md) for exact artifacts,
+  schedules, verification limits and reviewed exclusions.
+
+## [2026-11-21] migration | NASUS to pure storage, all workloads to rammus
+
+- Renamed the compute host `pn62` to `rammus` (`192.168.0.12`): hostname,
+  `/etc/hosts`, Hawser `AGENT_NAME`, Dockhand environment, OPNsense static DHCP
+  mapping, and AdGuard rewrites.
+- Moved every application off NASUS to rammus under `/opt/docker/stacks/` with
+  appdata at `/opt/docker/config/`: `newt`, `traefik`, `plex`, `qbittorrent`,
+  `prowlarr`, `scryer`, `arr-mcp`, `dashdot`, `hawser`. NASUS now runs **zero
+  containers**; fourteen stopped copies remain as a rollback path.
+- Added `docs/wiki/hosts/rammus.md` and rewrote
+  `docs/wiki/hosts/homenode.md` as a storage-only host page.
+- Switched the NASUS NFS client mounts from `soft,timeo=50,retrans=3` to
+  `hard,timeo=600,retrans=2`; `soft` produced `EIO` from slow RAID5 commits.
+  Removed the `systemd` automount triggers, which left containers reading empty
+  directories after an idle expiry.
+- Replaced `RequiresMountsFor` with `Wants=` + `After=` on the four mount units
+  in `/etc/systemd/system/docker.service.d/nfs.conf`. The previous form would
+  stop Docker from starting at all whenever NASUS was down or still booting.
+- Preserved Plex library identity (`MachineIdentifier` unchanged) and moved it
+  onto the rammus iGPU (`/dev/dri`, `renderD128`); removed the stale
+  `HardwareDevicePath`, set `autoEmptyTrash="0"` and
+  `TranscoderTempDirectory=/transcode`.
+- qBittorrent keeps identical container paths (`/data`, `/downloads`) so all 39
+  torrents needed no recheck; incomplete downloads now land on local SSD via
+  `/data/downloads/incomplete`. `Session\TempPathEnabled` enabled.
+- Pointed Pangolin targets `request.dennisb.xyz` and `plex.dennisb.xyz` at
+  `192.168.0.12`, and moved the OPNsense NAT forwards for 32400 and 6881 from
+  `.10` to `.12`.
+- LAN DNS is AdGuard Home on OPNsense (`:53`), not unbound. All rewrites were
+  repointed to `.12`; `dash-nas` was removed with the NASUS `dash` container.
+- Fixed two production breaks found during verification: a leftover NASUS
+  `newt-watchdog` cron that kept resurrecting a duplicate tunnel client (moved
+  to rammus, now on `/etc/cron.d/newt-watchdog`), and `qbit-proxy` on the
+  CloudNode still targeting the dead `192.168.0.10:443`.
+- Hardened `/usr/local/sbin/rammus-backup.sh`: it now refuses to run when
+  `/mnt/nasus/backups` is not a mountpoint, aborts if the appdata copy is under
+  100 MB, and includes `/etc/cron.d`, `/etc/systemd/system`, `/usr/local`, and
+  `/home/jesus/.ssh`. The earlier runs had copied about 12 KB of 2.5 GB.
+- Bound Hawser to `192.168.0.12:2375` (was `0.0.0.0`) and gave it a real bind
+  mount for `/data/stacks` instead of an anonymous volume.
+- Added `docs/wiki/hosts/rammus.md`, updated `system-overview.md`, `index.md`,
+  and `log.md`; `scripts/wiki_lint.py` reports zero errors and zero warnings.
+- Open: no availability or certificate-expiry alerting exists.
+- Removed the five dead AdGuard rewrites (`sonarr`, `radarr`, `bazarr`,
+  `profilarr`, `flaresolverr`) after confirming they were stopped before the
+  migration and had no container on either host. Rewrites went from 16 to 11;
+  `AdGuardHome --check-config` passed, then the plugin was restarted. The five
+  names now fall through to the Cloudflare record instead of returning a Traefik
+  404. Backup: `/usr/local/AdGuardHome/AdGuardHome.yaml.bak-pre-deadrewrites`.
+- Updated `/etc/hosts` on the CloudNode: `nasus`, `sonarr`, `radarr`, `bazarr`,
+  `prowlarr`, `profilarr`, `torrent`, and `adguard` were still pinned to
+  `192.168.0.10`. That static override, not DNS, was why four Homarr tiles showed
+  red after the move — AdGuard was already answering `.12`. `dash-nas` was
+  dropped from the pin list with the retired NASUS dashboard.
+- Repointed ten `extra_hosts` entries in `stacks/dashboard/docker-compose.yml`
+  from `192.168.0.10` to `192.168.0.12`. These pins live in the Homarr
+  **container's** `/etc/hosts`, so they override both AdGuard and the host
+  resolution and must be updated whenever an application changes address.
+- Rewrote `docs/wiki/README.md` coverage from two hosts to three, and corrected
+  the healthcheck claims against `docker inspect`: real healthchecks exist for
+  `traefik`, `plex`, `prowlarr`, `scryer`, `arr-mcp`, and `hawser`;
+  `newt`, `qbittorrent`, and `dashdot` have none.
+- Corrected `INFRASTRUCTURE.md`: the network diagram previously showed
+  Pangolin/Gerbil/CrowdSec inside the "home network" block and had orphaned
+  boxes. It now shows CloudNode, then LAN with rammus and NASUS side by side.
+  Also fixed the Dockhand env IDs (`3` = Rammus), the tunnel route
+  (`192.168.0.0/24`), and the widget `extra_hosts` path.
+- `concepts/port-matrix.md` now lists the ports actually published on rammus:
+  2375 bound to `.12`, 3003 and 6881 on all interfaces, and 8099/6060 on
+  loopback. Noted that UFW does not filter published container ports.
+- Dropped the same four dead names (`sonarr`, `radarr`, `bazarr`, `profilarr`)
+  from the CloudNode `/etc/hosts` pin and from the Homarr `extra_hosts` block,
+  then recreated Homarr. Container checks: `nasus` 200, `torrent` 200,
+  `prowlarr` 302, `adguard` 301. Six pins remain, all pointing at
+  `192.168.0.12`.
+- Verified Plex hardware transcoding on rammus with a live session: the
+  transcoder ran `-hwaccel vaapi -hwaccel_device /dev/dri/renderD128,driver=iHD`
+  with a `h264_vaapi` encoder and a fully GPU filter chain
+  (`hwupload` → `deinterlace_vaapi` → `scale_vaapi`). The process held
+  supplementary group `993` (`render`), which is the requirement that makes
+  VAAPI work inside the container. Recorded the check in `hosts/rammus.md`,
+  including the fallback-to-CPU symptom (no `vaapi` entries in the process args).
+- Root-caused the scryer → qBittorrent failure. `scryer` (`172.19.0.6`) sends
+  **no** credentials — no `/auth/login`, no `SID`, no `Authorization` header — and
+  has only ever worked because of `AuthSubnetWhitelistEnabled=true`. The migration
+  lost the `172.19.0.0/16` entry, every poll got `403`, and scryer escalated a
+  back-off (`escalation_level 3`, `disabled_until`) that kept the warning firing
+  for ~25 minutes after the whitelist was fixed. An attempt to disable the
+  whitelist broke scryer *and* the CloudNode `qbit-proxy`; both were restored.
+- Corrected a wrong intermediate diagnosis: `.2` on `traefik_traefik` is
+  **Traefik**, not scryer. A capture attributed to scryer was Traefik relaying a
+  browser session, which produced a false "scryer uses HTTP Basic auth" theory.
+- Recorded the container IP map, the back-off behaviour, and the whitelist
+  security debt in `AGENTS.md` and `hosts/rammus.md`. Open: scryer has no
+  credentials configured, and the whitelist bypasses qBittorrent auth for six
+  CIDRs including the now-nonexistent `172.18.0.0/16`.
+
+## [2026-11-21] verification | two independent audits, corrections applied
+
+Two read-only audit agents reviewed the migration independently: one against live
+infrastructure, one against documentation accuracy.
+
+- **Corrected `docs/wiki/hosts/homenode.md`:** it claimed all 14 stopped NASUS
+  containers were `restart=no`. Nine are; `sonarr`, `radarr`, `bazarr`,
+  `recyclarr`, and `profilarr` are still `unless-stopped`. The two dangerous ones
+  (`newt`, `plex`) are genuinely `restart=no`, so a reboot cannot create a
+  duplicate identity — but an ADM "start all" would revive the other five.
+- **Corrected the Dockhand environment ID** in `AGENTS.md`, `README.md`, and
+  `INFRASTRUCTURE.md`: the home environment is `env=3` (Rammus). `env=2` is the
+  dead `Nasus` entry. The `curl` examples all used `env=2`.
+- **Added a "Rollback to NASUS" section** to `hosts/rammus.md`, naming the
+  appdata that has diverged (`qbittorrent`, `plex-db`, `prowlarr`, `scryer`,
+  `arr-mcp`, and `/opt/docker/qbit-incomplete`, which exists only on rammus) and
+  the five places that must be repointed.
+- **Marked all 17 `services-homenode/*` pages `status: historical`** with a
+  banner under the title. Several read as current instructions and would have
+  led someone to deploy to NASUS.
+- **Bound dashdot to `192.168.0.12:3003`** instead of all interfaces. Image
+  unchanged, still serving 200. UFW does not filter published container ports,
+  so the bind address is the only real control.
+- **Documented, not fixed:** the backup has no history and copies live SQLite
+  files while they are open (`sqlite3` is not installed on rammus, so a hot copy
+  is not possible from the host); two OPNsense rules still allow `.10:2375`; NFS
+  exports use `no_root_squash,async` across several subnets; `plex` and
+  `qbittorrent` can start against an empty `/mnt/nasus/media` if NASUS is slower
+  than rammus at boot. Plex's `autoEmptyTrash="0"` prevents the worst outcome.
+- **Added `runbooks/add-rammus-service.md`** — the five places that must agree
+  for a new hostname: compose, AdGuard rewrite, CloudNode `/etc/hosts`, Homarr
+  `extra_hosts`, Pangolin target. This is the exact class of failure that caused
+  the red dashboard tiles.
+- Repository-wide: `192.168.1.x` in the runbooks corrected, `192.168.0.x`
+  everywhere. `scripts/wiki_lint.py`: zero errors, zero warnings.
+- **Added backup history to `/usr/local/sbin/rammus-backup.sh`.** Before each
+  rsync, `opt-docker-latest` is hardlink-snapshotted to `opt-docker-YYYYMMDD`
+  (`cp -al`) and the oldest beyond seven are pruned. Verified on run: identical
+  inode, link count 2, so the snapshot costs no extra space on NASUS. Without
+  this, an accidental appdata deletion would have been mirrored into the only
+  copy on the next 03:30 run. Backup of the previous script:
+  `rammus-backup.sh.bak-pre-snapshots`.
+- **Gated the NFS-dependent containers on the mount actually existing.**
+  `Wants=`/`After=` alone guaranteed ordering, not success, so a slow NASUS would
+  have started `plex` and `qbittorrent` against an empty `/mnt/nasus/media`.
+  Both now use `restart: "no"` (the only policy whose boot behaviour is certain),
+  and `nasus-media-apps.service` starts them only when
+  `mountpoint -q /mnt/nasus/media` succeeds, wrapped in `timeout 20` so a hung
+  hard mount cannot hang the unit. `nasus-media-apps.timer` runs it at boot plus
+  every 2 minutes and retries the mount via `Wants=`, so NASUS returning later
+  brings both back with no intervention. Cost: crash recovery is up to 2 minutes.
+  Stop the timer before a deliberate `docker stop`.
+- **NFS exports narrowed is NOT done.** NASUS serves all four exports to
+  `192.168.0.0/24`, `192.168.1.0/24`, and `192.168.3.0/24` with
+  `no_root_squash,async`, but only `192.168.0.12` mounts them. The export file is
+  ADM-managed (`/etc/exports` → `/volume0/etc/exports`), so the change belongs in
+  the ADM UI — which the owner deliberately does not open, because each visit
+  queues a stuck job. Left as a documented recommendation:
+  narrow each export to `192.168.0.12(...)`. `no_root_squash` must stay until the
+  backup script adds `--no-owner --no-group`, or `rsync -a` fails on ownership.
+  `sync` instead of `async` is unmeasured and would mainly slow the nightly
+  appdata copy.
+- Confirmed Pangolin targets without sudo: `db.sqlite` is mode 0644, so
+  `sqlite3 -readonly 'file:...db.sqlite?mode=ro'` works. `request` →
+  `192.168.0.12:443` and `plex` → `192.168.0.12:32400`, both enabled.
+
+### [2026-11-21] verification | Pangolin target audit
+
+Checked every Pangolin resource against the live database and against the real
+public path (resolved through Cloudflare's DoH, bypassing the CloudNode's
+`/etc/hosts`, which pins four app names at `192.168.0.12` and silently turns a
+"public" test into a LAN test).
+
+- **Correct:** `plex` → `192.168.0.12:32400` and `request` → `192.168.0.12:443`
+  both work end to end — public `plex.example.com` returns Plex's own `401`
+  (reached, needs a token) and `/web/index.html` returns `200`. Zero `.10`
+  targets remain. The other seven resources still point at CloudNode container
+  names and are unaffected.
+- **`request` is genuinely scryer, not a leftover seerr name.** The compose file
+  sets `SCRYER_WEBAUTHN_RP_ID=request.example.com`, so scryer's passkeys are
+  bound to that hostname. Renaming it would invalidate every registered
+  authenticator.
+- **`torrent`, `prowlarr`, `scryer`, `nasus`, `adguard` do not answer publicly —
+  correct.** They are LAN-only, reached via AdGuard rewrites plus rammus Traefik.
+- **`dash` is split-brained.** The Pangolin resource `dash` targets the
+  CloudNode's `dashdot:3001`; the AdGuard rewrite sends LAN clients to
+  `192.168.0.12:3003` on rammus. One hostname, two different dashboards. Fix is
+  to retarget the Pangolin resource at `192.168.0.12:3003`.
+- Corrected the `AGENTS.md` claim that the CloudNode host file pins six names:
+  `/etc/hosts` has four (`nasus`, `prowlarr`, `torrent`, `adguard`); the six live
+  in Homarr's `extra_hosts`, which adds `request` and `plex`.
+
+### [2026-11-21] verification | Hermes knowledge base audited and corrected
+
+A Sonnet agent updated Hermes's own wiki, skills, cron prompts and
+`memory_store.db` on the CloudNode (119 files backed up to
+`/home/jesus/.hermes/backups/homelab-rammus-sync-20261121/`).
+
+- **Found: Hermes's monitoring is now lying.** `service-watchdog.py` runs every
+  5 minutes and still probes NASUS. `.watchdog-state.json` at 22:05 reported 11
+  services down with 15 consecutive failures each — `Newt`, `NAS Traefik`,
+  `Hawser`, `Plex`, `Prowlarr`, `Scryer`, `qBit`, `arr-mcp`, `arr-mcp tunnel`,
+  `Olm data path`, `Dashdot NAS application`. All of them are healthy on rammus.
+  An alert was sent at 21:30:37 claiming a full outage.
+- `qb-reaper.py` and `tl-force-seed-guard.py` still SSH to `.10`, and
+  `update-home-crowdsec-whitelist.sh`, `ensure-arr-mcp-tunnel.sh` and
+  `migration-infra-watch.py` (`*/15`, enabled) do too. None of them can work.
+- The `dash-nas` watchdog check targets a hostname that no longer resolves.
+- **Corrected a doc error:** `/etc/fstab` does **not** contain
+  `timeo=600,retrans=2`. Those are the kernel defaults for a `hard` NFSv3 mount;
+  `findmnt` shows them on the live mount. The table in `hosts/rammus.md` now
+  shows the real fstab string and explains the defaults.
+- **Corrected the Plex GPU-group story.** The container runs as **root**
+  (`Config.User` empty, `GroupAdd=[]`) and opens `/dev/dri/renderD128` as root,
+  so no supplementary group is involved today. Host `render` is GID **993**;
+  the container's own `/etc/group` says `render:x:994:`, which is a red herring
+  that nearly produced a wrong doc edit. `group_add: ["993"]` only matters if
+  Plex is ever moved off root.
+- **Not yet done:** repointing the Hermes scripts at rammus. This is a change to
+  alerting behaviour, so the exact patches are being produced separately and
+  reviewed before applying. Until then the watchdog keeps reporting a false
+  outage.
+- Note: the repo checkout on the CloudNode (`/home/jesus/pangolin-stack`) does
+  **not** contain these corrections. They are uncommitted on the Mac only, so
+  Hermes's repo-derived answers stay stale until the branch is committed and
+  pushed.
+
+### [2026-11-21] fixes | everything outstanding closed
+
+- **Pangolin `dash` retargeted** (was split-brained). Pangolin stopped, DB
+  backed up to `db.sqlite.bak-pre-dash-retarget`, `targets` row 7 changed from
+  site `ThePangoli` / `dashdot:3001` (internalPort 60215) to site `homelab` /
+  `192.168.0.12:3003`, Pangolin restarted. Verified the backend answers `200`
+  with `Ubuntu 24.04.5` from the CloudNode, and all nine public resources still
+  respond. Note: changing only the IP would have failed — a local-site target
+  carries a Docker-mapped `internalPort` that is meaningless once the target
+  moves to a newt site.
+- **All 14 NASUS containers now `restart=no`.** `sonarr`, `radarr`, `bazarr`,
+  `recyclarr` and `profilarr` were still `unless-stopped`, so a NASUS reboot
+  could have revived services that now live on rammus. Manual `docker start`
+  still works, so the rollback path is intact.
+- **OPNsense `.10:2375` rules are blocks, not permits.** Verified with
+  `pfctl -sr | grep 2375`: `block drop in quick` on `igc1` and `igc3`. An earlier
+  audit misread the direction; they are protective and were left alone. The
+  host page was corrected.
+- **Hermes monitoring repointed at rammus.** `service-watchdog.py` now probes
+  rammus (`RAMMUS_SSH`, `RAMMUS = 192.168.0.12`), NASUS is reported as its own
+  storage check and gates nothing, and the retired `dash-nas` and CloudNode
+  `127.0.0.1:3001` checks are gone. Dry run: **34 checks, all true, zero
+  failures**. `qb-reaper.py`, `tl-force-seed-guard.py`,
+  `update-home-crowdsec-whitelist.sh` and `migration-infra-watch.py` all
+  retargeted; `ensure-arr-mcp-tunnel.sh` and `nasus-watchdog-setup.sh` archived
+  as dead code.
+- **`arr-mcp-tunnel.service`** forwarded to `NASUS:6060`, where nothing listens.
+  Repointed to `jesus@192.168.0.12`; `http://127.0.0.1:16060/healthz` now returns
+  `{"status":"ok","name":"arr-mcp","version":"1.70.0"}`.
+- **Watchdog unit tests fixed** (`NASUS_SSH` → `RAMMUS_SSH`, retired `dash-nas`
+  assertions removed, SSH host `.12`). 19 tests pass. The stale
+  `.watchdog-state.json` was deleted so the next run does not send a false
+  "all recovered" message.
+- **Backups now take consistent SQLite copies.** `sqlite3` installed on rammus;
+  after the rsync every `*.db` over 10 kB is rewritten with
+  `sqlite3 <live> ".backup <dest>"`. Verified `scryer.db` and `prowlarr.db`
+  report `integrity_check = ok`; the Plex library copy is readable with the same
+  258 tables. Plex's own DB cannot be `integrity_check`ed by stock sqlite (custom
+  tokenizer) and is not corrupt.
+- The authoritative host pages were copied into the CloudNode repo clone
+  (`/home/jesus/pangolin-stack`) so Hermes's repo-derived answers are correct.
+  The branch itself is still uncommitted on the workstation.
+
+### [2026-11-21] fixes | backup integrity and monitoring truth
+
+Independent production review found two high-severity defect classes that the
+migration itself did not cause but did expose. Both are fixed and regression
+tested.
+
+- **The SQLite snapshot step was overwriting backup history.** `cp -al` gives a
+  dated snapshot the *same inode* as `opt-docker-latest`, and `rsync` leaves that
+  link in place when it sees no change (Plex's library DB measured link count 2).
+  `sqlite3 .backup $dest` then rewrote the file inside the kept snapshot, so
+  "yesterday" silently became tonight's copy. Now writes `$dest.tmp` and
+  `mv -f`s. Verified: a 2-link test pair split into two inodes with the old rows
+  intact, and after a full backup run no `*.db` in `opt-docker-latest` shares an
+  inode with any kept snapshot.
+- **`migration-infra-watch` watched paths nothing writes to.** It read
+  `/volume2/backups/configs/configs-*.tgz` (producer `config-backup` is stopped)
+  and `/volume2/backups/scryer/*.enc` (that volume is not exported to rammus).
+  It would have alerted at ~15:30 on 2026-11-22 and again the next morning.
+  Now checks `/volume1/backups/rammus/rammus-etc-*.tar.gz`,
+  `/volume1/backups/scryer/*.enc`, and the freshness/size of
+  `opt-docker-latest`. The `find -printf` used for that age check is unsupported
+  by ADM's `find` and reported a 56-year-old copy; replaced with
+  `find -exec stat -c %Y`.
+- **scryer's backup destination moved with the app.** `/backups` inside scryer is
+  now `/volume1/backups/scryer`, which was empty while all history sat in the
+  unexported `/volume2/backups/scryer`. History was copied across with `cp -p`,
+  and write access from inside the container was proven by a probe file.
+- **`olm-watchdog.sh` probed `.10`**, so any NASUS maintenance window looked like
+  an Olm tunnel failure and would have restarted Olm, taking every home route
+  down. Now `TARGET_IP=192.168.0.12` / `/_ping`. That endpoint answers `401`,
+  which the script already accepts as reachable.
+- **The qBittorrent API probe timeout was raised 15 s → 30 s.** A single SSH
+  round trip under load produced a false `qBittorrent API unavailable`; the
+  direct check returned `v5.3.0` both times it fired.

@@ -13,7 +13,7 @@ http:
           # API configuration
           api: https://get.geojs.io/v1/ip/country/{ip}
           apiTimeoutMs: 750
-          cacheSize: 25
+          cacheSize: 2000
           forceMonthlyUpdate: true
           
           # Unknown countries handling

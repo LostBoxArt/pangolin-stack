@@ -2,7 +2,7 @@
 title: "qbittorrent"
 slug: homenode-qbittorrent
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "qbittorrent"]
 aliases: ["qbittorrent"]
 entities:
@@ -16,6 +16,8 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # qbittorrent
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Torrent client. LinuxServer.io image. Serves web UI at
 `torrent.example.com` (Traefik-routed). **Runs with no VPN sidecar** —

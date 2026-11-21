@@ -18,7 +18,7 @@ last_lint: 2026-04-17
 # Check HomeNode reachability via Olm
 
 ## When to use this
-Use this when the CloudNode cannot reach HomeNode services, especially when Dockhand on the CloudNode cannot talk to HomeNode Docker at `192.168.1.10:2375`.
+Use this when the CloudNode cannot reach HomeNode services, especially when Dockhand on the CloudNode cannot talk to HomeNode Docker at `192.168.0.12:2375`.
 
 ## Prerequisites
 - CloudNode shell access
@@ -27,7 +27,7 @@ Use this when the CloudNode cannot reach HomeNode services, especially when Dock
 ## Procedure
 1. Check that the HomeNode LAN route exists:
    ```bash
-   ip route | grep '192.168.1.0/24 dev olm'
+   ip route | grep '192.168.0.0/24 dev olm'
    ```
 2. If the route is missing, inspect the `olm` service state:
    ```bash
@@ -44,8 +44,8 @@ Use this when the CloudNode cannot reach HomeNode services, especially when Dock
 5. Re-check the route and then retry the failing HomeNode access path.
 
 ## Verification
-- Expected route: `192.168.1.0/24 dev olm`
-- CloudNode can reach `192.168.1.10`
+- Expected route: `192.168.0.0/24 dev olm`
+- CloudNode can reach `192.168.0.12`
 - Dockhand or other CloudNode-side HomeNode checks recover
 
 ## Rollback

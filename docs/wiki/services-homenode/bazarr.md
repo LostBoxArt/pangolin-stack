@@ -2,7 +2,7 @@
 title: "bazarr"
 slug: homenode-bazarr
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "bazarr"]
 aliases: ["bazarr"]
 entities:
@@ -12,10 +12,12 @@ related: ["./README.md", "./homenode-review-2026-04-17.md", "./system-overview.m
 sources: ["/volume1/docker/config/bazarr/docker-compose.yml", "host-configs/homenode/bazarr/docker-compose.yml"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
+last_ingested: 2026-10-16
 last_lint: 2026-04-17
 ---
 # bazarr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
 
@@ -48,7 +50,7 @@ services:
       - /volume1/media/movies:/movies
       - /volume1/media/tv:/tv
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:6767/system/status >/dev/null || exit 1"]
+      test: ["CMD", "/lsiopy/bin/python3", "-c", "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:6767/api/system/ping', timeout=8)).get('status') == 'OK'"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -62,8 +64,11 @@ services:
 ## Deviations / Findings
 
 - **`:latest` image** (`medium` / NM2).
-- **Healthcheck**: `/system/status` is the canonical endpoint for Bazarr
-  (not `/ping`, unlike Sonarr/Radarr). Correct.
+- **Healthcheck**: validate the JSON `status: OK` response from
+  `/api/system/ping`. The old `/system/status` path could return the web
+  frontend and incorrectly pass while authenticated API requests timed out.
+  This ping checks API availability; use authenticated status and MCP checks
+  separately to verify Sonarr/Radarr integration.
 - **Volumes match Sonarr/Radarr**: Bazarr sees `/movies` and `/tv` at the
   same paths those apps use, which is what Bazarr's
   "path mappings" config expects. No extra path mapping needed in the UI.

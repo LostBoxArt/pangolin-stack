@@ -2,7 +2,7 @@
 title: "prowlarr"
 slug: homenode-prowlarr
 type: service
-status: active
+status: historical
 tags: ["homelab", "homenode", "service", "prowlarr"]
 aliases: ["prowlarr"]
 entities:
@@ -16,6 +16,8 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # prowlarr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
 
 Indexer manager for the *arr suite — federates torrent/usenet indexers
 into one API that Sonarr/Radarr query.

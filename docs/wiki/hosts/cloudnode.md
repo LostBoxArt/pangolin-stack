@@ -60,4 +60,12 @@ Primary public edge and control-plane server.
 
 ## Known operational notes
 - If Gerbil is recreated, Traefik must be recreated afterward because Traefik shares Gerbil's network namespace.
-- CloudNode is the place where Dockhand reaches HomeNode Hawser and where `olm` route health matters.
+- CloudNode is the place where Dockhand reaches rammus Hawser and where `olm` route health matters.
+- **`/etc/hosts` overrides LAN names.** CloudNode does not use AdGuard for `*.example.com`
+  at the application-names level; it pins them statically in `/etc/hosts` and
+  `pangolin.example.com` → the public IP. When an application moved hosts, these
+  pins had to be updated by hand — a stale pin silently points at the old host and
+  shows as a dead Homarr tile even though DNS is correct elsewhere. If a tile is
+  red but the service is reachable directly, check `/etc/hosts` here first.
+- `qbit-proxy` targets `torrent.example.com` via `TARGET_IP`, which must match the
+  host actually running qBittorrent.

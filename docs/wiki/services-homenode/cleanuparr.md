@@ -2,7 +2,7 @@
 title: "cleanuparr"
 slug: homenode-cleanuparr
 type: service
-status: active
+status: archived
 tags: ["homelab", "homenode", "service", "cleanuparr"]
 aliases: ["cleanuparr"]
 entities:
@@ -16,6 +16,11 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # cleanuparr
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
+
+Absent from the verified 2026-10-27 live NAS inventory. The following describes
+historical configuration; do not recreate the service as routine maintenance.
 
 Automated cleanup for qBit / Sonarr / Radarr — removes failed / stalled /
 redundant downloads so they stop taking up disk and swarm slots.

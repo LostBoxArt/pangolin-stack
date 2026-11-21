@@ -2,7 +2,7 @@
 title: "termix"
 slug: cloudnode-termix
 type: service
-status: active
+status: archived
 tags: ["homelab", "cloudnode", "service", "termix"]
 aliases: ["termix"]
 entities:
@@ -16,6 +16,11 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # termix
+
+Absent from the verified 2026-10-27 live CloudNode inventory. The unused
+`pangolin-apps_termix_data` volume still contains about 19 MiB of state and is
+retained for recovery. No automatic volume pruning is enabled. The following
+documents the older repository template; it is not an instruction to recreate it.
 
 Web-based SSH terminal / tunneling / file editor at `termix.example.com`.
 

@@ -12,8 +12,8 @@ related: ["./README.md", "./log.md", "./glossary.md"]
 sources: ["docs/wiki/README.md"]
 confidence: high
 audience_level: operator
-last_ingested: 2026-04-17
-last_lint: 2026-04-21
+last_ingested: 2026-11-21
+last_lint: 2026-11-21
 ---
 
 # Wiki Index
@@ -43,7 +43,8 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`0003 HomeNode live-first sync workflow`](./decisions/0003-homenode-live-first-sync.md) — Accepted
 
 ## Hosts
-- [`HomeNode Host`](./hosts/homenode.md) — Home server that runs the media, torrent, and *arr workloads.
+- [`Rammus Host`](./hosts/rammus.md) — Compute host at `192.168.0.12` running every application workload. Formerly `pn62`.
+- [`HomeNode Host (NASUS)`](./hosts/homenode.md) — ASUSTOR NAS at `192.168.0.10`. Pure NFS storage; zero containers since 2026-11-21.
 - [`CloudNode Host`](./hosts/cloudnode.md) — Primary public edge and control-plane server.
 
 ## Networks
@@ -51,8 +52,11 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`traefik_traefik Docker Network`](./networks/traefik-traefik.md) — Single shared external Docker network for HomeNode services.
 
 ## Runbooks
+- [Backup recovery and off-host copies](./runbooks/backup-recovery.md) — private recovery artifacts, exact-image startup, retention guards and verification.
+- [NAS configuration backup and recovery](./runbooks/backup-nasus-config.md) — online database snapshots, encrypted repository, exact exclusions and safe restore layout.
 - [`All sites return 403`](./runbooks/403-all-sites.md) — When every Cloudflare-fronted site returns 403 simultaneously. Covers CrowdSec container exit, Cloudflare false leads, and origin health checks.
-- [`Check HomeNode reachability via Olm`](./runbooks/check-homenode-reachability-via-olm.md) — Use this when the CloudNode cannot reach HomeNode services, especially when Dockhand on the CloudNode cannot talk to HomeNode Docker at `192.168.1.10:2375`.
+- [`Check HomeNode reachability via Olm`](./runbooks/check-homenode-reachability-via-olm.md) — Use this when the CloudNode cannot reach rammus services, especially when Dockhand on the CloudNode cannot talk to rammus Docker at `192.168.0.12:2375`.
+- [`Add a new service on rammus`](./runbooks/add-rammus-service.md) — the five places that must agree: compose, AdGuard rewrite, CloudNode `/etc/hosts`, Homarr `extra_hosts`, and the Pangolin target.
 - [`Fix Pocket-ID shared data path`](./runbooks/fix-pocket-id-shared-data.md) — Use this to remediate `F-POCKETID-1 / C1`, where Pocket-ID mounts the shared repo `data/` directory instead of a dedicated path.
 - [`Recreate CloudNode Traefik after recreating Gerbil`](./runbooks/recreate-traefik-after-gerbil.md) — Use this whenever `gerbil` has been recreated, replaced, or force-recreated on the CloudNode.
 
@@ -67,21 +71,30 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`pangolin`](./services/pangolin.md) — Fossorial Pangolin — control plane, dashboard, API, and database for the whole stack. All other Fossorial components (Gerbil, Newt, Olm, Badger) read config from it.
 - [`pocket-id`](./services/pocket-id.md) — OIDC / passkey-first identity provider. Used as the SSO gateway behind Traefik for admin UIs (`auth.example.com`).
 - [`qbit-proxy`](./services/qbit-proxy.md) — Local reverse-proxy sidecar for Homarr's qBittorrent widget. Built from in-repo Dockerfile.
-- [`termix`](./services/termix.md) — Web-based SSH terminal / tunneling / file editor at `termix.example.com`.
 - [`traefik-log-dashboard (agent + UI)`](./services/traefik-log-dashboard.md) — Two services, one codebase: the **agent** tails Traefik's JSON access/error logs and exposes a parsed stream; the **dashboard** renders that stream in a React SPA with geolocation, status-code breakdowns, and service metrics.
 - [`traefik`](./services/traefik.md) — Edge reverse-proxy and TLS terminator for everything exposed behind `*.example.com`. Shares Gerbil's network namespace.
 - [`badger`](./services/badger.md) — Traefik CrowdSec bouncer plugin (`v1.4.0`). Not a container; runs inside Traefik.
-- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.4.4`), not a container.
+- [`olm`](./services/olm.md) — WireGuard endpoint for LAN reachability. CloudNode systemd service (`1.9.1` verified 2026-10-27), with a root-only credential file.
 
 ## CloudNode Services (Archived)
 - [`linkstack`](./services/linkstack.md) — Self-hosted Linktree replacement (archived — replaced by `landing` on 2026-04-21).
+- [`termix`](./services/termix.md) — absent from the 2026-10-27 live inventory; its existing recovery volume is retained.
 
 ## CloudNode Services (Removed)
 - [`adguard-home`](./services/adguard-home.md) — ~~Network-wide DNS filtering~~ **REMOVED 2026-04-21**. iPhone now uses `1.1.1.1` directly. Config preserved at `./config/adguard-home/`.
 
-## HomeNode Services
+## Application Services (all running on rammus)
+
+These pages were written for the pre-2026-11-21 NASUS layout. Every service in
+this section now runs on [rammus](./hosts/rammus.md) under
+`/opt/docker/stacks/<service>/`, with appdata at `/opt/docker/config/<service>`.
+Read host paths and IPs in these pages as historical.
+
+`scryer` (media acquisition manager, WebUI `request.example.com`) runs on rammus
+but has no dedicated page yet.
+
+- [`arr-mcp`](./services-homenode/arr-mcp.md) — authenticated media MCP on loopback, reached from CloudNode through supervised SSH.
 - [`bazarr`](./services-homenode/bazarr.md) — Subtitle manager for Sonarr + Radarr. LinuxServer.io image.
-- [`cleanuparr`](./services-homenode/cleanuparr.md) — Automated cleanup for qBit / Sonarr / Radarr — removes failed / stalled / redundant downloads so they stop taking up disk and swarm slots.
 - [`dashdot (HomeNode)`](./services-homenode/dashdot.md) — Lightweight system dashboard for HomeNode. Separate instance from the CloudNode dashdot (which lives at [services/dashdot](./services/dashdot.md)).
 - [`flaresolverr`](./services-homenode/flaresolverr.md) — Cloudflare anti-bot challenge solver. Runs a headless browser; Prowlarr and the *arr apps proxy indexer requests through it when hitting sites protected by Cloudflare's Under-Attack Mode / Turnstile.
 - [`hawser`](./services-homenode/hawser.md) — Dockhand's remote agent. The CloudNode Dockhand connects to this agent over TCP to manage HomeNode containers in the same UI as CloudNode containers.
@@ -90,9 +103,15 @@ Flat catalog of the current wiki contents. This is the fastest content map for b
 - [`profilarr`](./services-homenode/profilarr.md) — Quality-profile manager for Sonarr / Radarr — keeps custom formats, quality definitions, and naming schemes in sync across the *arr apps from a central spec.
 - [`prowlarr`](./services-homenode/prowlarr.md) — Indexer manager for the *arr suite — federates torrent/usenet indexers into one API that Sonarr/Radarr query.
 - [`qbittorrent`](./services-homenode/qbittorrent.md) — Torrent client. LinuxServer.io image. Serves web UI at `torrent.example.com` (Traefik-routed). **Runs with no VPN sidecar** — outbound swarm traffic exits on the ISP IP.
-- [`qui`](./services-homenode/qui.md) — autobrr's "qui" — modern web UI for managing qBittorrent torrents (sort, bulk re-category, cross-seed workflows, etc.).
 - [`radarr`](./services-homenode/radarr.md) — Movie manager. LinuxServer.io image. Twin of Sonarr, with `/movies` instead of `/tv`.
 - [`recyclarr`](./services-homenode/recyclarr.md) — CLI + cron job that applies TRaSH-Guides recommended quality profiles and custom formats to Sonarr / Radarr. Runs on a schedule, not a long-lived server.
 - [`seerr`](./services-homenode/seerr.md) — Media request front-end for end users — they ask for a movie / show, it hands the request to Sonarr / Radarr for fulfilment.
 - [`sonarr`](./services-homenode/sonarr.md) — TV series manager. LinuxServer.io image.
 - [`traefik (HomeNode)`](./services-homenode/traefik.md) — Home-LAN reverse proxy for all HomeNode services. Terminates TLS for `*.example.com` via Cloudflare DNS challenge. Distinct from the CloudNode Traefik.
+
+## HomeNode Services (Archived)
+- [`qui`](./services-homenode/qui.md) and [`cleanuparr`](./services-homenode/cleanuparr.md) — absent from the 2026-10-27 live inventory; historical configuration only.
+
+## Current Maintenance
+- [2026-10-27 maintenance record](./maintenance-2026-10-27.md) — live inventory, applied fixes, verification and disposition of the deep-sweep recommendations.
+- [Monitoring and arr-mcp](./runbooks/monitoring-and-arr-mcp.md) — supervised tunnel and watchdog operations.

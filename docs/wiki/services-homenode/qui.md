@@ -2,7 +2,7 @@
 title: "qui"
 slug: homenode-qui
 type: service
-status: active
+status: archived
 tags: ["homelab", "homenode", "service", "qui"]
 aliases: ["qui"]
 entities:
@@ -16,6 +16,11 @@ last_ingested: 2026-04-17
 last_lint: 2026-04-17
 ---
 # qui
+
+**Historical (pre-2026-11-21 NASUS layout). Do not deploy. Live: [[../hosts/rammus.md]].**
+
+Absent from the verified 2026-10-27 live NAS inventory. The following describes
+historical configuration; do not recreate the service as routine maintenance.
 
 autobrr's "qui" — modern web UI for managing qBittorrent torrents (sort,
 bulk re-category, cross-seed workflows, etc.).

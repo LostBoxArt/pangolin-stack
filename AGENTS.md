@@ -104,9 +104,10 @@ Apps:
 - Verified live on 2026-11-21: Pangolin `1.26.0`, Gerbil `1.6.0`, CloudNode
   Traefik `v3.7.19`. Treat version numbers here as a snapshot, not a pin.
 - Source pins after the 2026-11-06 sweep (`stacks/*/docker-compose.yml`): Pangolin
-  `1.26.0`, Gerbil `1.6.0`, Traefik `v3.7.17`, Badger plugin `v1.8.0`, Homarr
-  `v2.11.1`, Pocket-ID `v2.19.2`, CrowdSec Web UI `2026.11.5`. The CloudNode
-  Traefik compose pin (`v3.7.17`) lags the live `v3.7.19`; reconcile before redeploying.
+  `1.26.0`, Gerbil `1.6.0`, Traefik `v3.7.19`, Badger plugin `v1.8.0`, Homarr
+  `v2.13.1`, Pocket-ID `v2.19.2`, CrowdSec Web UI `2026.11.11`. Traefik, Homarr
+  and CrowdSec Web UI were corrected to the running images on 2026-11-21
+  (`docker inspect`), so the reference pins now match the deployed set.
 - CrowdSec Web UI persistent state uses `/app/data` (`state.db`) and the host service UID.
 - Newt runs on **rammus**; its current snapshot pins `1.19.0`.
 - rammus runs Traefik `3.7.17` (pinned) and Plex/qBittorrent/dashdot on `:latest`.
@@ -197,6 +198,15 @@ Live application compose files are **not** in this repo. They run on rammus unde
 `/opt/docker/stacks/<service>/docker-compose.yml`, with appdata at
 `/opt/docker/config/<service>`. The `host-configs/homenode/` tree is a stale
 snapshot and must not be deployed over the live host.
+
+**The CloudNode clone `/home/jesus/pangolin-stack` is the deployment source and
+is deliberately dirty.** It carries the real `dennisb.xyz` hostnames where this
+repo uses `example.com`, and it is often ahead on image pins. Never
+`git reset --hard` or `git checkout .` there: that would replace live hostnames
+with placeholders and roll back pins on a running host. On 2026-11-21 the working
+tree was ahead of `main` by three pins (`traefik:v3.7.19`,
+`homarr:v2.13.1`, `crowdsec-web-ui:2026.11.11`); those were copied into the repo
+rather than the clone being reset.
 
 ## Key Environment Variables
 From `.env` (all are referenced in compose):

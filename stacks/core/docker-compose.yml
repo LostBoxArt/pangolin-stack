@@ -68,7 +68,7 @@ services:
     depends_on:
       pangolin:
         condition: service_healthy
-    image: traefik:v3.7.17
+    image: traefik:v3.7.19
     network_mode: service:gerbil
     restart: unless-stopped
     volumes:

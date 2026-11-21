@@ -34,14 +34,13 @@ services:
     environment:
       - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
       - TZ=Asia/Jerusalem
+    # Must match the live container (`docker inspect homarr`). sonarr, radarr,
+    # bazarr and profilarr are omitted: those containers are stopped and absent
+    # since the 2026-11-21 move, so a pin for them only hides real DNS failures.
     extra_hosts:
+      - "request.example.com:192.168.0.12"
       - "torrent.example.com:192.168.0.12"
-      - "sonarr.example.com:192.168.0.12"
-      - "radarr.example.com:192.168.0.12"
-      - "bazarr.example.com:192.168.0.12"
       - "prowlarr.example.com:192.168.0.12"
-      - "profilarr.example.com:192.168.0.12"
       - "nasus.example.com:192.168.0.12"
       - "adguard.example.com:192.168.0.12"
       - "plex.example.com:192.168.0.12"
-      - "request.example.com:192.168.0.12"

@@ -70,10 +70,49 @@ class WatchdogTests(unittest.TestCase):
         self.assertIn('recovered', self.run_checks({'critical': True, 'Tailscale router': False})[1])
         self.assertEqual(self.run_checks({'critical': True, 'Tailscale router': False})[1], '')
 
+    def test_explicit_origin_does_not_fallback_to_public_dns_on_failure(self):
+        with mock.patch.object(watchdog, 'curl_check', return_value=None) as curl, mock.patch.object(watchdog, '_resolve_via_upstream') as resolve:
+            self.assertFalse(watchdog.http_check('https://dennisb.xyz/', [200], resolved_ip='51.195.100.11'))
+            self.assertEqual(curl.call_args.kwargs['resolved_ip'], '51.195.100.11')
+            resolve.assert_not_called()
+
+    def test_residential_edge_probe_uses_public_dns_and_ssh_with_tls(self):
+        ok = subprocess.CompletedProcess([], 0, '200', '')
+        with mock.patch.object(watchdog, '_resolve_via_upstream', return_value='188.114.97.3'), mock.patch.object(watchdog.subprocess, 'run', return_value=ok) as run:
+            self.assertTrue(watchdog.residential_landing_check())
+        cmd = run.call_args.args[0]
+        self.assertIn('StrictHostKeyChecking=yes', cmd)
+        self.assertIn('jesus@192.168.0.12', cmd)
+        self.assertIn('dennisb.xyz:443:188.114.97.3', cmd[-1])
+        self.assertNotIn(' -k ', f' {cmd[-1]} ')
+        with mock.patch.object(watchdog, '_resolve_via_upstream', return_value=None), mock.patch.object(watchdog.subprocess, 'run') as run:
+            self.assertFalse(watchdog.residential_landing_check())
+            run.assert_not_called()
+
+    def test_collector_keeps_landing_and_dash_paths_separate(self):
+        calls = []
+        def http(url, expect, **kwargs):
+            calls.append((url, expect, kwargs))
+            return True
+        with mock.patch.object(watchdog, 'ping', return_value=True), \
+             mock.patch.object(watchdog, 'container_health', side_effect=lambda checks, *args: {c['container']: True for c in checks}), \
+             mock.patch.object(watchdog, 'http_check', side_effect=http), \
+             mock.patch.object(watchdog, 'residential_landing_check', return_value=True) as residential, \
+             mock.patch.object(watchdog.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)):
+            results = watchdog.collect_checks()
+        self.assertTrue(results['Public landing'])
+        residential.assert_called_once()
+        origin = next(x for x in calls if x[0] == 'https://dennisb.xyz/')
+        self.assertEqual(origin[2]['resolved_ip'], '51.195.100.11')
+        self.assertEqual(origin[1], [200])
+        auth = next(x for x in calls if x[0] == 'https://dash.dennisb.xyz/')
+        self.assertIn(401, auth[1])
+        self.assertNotIn(200, auth[1])
+
     def test_public_denials_and_auth_boundary(self):
         for check in watchdog.PUBLIC:
             self.assertNotIn(403, check['expect'])
-        prefix = 'https://pangolin.example.com/auth/resource/'
+        prefix = 'https://pangolin.dennisb.xyz/auth/resource/'
         self.assertTrue(watchdog.response_matches(302, {'Location': prefix + 'test'}, [302], prefix))
         self.assertFalse(watchdog.response_matches(302, {'Location': 'https://unexpected.test/'}, [302], prefix))
         self.assertFalse(watchdog.response_matches(403, {}, [302], prefix))
@@ -84,7 +123,7 @@ class WatchdogTests(unittest.TestCase):
         checks = [{'name': n, 'container': n} for n in ['a', 'b', 'c', 'missing']]
         output = subprocess.CompletedProcess([], 1, '/a|running|healthy\n/b|running|none\n/c|running|unhealthy\n', '')
         with mock.patch.object(watchdog.subprocess, 'run', return_value=output) as run:
-            result = watchdog.container_health(checks, '192.168.1.10')
+            result = watchdog.container_health(checks, '192.168.0.12')
         self.assertEqual(result, {'a': True, 'b': True, 'c': False, 'missing': False})
         run.assert_called_once()
         self.assertEqual(run.call_args.args[0][0], 'ssh')
@@ -122,8 +161,18 @@ class WatchdogTests(unittest.TestCase):
         self.assertEqual(cmd[cmd.index('--interface') + 1], 'olm')
         self.assertEqual(cmd[cmd.index('--noproxy') + 1], '*')
 
+    def test_media_checks_follow_scryer_migration(self):
+        checks = {item['name']: item['container'] for item in watchdog.RAMMUS_SSH}
+        for name in ('Sonarr', 'Radarr', 'Bazarr', 'Profilarr', 'Recyclarr'):
+            self.assertNotIn(name, checks)
+        self.assertEqual(checks['Scryer'], 'scryer')
+        for name in ('qBit', 'Prowlarr', 'Plex', 'arr-mcp'):
+            self.assertIn(name, checks)
+        probe = next(c for c in watchdog.PUBLIC if c['name'] == 'request.dennisb.xyz')
+        self.assertEqual(probe['expect'], [200, 301, 302, 307])
+
     def test_removed_fileflows_is_not_monitored(self):
-        self.assertFalse(any('fileflows' in str(c).lower() for c in watchdog.NASUS_SSH))
+        self.assertFalse(any('fileflows' in str(c).lower() for c in watchdog.RAMMUS_SSH))
 
 
 class DiagnosticsTests(unittest.TestCase):

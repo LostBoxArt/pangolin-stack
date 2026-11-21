@@ -45,8 +45,8 @@ SILENT_CHECKS = {"Tailscale router"}
 # ── Ping checks ────────────────────────────────────────────────────
 
 PING = [
-    {"name": "NASUS", "host": "192.168.1.10"},
-    {"name": "Tailscale router", "host": "100.64.0.1"},
+    {"name": "NASUS", "host": "192.168.0.10"},
+    {"name": "Tailscale router", "host": "100.74.203.121"},
 ]
 
 # ── CloudNode local (Docker bridge / localhost) ────────────────────
@@ -55,12 +55,11 @@ CLOUDNODE = [
     {"name": "Traefik",         "url": "http://127.0.0.1:80/",               "expect": [200, 404]},
     {"name": "SearXNG",         "url": "http://127.0.0.1:8889/",             "expect": [200]},
     {"name": "Homarr",          "url": "http://127.0.0.1:7575/",             "expect": [200, 301, 302]},
-    {"name": "Dashdot",         "url": "http://127.0.0.1:3001/",             "expect": [200, 301, 302]},
     {"name": "CrowdSec",        "url": "http://127.0.0.1:8080/",             "expect": [200, 401, 404]},
     {"name": "CrowdSec Web UI", "url": "http://127.0.0.1:3458/",             "expect": [200, 301, 302]},
     {"name": "arr-mcp tunnel",  "url": "http://127.0.0.1:16060/healthz",       "expect": [200]},
-    {"name": "Olm data path", "url": "http://192.168.1.10:2375/_hawser/health",
-     "expect": [200], "interface": "olm"},
+    {"name": "Olm data path", "url": "http://192.168.0.12:2375/_hawser/health",
+     "expect": [200], "interface": "olm", "fallback_interface": "tailscale0"},
 ]
 
 # A running container without a healthcheck only proves process availability.
@@ -74,55 +73,72 @@ CLOUDNODE_DOCKER = [
     {"name": "qBit proxy", "container": "qbit-proxy"},
 ]
 
-# ── NASUS via SSH (services on Docker bridge, not host-mapped) ────
+# ── rammus via SSH (every home application since 2026-11-21) ───────
 
-NASUS_SSH = [
+RAMMUS = "192.168.0.12"
+RAMMUS_SSH = [
     {"name": "Newt",        "container": "newt"},
-    {"name": "NAS Traefik", "container": "traefik"},
+    {"name": "Rammus Traefik", "container": "traefik"},
+    {"name": "Dashdot rammus", "container": "dashdot"},
     {"name": "Hawser",      "container": "hawser"},
     {"name": "arr-mcp",     "container": "arr-mcp"},
-    {"name": "FlareSolverr", "container": "flaresolverr"},
-    {"name": "Sonarr",      "container": "sonarr"},
-    {"name": "Radarr",      "container": "radarr"},
+    {"name": "Scryer",      "container": "scryer"},
     {"name": "qBit",        "container": "qbittorrent"},
     {"name": "Prowlarr",    "container": "prowlarr"},
-    {"name": "Seerr",       "container": "seerr"},
-    {"name": "Bazarr",      "container": "bazarr"},
     {"name": "Plex",        "container": "plex"},
-    # Auxiliary media services. These currently have no container healthcheck,
-    # so this verifies that they remain running rather than application health.
-    {"name": "Recyclarr",   "container": "recyclarr"},
-    {"name": "Profilarr",   "container": "profilarr"},
 
 ]
-
-# ── NASUS host-mapped services (ports exposed on the NAS IP) ────────
-
-NASUS_DIRECT = []
 
 # ── Public URLs (Cloudflare → CloudNode → tunnel → NASUS) ─────────
 
 PUBLIC = [
-    {"name": "Public landing", "url": "https://example.com/", "expect": [200]},
-    {"name": "request.example.com", "url": "https://request.example.com/", "expect": [200, 301, 302, 307]},
-    {"name": "plex.example.com", "url": "https://plex.example.com/", "expect": [200, 301, 302, 307, 401]},
+    {"name": "Landing origin", "url": "https://dennisb.xyz/", "expect": [200],
+     "resolved_ip": "51.195.100.11"},
+    {"name": "request.dennisb.xyz", "url": "https://request.dennisb.xyz/", "expect": [200, 301, 302, 307]},
+
+    {"name": "plex.dennisb.xyz", "url": "https://plex.dennisb.xyz/", "expect": [200, 301, 302, 307, 401]},
     # This checks the authentication boundary, not Homarr's application health.
-    {"name": "Home auth boundary", "url": "https://home.example.com/", "expect": [302, 401],
-     "redirect_prefix": "https://pangolin.example.com/auth/resource/"},
-    {"name": "dash.example.com", "url": "https://dash.example.com/", "expect": [200, 301, 302, 307]},
-    {"name": "dockhand.example.com", "url": "https://dockhand.example.com/", "expect": [200, 301, 302, 307, 401]},
+    {"name": "Home auth boundary", "url": "https://home.dennisb.xyz/", "expect": [302, 401],
+     "redirect_prefix": "https://pangolin.dennisb.xyz/auth/resource/"},
+    # Auth response proves the boundary, not the application behind it.
+    {"name": "dash.dennisb.xyz", "url": "https://dash.dennisb.xyz/", "expect": [401, 302],
+     "redirect_prefix": "https://pangolin.dennisb.xyz/auth/resource/"},
+    {"name": "dockhand.dennisb.xyz", "url": "https://dockhand.dennisb.xyz/", "expect": [200, 301, 302, 307, 401]},
 ]
 
 TIMEOUT = 8
 
 # ── Helpers ────────────────────────────────────────────────────────
 
-def ping(host):
+def ping(host, attempts=3):
+    """ICMP over a tunnel (Tailscale) drops single packets easily; require
+    only one success out of a few attempts so a blip does not cascade into
+    every NASUS-dependent service being marked down at once."""
+    for _ in range(attempts):
+        try:
+            r = subprocess.run(["ping", "-c", "1", "-W", "3", host], capture_output=True, timeout=10)
+            if r.returncode == 0:
+                return True
+        except Exception:
+            pass
+    return False
+
+def ssh_probe(host, timeout=8):
+    """Authoritative reachability probe: SSH answers only if the host and the
+    tunnel path are genuinely up. Used as the gate for NASUS-dependent checks."""
     try:
-        r = subprocess.run(["ping", "-c", "1", "-W", "3", host], capture_output=True, timeout=10)
+        r = subprocess.run(
+            ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5",
+             "-o", "StrictHostKeyChecking=yes", f"jesus@{host}", "true"],
+            capture_output=True, timeout=timeout)
         return r.returncode == 0
     except Exception:
         return False
+
+def host_reachable(host):
+    # SSH is the strong signal; ping alone is not (single-packet drops over
+    # Tailscale caused a 9-service false outage on 2026-11-15).
+    return ssh_probe(host) or ping(host)
 
 def _resolve_via_upstream(host):
     """Resolve a hostname using a known-working upstream DNS (bypass system resolver)."""
@@ -141,6 +157,24 @@ def _resolve_via_upstream(host):
     except Exception:
         return None
 
+def residential_landing_check():
+    """Probe the public edge from rammus, bypassing its split DNS rewrite."""
+    ip = _resolve_via_upstream('dennisb.xyz')
+    if not ip:
+        return False
+    command = ['curl', '--noproxy', '*', '-sS', '-o', '/dev/null', '-w', '%{http_code}',
+               '--connect-timeout', '4', '--max-time', str(TIMEOUT),
+               '--resolve', f'dennisb.xyz:443:{ip}', 'https://dennisb.xyz/']
+    try:
+        result = subprocess.run(
+            ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
+             '-o', 'StrictHostKeyChecking=yes', f'jesus@{RAMMUS}', shlex.join(command)],
+            capture_output=True, text=True, timeout=TIMEOUT + 7)
+        return result.returncode == 0 and result.stdout.strip() == '200'
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
 def response_matches(status, headers, expect, redirect_prefix=None):
     return status in expect and (
         not redirect_prefix or status == 401 or headers.get("Location", "").startswith(redirect_prefix)
@@ -151,8 +185,10 @@ def curl_check(url, expect, timeout, ssl_verify, redirect_prefix, resolved_ip=No
     # curl's total deadline also bounds DNS, unlike urlopen's socket timeout.
     cmd = ["curl", "-s", "-D", "-", "-o", "/dev/null", "-w", "\n%{http_code}",
            "--connect-timeout", str(timeout), "--max-time", str(timeout)]
+    if interface or resolved_ip:
+        cmd += ["--noproxy", "*"]
     if interface:
-        cmd += ["--noproxy", "*", "--interface", interface]
+        cmd += ["--interface", interface]
     if resolved_ip:
         from urllib.parse import urlparse
         parsed = urlparse(url)
@@ -173,10 +209,19 @@ def curl_check(url, expect, timeout, ssl_verify, redirect_prefix, resolved_ip=No
         return None
 
 
-def http_check(url, expect, timeout=TIMEOUT, ssl_verify=True, redirect_prefix=None, interface=None):
-    result = curl_check(url, expect, timeout, ssl_verify, redirect_prefix, interface=interface)
+def http_check(url, expect, timeout=TIMEOUT, ssl_verify=True, redirect_prefix=None, interface=None, resolved_ip=None, fallback_interface=None):
+    result = curl_check(url, expect, timeout, ssl_verify, redirect_prefix, resolved_ip=resolved_ip, interface=interface)
     if result is not None:
         return result
+    if fallback_interface and fallback_interface != interface:
+        # The bound interface's tunnel may be up while its data path is dead
+        # (peer registered in Pangolin, WG handshake counters frozen). Retry
+        # once via the fallback interface, which uses the proven subnet route.
+        result = curl_check(url, expect, timeout, ssl_verify, redirect_prefix, resolved_ip=resolved_ip, interface=fallback_interface)
+        if result is not None:
+            return result
+    if resolved_ip:
+        return False  # An explicit origin must never silently switch to public DNS.
     from urllib.parse import urlparse
     parsed = urlparse(url)
     if not parsed.hostname:
@@ -198,7 +243,7 @@ def container_health(containers, host=None):
     if host:
         # The NAS wrapper performs its approved sudo call internally.
         cmd = ["ssh", "-o", "ConnectTimeout=5", "-o", "BatchMode=yes",
-               "-o", "StrictHostKeyChecking=yes", f"admin@{host}", shlex.join(cmd)]
+               "-o", "StrictHostKeyChecking=yes", f"jesus@{host}", shlex.join(cmd)]
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
         # A missing container makes inspect return nonzero while still reporting others.
@@ -216,14 +261,23 @@ def collect_checks():
     results = {c["name"]: ping(c["host"]) for c in PING}
     local = container_health(CLOUDNODE_DOCKER)
     results.update({c["name"]: local[c["container"]] for c in CLOUDNODE_DOCKER})
-    nasus_up = results.get("NASUS", False)
-    if nasus_up:
-        remote = container_health(NASUS_SSH, "192.168.1.10")
-        results.update({c["name"]: remote[c["container"]] for c in NASUS_SSH})
-    checks = CLOUDNODE + PUBLIC + (NASUS_DIRECT if nasus_up else [])
+    # Gate on real reachability: SSH first (strong), ping as fallback.
+    # A single dropped ICMP over Tailscale must not cascade into 9 phantom failures.
+    # NASUS is storage only: reported on its own, gates nothing.
+    results["NASUS"] = results.get("NASUS", False) or host_reachable("192.168.0.10")
+    # One "rammus" failure instead of nine container failures when the host is unreachable.
+    rammus_up = host_reachable(RAMMUS)
+    results["rammus"] = rammus_up
+    if rammus_up:
+        remote = container_health(RAMMUS_SSH, RAMMUS)
+        results.update({c["name"]: remote[c["container"]] for c in RAMMUS_SSH})
+    # This is the residential public-edge path; a failure also includes rammus/SSH/DNS failures.
+    results["Public landing"] = residential_landing_check() if rammus_up else False
+    checks = CLOUDNODE + PUBLIC
     def check(c):
         return http_check(c["url"], c["expect"], redirect_prefix=c.get("redirect_prefix"),
-                          interface=c.get("interface"))
+                          interface=c.get("interface"), resolved_ip=c.get("resolved_ip"),
+                          fallback_interface=c.get("fallback_interface"))
     with ThreadPoolExecutor(max_workers=6) as executor:
         results.update(zip((c["name"] for c in checks), executor.map(check, checks)))
     try:
